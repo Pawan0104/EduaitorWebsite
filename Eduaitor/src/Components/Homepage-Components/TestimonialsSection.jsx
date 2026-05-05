@@ -1,44 +1,44 @@
 import React, { useRef, useEffect, useState } from "react";
 import "./TestimonialsSection.css";
 
-const testimonials = [
-  {
-    quote:
-      "EduAitor cut our monthly admin workload by 60%. Fee collection that used to take our staff 3 days now runs automatically. The ROI was clear within the first term.",
-    name: "Rajesh Kumar",
-    role: "Principal, Delhi Public School, Jaipur",
-    img: "https://randomuser.me/api/portraits/men/32.jpg",
-    rating: 5,
-    tag: "Fee Management",
-  },
-  {
-    quote:
-      "As a parent, I finally feel in the loop. Real-time attendance alerts, fee receipts on my phone, direct chat with teachers — everything I needed in one app.",
-    name: "Priya Sharma",
-    role: "Parent, Sunshine International School",
-    img: "https://randomuser.me/api/portraits/women/44.jpg",
-    rating: 5,
-    tag: "Parent App",
-  },
-  {
-    quote:
-      "The analytics dashboard alone is worth it. I can see which students need intervention before the term ends — not after. That's transformational for our teachers.",
-    name: "Dr. Anita Verma",
-    role: "Academic Director, Wisdom Group of Schools",
-    img: "https://randomuser.me/api/portraits/women/68.jpg",
-    rating: 5,
-    tag: "Analytics",
-  },
-  {
-    quote:
-      "We manage 4 campuses and 12,000 students. EduAitor handles all of it from one login. Vendor management, payroll, academics — everything synced, zero duplicates.",
-    name: "Sandeep Agarwal",
-    role: "Chairman, Agarwal Education Trust",
-    img: "https://randomuser.me/api/portraits/men/45.jpg",
-    rating: 5,
-    tag: "Multi-Campus",
-  },
-];
+// const testimonials = [
+//   {
+//     quote:
+//       "EduAitor cut our monthly admin workload by 60%. Fee collection that used to take our staff 3 days now runs automatically. The ROI was clear within the first term.",
+//     name: "Rajesh Kumar",
+//     role: "Principal, Delhi Public School, Jaipur",
+//     img: "https://randomuser.me/api/portraits/men/32.jpg",
+//     rating: 5,
+//     tag: "Fee Management",
+//   },
+//   {
+//     quote:
+//       "As a parent, I finally feel in the loop. Real-time attendance alerts, fee receipts on my phone, direct chat with teachers — everything I needed in one app.",
+//     name: "Priya Sharma",
+//     role: "Parent, Sunshine International School",
+//     img: "https://randomuser.me/api/portraits/women/44.jpg",
+//     rating: 5,
+//     tag: "Parent App",
+//   },
+//   {
+//     quote:
+//       "The analytics dashboard alone is worth it. I can see which students need intervention before the term ends — not after. That's transformational for our teachers.",
+//     name: "Dr. Anita Verma",
+//     role: "Academic Director, Wisdom Group of Schools",
+//     img: "https://randomuser.me/api/portraits/women/68.jpg",
+//     rating: 5,
+//     tag: "Analytics",
+//   },
+//   {
+//     quote:
+//       "We manage 4 campuses and 12,000 students. EduAitor handles all of it from one login. Vendor management, payroll, academics — everything synced, zero duplicates.",
+//     name: "Sandeep Agarwal",
+//     role: "Chairman, Agarwal Education Trust",
+//     img: "https://randomuser.me/api/portraits/men/45.jpg",
+//     rating: 5,
+//     tag: "Multi-Campus",
+//   },
+// ];
 
 const platformStats = [
   { val: "4.9", unit: "/5", label: "App Store Rating" },
@@ -48,6 +48,25 @@ const platformStats = [
 
 export default function TestimonialsSection() {
   const [visible, setVisible] = useState(false);
+ const [testimonials, setTestimonials] = useState([]);
+
+useEffect(() => {
+  fetch(`${import.meta.env.VITE_API_URL}/testimonials?activeOnly=true`)
+  //              ^^^^ .env — not just .meta
+    .then((res) => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    })
+    .then((data) => {
+      if (data.success) {setTestimonials(data.data);
+        console.log("Loaded testimonials:", data.data);
+      }
+      //                                     ^^^^^ data.data, not data
+      else console.error("Failed to load testimonials:", data.message);
+    })
+    .catch((err) => console.error("Error fetching testimonials:", err));
+}, []);
+
   const ref = useRef(null);
   useEffect(() => {
     const obs = new IntersectionObserver(
@@ -86,7 +105,7 @@ export default function TestimonialsSection() {
 
         {/* Cards grid */}
         <div className="testi__grid">
-          {testimonials.map((t, i) => (
+          {testimonials.slice(0,4).map((t, i) => (
             <div
               className={`testi__card ${visible ? "testi__card--show" : ""}`}
               key={i}
@@ -105,7 +124,7 @@ export default function TestimonialsSection() {
 
               <div className="testi__user">
                 <div className="testi__avatar-wrap">
-                  <img src={t.img} alt={t.name} className="testi__avatar" />
+                  <img src={t.image} alt={t.name} className="testi__avatar" />
                   <div className="testi__avatar-ring" />
                 </div>
                 <div>

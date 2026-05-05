@@ -6,7 +6,8 @@ import connectDB from "./config/db.js";
 import planRoute from "./routes/planRoute.js";
 import settingRoute from "./routes/settingRoute.js";
 import demoRoute from "./routes/demoRoute.js";
-
+import logoRoute from "./routes/logoRoutes.js";
+import testimonialRoute from "./routes/testimonialsRoute.js";
 dotenv.config();
 
 const app = express();
@@ -51,6 +52,8 @@ app.get("/", (req, res) => {
 app.use("/api/plans", planRoute);
 app.use("/api/settings", settingRoute);
 app.use("/api/demo", demoRoute);
+app.use("/api/logos", logoRoute);
+app.use("/api/testimonials", testimonialRoute);
 
 /* ─── 404 ─── */
 app.use((req, res) => {

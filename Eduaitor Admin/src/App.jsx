@@ -6,6 +6,9 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import Plan from "./pages/Plan";
 import Setting from "./pages/Setting";
 import Demos from "./pages/Demos";
+import Institute from "./pages/Institute";
+import Testimonials from "../src/pages/Testimonials";
+import Award from "./pages/Award";
 
 const ComingSoon = ({ name }) => (
   <div className="flex items-center justify-center min-h-[60vh] t-base">
@@ -58,6 +61,9 @@ export default function App() {
         {/* <Route path="team" element={<ComingSoon name="Team" />} />
         <Route path="visit" element={<ComingSoon name="Visits" />} /> */}
         <Route path="contact" element={<ComingSoon name="Contacts" />} />
+        <Route path="institute" element={<Institute />} />
+        <Route path="testimonial" element={<Testimonials />} />
+        <Route path="award" element={<Award />} />
         <Route path="gallery" element={<ComingSoon name="Gallery" />} />
         <Route path="blog" element={<ComingSoon name="Blogs" />} />
         <Route path="setting" element={<Setting />} />

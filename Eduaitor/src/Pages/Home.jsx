@@ -23,22 +23,23 @@ import AwardsSection from "../Components/Homepage-Components/AwardsSection";
 import { NavLink } from "react-router-dom";
 import Counter from "../Components/Counter";
 
-const logos = [
-  logo1,
-  logo2,
-  logo3,
-  logo4,
-  logo5,
-  logo6,
-  logo7,
-  logo8,
-  logo9,
-  logo10,
-  logo11,
-  logo12,
-  logo13,
-  logo14,
-];
+// const logos = [
+//   logo1,
+//   logo2,
+//   logo3,
+//   logo4,
+//   logo5,
+//   logo6,
+//   logo7,
+//   logo8,
+//   logo9,
+//   logo10,
+//   logo11,
+//   logo12,
+//   logo13,
+//   logo14,
+// ];
+
 
 const stats = [
   { end: 1250, suffix: "+", label: "Institutions Onboarded" },
@@ -136,7 +137,17 @@ export default function Home() {
   const [statsRef, statsVisible] = useScrollReveal();
   const [whyRef, whyVisible] = useScrollReveal();
   const [taglineRef, taglineVisible] = useScrollReveal();
+  const [logos, setLogos] = useState([]);
 
+  useEffect(() => {
+  const lolo = fetch(`${import.meta.env.VITE_API_URL}/logos?activeOnly=true`)
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("Fetched logos:", data.logos)
+      setLogos(data.logos.map((l) => l.imageUrl))
+    })
+    .catch((err) => console.error("Error fetching logos:", err));
+}, []);
   return (
     <div className="hm-root">
       {/* ── HERO ─────────────────────────────────── */}
@@ -263,7 +274,7 @@ export default function Home() {
         </p>
         <div className="hm-logos__slider">
           <div className="hm-logos__track">
-            {[...logos, ...logos].map((logo, i) => (
+            {logos.map((logo, i) => (
               <img key={i} src={logo} alt="" className="hm-logos__img" />
             ))}
           </div>

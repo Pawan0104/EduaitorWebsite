@@ -45,7 +45,7 @@ export const sendUserConfirmation = async (demo) => {
 
   const result = await resend.emails.send({
     from: FROM,
-    to: [demo.email],
+    to: [process.env.ADMIN_MAIL],
     subject: "✅ Your EduAItor Demo is Booked!",
     html,
   });

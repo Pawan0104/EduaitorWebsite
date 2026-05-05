@@ -1,0 +1,322 @@
+/* ── Billing Toggle ── */
+.pricing-page .billing-toggle-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px 0;
+}
+
+.pricing-page .billing-toggle {
+  display: inline-flex;
+  background: #f5f3ff;
+  border: 1px solid #e0daf7;
+  border-radius: 99px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.pricing-page .billing-btn {
+  padding: 8px 24px;
+  border-radius: 99px;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #7a7a9a;
+  transition: all 0.18s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pricing-page .billing-btn.active {
+  background: #ffffff;
+  color: #1a1a2e;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pricing-page .save-badge {
+  font-size: 11px;
+  font-weight: 500;
+  background: #d4f3e8;
+  color: #0f6e56;
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+
+/* ── Student Estimator ── */
+.pricing-page .estimator-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 20px 20px 0;
+}
+
+.pricing-page .estimator {
+  background: #fafafa;
+  border: 1px solid #eeeef5;
+  border-radius: 14px;
+  padding: 16px 22px;
+  width: 100%;
+  max-width: 660px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pricing-page .estimator-label {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pricing-page .estimator-label strong {
+  color: #1a1a2e;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.pricing-page .estimator-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.pricing-page .preset-btn {
+  padding: 5px 14px;
+  border-radius: 8px;
+  border: 1px solid #e0daf7;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #6b7280;
+  transition: all 0.15s;
+}
+
+.pricing-page .preset-btn:hover {
+  border-color: #7b4dc4;
+  color: #7b4dc4;
+}
+
+.pricing-page .preset-btn.selected {
+  background: #7b4dc4;
+  color: #fff;
+  border-color: #7b4dc4;
+}
+
+.pricing-page .custom-student-input {
+  width: 90px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid #e0daf7;
+  font-size: 13px;
+  color: #1a1a2e;
+  outline: none;
+}
+
+.pricing-page .custom-student-input:focus {
+  border-color: #7b4dc4;
+}
+
+/* ── Plan Cards ── */
+.pricing-page .plans-section {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+  padding: 40px 20px 60px;
+}
+
+.pricing-page .plan-card {
+  width: 360px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 30px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+  transition: 0.3s;
+  position: relative;
+}
+
+.pricing-page .plan-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(123, 77, 196, 0.1);
+}
+
+.pricing-page .plan-card.highlighted {
+  border: 2px solid #7b4dc4;
+}
+
+.pricing-page .popular-tag {
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #7b4dc4;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 14px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+
+.pricing-page .plan-card h2 {
+  color: #7b4dc4;
+  font-size: 1.8rem;
+  margin: 0 0 8px;
+}
+
+.pricing-page .plan-desc {
+  margin: 0 0 20px;
+  color: #555;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ── Price Block ── */
+.pricing-page .price-block {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  background: #f9f7ff;
+  border-radius: 10px;
+  border: 1px solid #ede9fb;
+}
+
+.pricing-page .price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+  margin-bottom: 4px;
+}
+
+.pricing-page .price-currency {
+  font-size: 18px;
+  font-weight: 600;
+  color: #7b4dc4;
+}
+
+.pricing-page .price-amount {
+  font-size: 38px;
+  font-weight: 700;
+  color: #1a1a2e;
+  line-height: 1;
+}
+
+.pricing-page .price-unit {
+  font-size: 13px;
+  color: #9ca3af;
+  margin-left: 4px;
+}
+
+.pricing-page .price-total {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.pricing-page .yearly-note {
+  color: #0f6e56;
+  font-weight: 500;
+}
+
+/* ── CTA ── */
+.pricing-page .plans-section .demo-btn {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 1.5px solid #7b4dc4;
+  border-radius: 8px;
+  color: #7b4dc4;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: 24px;
+  transition: all 0.2s;
+}
+
+.pricing-page .plans-section .demo-btn:hover {
+  background: #f5f3ff;
+}
+
+.pricing-page .plans-section .demo-btn.demo-btn-primary {
+  background: #7b4dc4;
+  color: #fff;
+  border-color: #7b4dc4;
+}
+
+.pricing-page .plans-section .demo-btn.demo-btn-primary:hover {
+  background: #6a3db0;
+}
+
+/* ── Features ── */
+.pricing-page .feature-box h4 {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9ca3af;
+  margin: 0 0 12px;
+}
+
+.pricing-page .feature-box ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pricing-page .feature-box ul li {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.4;
+}
+
+.pricing-page .feature-check {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #f0ebff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.pricing-page .feature-inherited {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.pricing-page .feature-inherited .feature-check {
+  background: #f3f4f6;
+}
+
+/* ── Footnote ── */
+.pricing-page .pricing-footnote {
+  text-align: center;
+  padding: 0 20px 60px;
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.pricing-page .pricing-footnote a {
+  color: #7b4dc4;
+  text-decoration: none;
+}
+
+.pricing-page .pricing-footnote a:hover {
+  text-decoration: underline;
+}

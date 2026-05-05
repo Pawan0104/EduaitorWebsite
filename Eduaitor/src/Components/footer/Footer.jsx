@@ -81,7 +81,7 @@ const Footer = () => {
             <li><NavLink to="/">  Home</NavLink></li>
             <li><NavLink to="/aboutus">  About Us</NavLink></li>
             <li><NavLink to="/contactus">  Contact Us</NavLink></li>
-            <li><NavLink to="/marketplace">  Marketplace</NavLink></li> 
+            <li><NavLink to="/plans">  Plans</NavLink></li> 
             <li><NavLink to="/solution">Solution</NavLink></li> 
           </ul>
         </div>

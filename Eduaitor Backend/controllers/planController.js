@@ -2,6 +2,8 @@ import Plan from "../models/plan.js";
 
 /* ───────── GET ALL ───────── */
 export const getPlans = async (req, res) => {
+  console.log("hit api ")
+  console.log("query params:", req.query?.active) // Log the 'active' query parameter;
   try {
     const filter = {};
 

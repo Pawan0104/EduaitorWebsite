@@ -226,3 +226,39 @@ body {
   color: var(--text-primary);
   background-color: var(--bg-hover);
 }
+
+/* ========================================================================================================
+============================================================================================================
+========================================================================================================= */
+/* stgyle for intitution logos  */
+
+.institute-grid {
+  display: grid;
+  grid-template-columns: 330px 1fr;
+  gap: 22px;
+  align-items: start;
+}
+
+/* 📱 Mobile */
+@media (max-width: 768px) {
+  .lm-page {
+    padding: 16px !important;
+  }
+
+  .institute-grid {
+    grid-template-columns: 1fr; /* stack */
+  }
+}
+
+/* 📲 Small mobile */
+@media (max-width: 480px) {
+  .lm-page {
+    padding: 12px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .logo-form {
+    position: static !important;
+  }
+}

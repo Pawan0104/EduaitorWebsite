@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import "./AwardsSection.css";
+import { Link } from "react-router-dom";
 import awardLogo1 from "../../assets/awardLogo1.webp";
 import awardLogo2 from "../../assets/awardLogo2.webp";
 import awardLogo3 from "../../assets/awardLogo3.webp";
@@ -94,7 +95,7 @@ export default function AwardsSection() {
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
             </a>
-            <a href="/pricing" className="aw__cta-btn aw__cta-btn--ghost">View Pricing</a>
+            <a link="/palns" className="aw__cta-btn aw__cta-btn--ghost">View Pricing</a>
           </div>
         </div>
 

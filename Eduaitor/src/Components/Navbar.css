@@ -166,8 +166,8 @@
   }
 
   .nav-btn button {
-    padding: 10px 22px;
-    font-size: 14px;
+    padding: 10px 12px;
+    font-size: 12px;
   }
 }
 
@@ -215,12 +215,13 @@
 
   .nav-links.active {
     right: 0;
+    top: 12vh;
   }
 
   .nav-links li {
     width: 100%;
     padding: 15px 0;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 2px solid #f0f0f0;
   }
 
   .nav-links li:last-child {
@@ -247,7 +248,7 @@
   .nav-links.active::before {
     content: "";
     position: fixed;
-    top: 70px;
+    top: 12vh;
     left: 0;
     width: calc(100vw - 280px);
     height: calc(100vh - 70px);
@@ -265,7 +266,16 @@
   .nav-links {
     width: 250px;
   }
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
+  .logo img {
+    margin-top: 3px;
+    height: 60px; /* Further reduced for smaller screens */
+  }
   .nav-links.active::before {
     width: calc(100vw - 250px);
   }
