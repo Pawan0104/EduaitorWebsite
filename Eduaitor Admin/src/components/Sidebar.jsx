@@ -32,6 +32,17 @@ const NAV_SECTIONS = [
   {
     label: "Content",
     links: [
+      {
+        name: "Institutions Logos",
+        path: "/admin/institute",
+        icon: <FaEnvelope />,
+      },
+      {
+        name: "Testimonials",
+        path: "/admin/testimonial",
+        icon: <FaEnvelope />,
+      },
+      { name: "Awards", path: "/admin/award", icon: <FaEnvelope /> },
       { name: "Contacts", path: "/admin/contact", icon: <FaEnvelope /> },
       { name: "Gallery", path: "/admin/gallery", icon: <FaImages /> },
       { name: "Blogs", path: "/admin/blog", icon: <FaBlog /> },

@@ -28,56 +28,6 @@
 
 /* ================= PLAN CARDS ================= */
 
-.pricing-page .plans-section {
-  display: flex;
-  justify-content: center;
-  gap: 30px;
-  flex-wrap: wrap;
-  padding: 40px 20px 80px;
-}
-
-.pricing-page .plan-card {
-  width: 320px;
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 30px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
-  transition: 0.3s;
-}
-
-.pricing-page .plan-card:hover {
-  transform: translateY(-8px);
-}
-
-.pricing-page .highlighted {
-  border: 2px solid #7b4dc4;
-}
-
-.pricing-page .plan-card h2 {
-  color: #7b4dc4;
-  font-size: 1.8rem;
-}
-
-.pricing-page .plan-desc {
-  margin: 15px 0;
-  color: #555;
-}
-
-.pricing-page .plans-section .demo-btn {
-  width: 100%;
-  padding: 12px;
-  background: #7b4dc4;
-  border: none;
-  border-radius: 8px;
-  color: #fff;
-  cursor: pointer;
-  margin-bottom: 20px;
-}
-
-.pricing-page .plans-section .demo-btn:hover {
-  background: #7b4dc4;
-}
 
 /* ================= FEATURES ================= */
 
@@ -141,75 +91,162 @@
 }
 
 /* ================= COMPARISON ================= */
-
-.pricing-page .comparison-section {
-  padding: 120px 20px;
-  background: linear-gradient(180deg, #ffffff, #f8fbff);
-}
-
-.pricing-page .comparison-container {
-  max-width: 1100px;
-  margin: auto;
-  text-align: center;
-}
-
-.pricing-page .comparison-sub {
-  margin-bottom: 50px;
-  color: #555;
-}
-
-.pricing-page .comparison-table {
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
-}
-
-.pricing-page .row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  padding: 18px;
-  border-bottom: 1px solid #f1f5f9;
-  transition: 0.2s;
-}
-
-.pricing-page .row:hover {
-  background: #111;
-  color: #fff;
-}
-
-.pricing-page .header {
-  background: #7b4dc4;
-  color: white;
-  font-weight: 600;
-}
-
-.pricing-page .check {
-  color: #7b4dc4;
-  font-weight: bold;
-}
-
-/* ================= RESPONSIVE ================= */
-
-@media (max-width: 768px) {
-
-  .pricing-page .pricing-header h1 {
-    font-size: 2rem;
-  }
-
-  .pricing-page .plan-card {
-    width: 100%;
-  }
-
-  .pricing-page .feature-card {
-    width: 100%;
-  }
-
-  .pricing-page .comparison-table {
-    overflow-x: auto;
-  }
-
-  .pricing-page .row {
-    min-width: 600px;
-  }
-}
+ .comparison-section {
+          padding: 80px 20px;
+          background: linear-gradient(180deg, #ffffff, #f8fbff);
+        }
+ 
+        .comparison-container {
+          max-width: 860px;
+          margin: auto;
+          text-align: center;
+        }
+ 
+        .comparison-container h2 {
+          font-size: 2rem;
+          font-weight: 700;
+          color: #1a1a2e;
+          margin-bottom: 8px;
+        }
+ 
+        .comparison-sub {
+          color: #6b7280;
+          margin-bottom: 48px;
+          font-size: 15px;
+        }
+ 
+        /* Table */
+        .comparison-table {
+          background: #ffffff;
+          border-radius: 16px;
+          box-shadow: 0 15px 40px rgba(0, 0, 0, 0.05);
+          overflow: hidden;
+          border: 1px solid #ede9fb;
+          text-align: left;
+        }
+ 
+        /* Sticky header */
+        .comparison-header {
+          display: grid;
+          grid-template-columns: 1fr 160px 160px;
+          background: #7b4dc4;
+          color: white;
+          font-weight: 600;
+          font-size: 15px;
+          position: sticky;
+          top: 0;
+          z-index: 2;
+        }
+ 
+        .comparison-header > div {
+          padding: 18px 20px;
+        }
+ 
+        .comparison-header .col-plan {
+          text-align: center;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 4px;
+        }
+ 
+        .header-plan-name { font-weight: 700; font-size: 15px; }
+ 
+        .header-popular-pill {
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          background: rgba(255,255,255,0.25);
+          padding: 2px 10px;
+          border-radius: 99px;
+        }
+ 
+        /* Category group */
+        .category-group { }
+ 
+        .category-label {
+          display: grid;
+          grid-template-columns: 1fr 160px 160px;
+          background: #f5f3ff;
+          border-top: 1px solid #ede9fb;
+          border-bottom: 1px solid #ede9fb;
+        }
+ 
+        .category-label > div:first-child {
+          padding: 10px 20px;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: #7b4dc4;
+        }
+ 
+        .category-label > div:not(:first-child) {
+          background: #ede9fb;
+        }
+ 
+        /* Feature rows */
+        .comparison-row {
+          display: grid;
+          grid-template-columns: 1fr 160px 160px;
+          border-bottom: 1px solid #f1f5f9;
+          transition: background 0.18s;
+          animation: fadeSlideIn 0.35s ease both;
+        }
+ 
+        .comparison-row:last-child { border-bottom: none; }
+ 
+        .comparison-row:hover { background: #faf8ff; }
+ 
+        @keyframes fadeSlideIn {
+          from { opacity: 0; transform: translateY(6px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+ 
+        .comparison-row > div {
+          padding: 15px 20px;
+          font-size: 14px;
+          color: #374151;
+          display: flex;
+          align-items: center;
+        }
+ 
+        .comparison-row .col-plan-cell {
+          justify-content: center;
+        }
+ 
+        /* Check / Cross icons */
+        .icon-check, .icon-cross {
+          width: 22px;
+          height: 22px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+ 
+        .icon-check { background: #ede9fb; }
+        .icon-cross  { background: #f3f4f6; }
+ 
+        /* Highlighted premium column stripe */
+        .comparison-row .col-premium,
+        .category-label .col-premium {
+          background: rgba(123, 77, 196, 0.03);
+        }
+ 
+        /* Responsive */
+        @media (max-width: 600px) {
+          .comparison-header,
+          .category-label,
+          .comparison-row {
+            grid-template-columns: 1fr 90px 90px;
+          }
+ 
+          .comparison-header > div,
+          .comparison-row > div {
+            padding: 12px 10px;
+            font-size: 13px;
+          }
+        }
