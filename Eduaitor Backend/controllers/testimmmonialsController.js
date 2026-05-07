@@ -1,5 +1,5 @@
 // controllers/testimonialController.js
-import Testimonial from "../models/Testimonial.js";
+import Testimonial from "../models/testimonial.js";
 import cloudinary  from "../middlewares/cloudinary.js";
 
 /* ─────────────────────────────────────────────────────────────────────────────
