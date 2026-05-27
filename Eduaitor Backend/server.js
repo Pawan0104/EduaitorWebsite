@@ -23,11 +23,7 @@ const allowedOrigins = [
     process.env.CLIENT_URL_3,
     "http://localhost:5173",
     "http://localhost:5174",
-<<<<<<< HEAD
-    "http://localhost:5175"
-=======
     "http://localhost:5175",
->>>>>>> 82f31ec9eb5efc04382e40f75ee6b105d395f8e6
 ].filter(Boolean); // .filter(Boolean) removes undefined if CLIENT_URL isn't set
 
 app.use(

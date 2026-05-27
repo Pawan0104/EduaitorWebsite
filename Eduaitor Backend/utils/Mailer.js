@@ -1,15 +1,3 @@
-<<<<<<< HEAD
-import nodemailer from "nodemailer";
-
-const transporter = nodemailer.createTransport({
-  service: "gmail",           // or use host/port for other providers (see note below)
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
-
-=======
 // import { Resend } from "resend";
 
 // // ── Resend client ─────────────────────────────────────────────
@@ -123,14 +111,13 @@ import nodemailer from "nodemailer";
 //   MAIL_PASS=your_app_password   ← Gmail: use an App Password, not your real password
 //   ADMIN_MAIL=admin@yourdomain.com
 const transporter = nodemailer.createTransport({
-  service: "gmail",           // or use host/port for other providers (see note below)
+  service: "gmail", // or use host/port for other providers (see note below)
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
 });
 
->>>>>>> 82f31ec9eb5efc04382e40f75ee6b105d395f8e6
 const FROM = `EduAItor <${process.env.EMAIL_USER}>`;
 const ADMIN_TO = process.env.ADMIN_MAIL;
 
@@ -169,7 +156,7 @@ export const sendUserConfirmation = async (demo) => {
 
   const result = await transporter.sendMail({
     from: FROM,
-    to: demo.email,         // ← sends to the actual user who booked
+    to: demo.email, // ← sends to the actual user who booked
     subject: "✅ Your EduAItor Demo is Booked!",
     html,
   });

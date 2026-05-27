@@ -156,30 +156,4 @@ export const reorderLogos = async (req, res) => {
     console.error(err);
     res.status(500).json({ success: false, message: "Failed to reorder" });
   }
-<<<<<<< HEAD
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-=======
-};
->>>>>>> 82f31ec9eb5efc04382e40f75ee6b105d395f8e6
