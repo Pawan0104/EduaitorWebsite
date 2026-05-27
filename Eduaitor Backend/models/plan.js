@@ -1,57 +1,53 @@
+// models/plan.model.js
 import mongoose from "mongoose";
 
 const planSchema = new mongoose.Schema(
-    {
-        name: {
-            type: String,
-            required: [true, "Plan name is required"],
-            trim: true,
-        },
-        price: {
-            type: Number,
-            required: [true, "Price is required"],
-            min: [0, "Price cannot be negative"],
-        },
-        duration: {
-            type: String,
-            enum: ["monthly", "quarterly", "yearly", "lifetime"],
-            default: "monthly",
-        },
-        badge: {
-            type: String,
-            default: "",
-            trim: true,
-        },
-        badgeColor: {
-            type: String,
-            default: "#6366f1",
-        },
-        ctaText: {
-            type: String,
-            default: "Get Started",
-            trim: true,
-        },
-        features: {
-            type: [String],
-            default: [],
-        },
-        isActive: {
-            type: Boolean,
-            default: true,
-        },
-        order: {
-            type: Number,
-            default: 0,
-        },
+  {
+    name: {
+      type: String,
+      required: [true, "Plan name is required"],
+      trim: true,
     },
-    {
-        timestamps: true,
-    }
+    short: {
+      type: String,
+      required: [true, "Short description is required"],
+      trim: true,
+    },
+    CTA: {
+      type: String,
+      default: "Request Demo",
+      trim: true,
+    },
+    price: {
+      monthly: {
+        type: Number,
+        required: [true, "Monthly price is required"],
+        min: [0, "Price cannot be negative"],
+      },
+      yearly: {
+        type: Number,
+        required: [true, "Yearly price is required"],
+        min: [0, "Price cannot be negative"],
+      },
+    },
+    highlight: {
+      type: Boolean,
+      default: false,
+    },
+    features: {
+      type: [String],
+      default: [],
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+    order: {
+      type: Number,
+      default: 0, // lower = shown first
+    },
+  },
+  { timestamps: true }
 );
 
-// Index for sorting by order then creation date
-planSchema.index({ order: 1, createdAt: 1 });
-
-const Plan = mongoose.model("Plan", planSchema);
-
-export default Plan;
+export default mongoose.model("Plan", planSchema);

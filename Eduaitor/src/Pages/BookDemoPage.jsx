@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState ,useRef,useEffect} from "react";
 import "./BookDemoPage.css";
 import Faqsection from "../Components/MarketPlace-components/Faqsection";
 import axios from "axios";
@@ -24,6 +24,7 @@ const BookDemoPage = () => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState("");
+   const successRef = useRef(null);
 
   const validateForm = () => {
     const newErrors = {};
@@ -98,268 +99,269 @@ const BookDemoPage = () => {
       answer: "Yes, you can request specific modules during your demo.",
     },
   ];
+ useEffect(() => {
+  if (submitStatus && successRef.current) {
+    const timer = setTimeout(() => {
+      successRef.current.scrollIntoView({ 
+        behavior: "smooth", 
+        block: "center" // Changed from 'start' to 'center'
+      });
+    }, 150); // Slightly longer delay to ensure DOM paint
+
+    return () => clearTimeout(timer);
+  }
+}, [submitStatus]);
 
   return (
     <div className="book-demo-page">
-      {/* Hero */}
-      <section className="hero-section">
-        <div className="container">
-          <div className="hero-grid">
-            <div className="hero-content">
-              <h1>Experience EduAitor Live – Your 30-Min Demo Awaits</h1>
-              <p>
-                Discover how our all-in-one platform transforms institution
-                management.
-              </p>
-              <ul className="benefits">
-                <li>
-                  <span>🎯</span> Personalized walkthrough
-                </li>
-                <li>
-                  <span>🚀</span> Real modules demo
-                </li>
-                <li>
-                  <span>💬</span> Live Q&A included
-                </li>
-                <li>
-                  <span>🆓</span> Zero commitment
-                </li>
-              </ul>
+      {/* Single full-viewport section — hero left, form right */}
+<section className="bookdemo-section">
+  <div className="container">
+    <div className="bookdemo-grid">
+
+      {/* ── LEFT: Hero content ── */}
+      <div className="hero-content">
+        <h1>Experience EduAitor Live – Your 30-Min Demo Awaits</h1>
+        <p>
+          Discover how our all-in-one platform transforms institution
+          management.
+        </p>
+        <ul className="benefits">
+          <li><span>🎯</span> Personalized walkthrough</li>
+          <li><span>🚀</span> Real modules demo</li>
+          <li><span>💬</span> Live Q&A included</li>
+          <li><span>🆓</span> Zero commitment</li>
+        </ul>
+
+        <div className="trust-panel">
+          <h3>What Happens After You Book</h3>
+          <div className="process-steps">
+            <div className="step">
+              <div className="step-number">1</div>
+              <p>We review your details instantly</p>
+            </div>
+            <div className="step">
+              <div className="step-number">2</div>
+              <p>Confirm your slot within 24 hours</p>
+            </div>
+            <div className="step">
+              <div className="step-number">3</div>
+              <p>Join seamless Zoom/Meet demo</p>
             </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Booking Form */}
-      <section className="booking-section">
-        <div className="container">
-          <div className="booking-grid">
-            <div className="trust-panel">
-              <h3>What Happens After You Book</h3>
-              <div className="process-steps">
-                <div className="step">
-                  <div className="step-number">1</div>
-                  <p>We review your details instantly</p>
+      {/* ── RIGHT: Form ── */}
+      <div className="form-col" ref={successRef}>
+        <form className="demo-form" onSubmit={handleSubmit}>
+          {submitStatus ? (
+            <div className="success-message">
+              <h3>🎉 {submitStatus}</h3>
+              <button
+                type="button"
+                onClick={() => setSubmitStatus("")}
+                className="book-again"
+              >
+                Book Another Demo
+              </button>
+            </div>
+          ) : (
+            <>
+              {errors.submit && (
+                <div
+                  style={{
+                    color: "#ef4444",
+                    background: "rgba(239,68,68,0.08)",
+                    border: "1px solid rgba(239,68,68,0.2)",
+                    borderRadius: 8,
+                    padding: "10px 14px",
+                    marginBottom: 16,
+                    fontSize: 14,
+                  }}
+                >
+                  {errors.submit}
                 </div>
-                <div className="step">
-                  <div className="step-number">2</div>
-                  <p>Confirm your slot within 24 hours</p>
+              )}
+
+              <div className="form-section">
+                <h4>🏫 Institution Details</h4>
+                <div className="input-group">
+                  <input
+                    name="instName"
+                    placeholder="Institution Name *"
+                    value={formData.instName}
+                    onChange={handleChange}
+                    className={errors.instName ? "error" : ""}
+                  />
+                  {errors.instName && (
+                    <span className="error-text">{errors.instName}</span>
+                  )}
                 </div>
-                <div className="step">
-                  <div className="step-number">3</div>
-                  <p>Join seamless Zoom/Meet demo</p>
+                <div className="input-row">
+                  <div className="input-group">
+                    <select
+                      name="instType"
+                      value={formData.instType}
+                      onChange={handleChange}
+                    >
+                      <option value="">Institution Type *</option>
+                      <option value="school">School</option>
+                      <option value="college">College</option>
+                      <option value="coaching">Coaching Institute</option>
+                      <option value="university">University</option>
+                    </select>
+                    {errors.instType && (
+                      <span className="error-text">{errors.instType}</span>
+                    )}
+                  </div>
+                  <div className="input-group">
+                    <input
+                      name="students"
+                      placeholder="Number of Students"
+                      value={formData.students}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+                <div className="input-group">
+                  <input
+                    name="branches"
+                    placeholder="Number of Branches"
+                    value={formData.branches}
+                    onChange={handleChange}
+                  />
                 </div>
               </div>
-            </div>
 
-            <form className="demo-form" onSubmit={handleSubmit}>
-              {submitStatus ? (
-                <div className="success-message">
-                  <h3>🎉 {submitStatus}</h3>
-                  <button
-                    type="button"
-                    onClick={() => setSubmitStatus("")}
-                    className="book-again"
-                  >
-                    Book Another Demo
-                  </button>
-                </div>
-              ) : (
-                <>
-                  {errors.submit && (
-                    <div
-                      style={{
-                        color: "#ef4444",
-                        background: "rgba(239,68,68,0.08)",
-                        border: "1px solid rgba(239,68,68,0.2)",
-                        borderRadius: 8,
-                        padding: "10px 14px",
-                        marginBottom: 16,
-                        fontSize: 14,
-                      }}
-                    >
-                      {errors.submit}
-                    </div>
-                  )}
-
-                  <div className="form-section">
-                    <h4>🏫 Institution Details</h4>
-                    <div className="input-group">
-                      <input
-                        name="instName"
-                        placeholder="Institution Name *"
-                        value={formData.instName}
-                        onChange={handleChange}
-                        className={errors.instName ? "error" : ""}
-                      />
-                      {errors.instName && (
-                        <span className="error-text">{errors.instName}</span>
-                      )}
-                    </div>
-                    <div className="input-row">
-                      <div className="input-group">
-                        <select
-                          name="instType"
-                          value={formData.instType}
-                          onChange={handleChange}
-                        >
-                          <option value="">Institution Type *</option>
-                          <option value="school">School</option>
-                          <option value="college">College</option>
-                          <option value="coaching">Coaching Institute</option>
-                          <option value="university">University</option>
-                        </select>
-                        {errors.instType && (
-                          <span className="error-text">{errors.instType}</span>
-                        )}
-                      </div>
-                      <div className="input-group">
-                        <input
-                          name="students"
-                          placeholder="Number of Students"
-                          value={formData.students}
-                          onChange={handleChange}
-                        />
-                      </div>
-                    </div>
-                    <div className="input-group">
-                      <input
-                        name="branches"
-                        placeholder="Number of Branches"
-                        value={formData.branches}
-                        onChange={handleChange}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="form-section">
-                    <h4>👤 Contact Person</h4>
-                    <div className="input-row">
-                      <div className="input-group">
-                        <input
-                          name="contactName"
-                          placeholder="Full Name *"
-                          value={formData.contactName}
-                          onChange={handleChange}
-                          className={errors.contactName ? "error" : ""}
-                        />
-                        {errors.contactName && (
-                          <span className="error-text">
-                            {errors.contactName}
-                          </span>
-                        )}
-                      </div>
-                      <div className="input-group">
-                        <input
-                          name="designation"
-                          placeholder="Designation"
-                          value={formData.designation}
-                          onChange={handleChange}
-                        />
-                      </div>
-                    </div>
-                    <div className="input-row">
-                      <div className="input-group">
-                        <input
-                          name="email"
-                          type="email"
-                          placeholder="Official Email *"
-                          value={formData.email}
-                          onChange={handleChange}
-                          className={errors.email ? "error" : ""}
-                        />
-                        {errors.email && (
-                          <span className="error-text">{errors.email}</span>
-                        )}
-                      </div>
-                      <div className="input-group">
-                        <input
-                          name="phone"
-                          placeholder="Phone Number *"
-                          value={formData.phone}
-                          onChange={handleChange}
-                          className={errors.phone ? "error" : ""}
-                        />
-                        {errors.phone && (
-                          <span className="error-text">{errors.phone}</span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="input-group">
-                      <input
-                        name="city"
-                        placeholder="City / State"
-                        value={formData.city}
-                        onChange={handleChange}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="form-section">
-                    <h4>📅 Demo Preferences</h4>
-                    <div className="input-row">
-                      <div className="input-group">
-                        <input
-                          name="date"
-                          type="date"
-                          value={formData.date}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="input-group">
-                        <select
-                          name="time"
-                          value={formData.time}
-                          onChange={handleChange}
-                        >
-                          <option value="">Preferred Time Slot</option>
-                          <option value="10AM">10:00 AM – 11:00 AM</option>
-                          <option value="2PM">2:00 PM – 3:00 PM</option>
-                          <option value="4PM">4:00 PM – 5:00 PM</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div className="input-group">
-                      <select
-                        name="mode"
-                        value={formData.mode}
-                        onChange={handleChange}
-                      >
-                        <option value="zoom">Zoom (Recommended)</option>
-                        <option value="meet">Google Meet</option>
-                        <option value="inperson">In-Person (Jaipur)</option>
-                      </select>
-                    </div>
-                    <div className="input-group">
-                      <textarea
-                        name="message"
-                        placeholder="Special Requirements (Optional)"
-                        rows="3"
-                        value={formData.message}
-                        onChange={handleChange}
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="submit-btn"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <span className="spinner"></span> Booking…
-                      </>
-                    ) : (
-                      "Book Your Free Demo"
+              <div className="form-section">
+                <h4>👤 Contact Person</h4>
+                <div className="input-row">
+                  <div className="input-group">
+                    <input
+                      name="contactName"
+                      placeholder="Full Name *"
+                      value={formData.contactName}
+                      onChange={handleChange}
+                      className={errors.contactName ? "error" : ""}
+                    />
+                    {errors.contactName && (
+                      <span className="error-text">{errors.contactName}</span>
                     )}
-                  </button>
-                </>
-              )}
-            </form>
-          </div>
-        </div>
-      </section>
+                  </div>
+                  <div className="input-group">
+                    <input
+                      name="designation"
+                      placeholder="Designation"
+                      value={formData.designation}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+                <div className="input-row">
+                  <div className="input-group">
+                    <input
+                      name="email"
+                      type="email"
+                      placeholder="Official Email *"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className={errors.email ? "error" : ""}
+                    />
+                    {errors.email && (
+                      <span className="error-text">{errors.email}</span>
+                    )}
+                  </div>
+                  <div className="input-group">
+                    <input
+                      name="phone"
+                      placeholder="Phone Number *"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      className={errors.phone ? "error" : ""}
+                    />
+                    {errors.phone && (
+                      <span className="error-text">{errors.phone}</span>
+                    )}
+                  </div>
+                </div>
+                <div className="input-group">
+                  <input
+                    name="city"
+                    placeholder="City / State"
+                    value={formData.city}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              <div className="form-section">
+                <h4>📅 Demo Preferences</h4>
+                <div className="input-row">
+                  <div className="input-group">
+                    <input
+                      name="date"
+                      type="date"
+                      value={formData.date}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="input-group">
+                    <select
+                      name="time"
+                      value={formData.time}
+                      onChange={handleChange}
+                    >
+                      <option value="">Preferred Time Slot</option>
+                      <option value="10AM">10:00 AM – 11:00 AM</option>
+                      <option value="2PM">2:00 PM – 3:00 PM</option>
+                      <option value="4PM">4:00 PM – 5:00 PM</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="input-group">
+                  <select
+                    name="mode"
+                    value={formData.mode}
+                    onChange={handleChange}
+                  >
+                    <option value="zoom">Zoom (Recommended)</option>
+                    <option value="meet">Google Meet</option>
+                    <option value="inperson">In-Person (Jaipur)</option>
+                  </select>
+                </div>
+                <div className="input-group">
+                  <textarea
+                    name="message"
+                    placeholder="Special Requirements (Optional)"
+                    rows="3"
+                    value={formData.message}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="submit-btn"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <span className="spinner"></span> Booking…
+                  </>
+                ) : (
+                  "Book Your Free Demo"
+                )}
+              </button>
+            </>
+          )}
+        </form>
+      </div>
+
+    </div>
+  </div>
+</section>
 
       {/* Features */}
       <section className="features-section">

@@ -1,13 +1,14 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-// ── Resend client ─────────────────────────────────────────────
-// Set RESEND_API_KEY in your .env
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  service: "gmail",           // or use host/port for other providers (see note below)
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
-// RESEND_FROM must be a verified sender in your Resend dashboard
-// e.g.  RESEND_FROM=EduAItor <noreply@yourdomain.com>
-// During dev you can use:  onboarding@resend.dev  (only sends to your own email)
-const FROM = process.env.RESEND_FROM || "onboarding@resend.dev";
+const FROM = `EduAItor <${process.env.EMAIL_USER}>`;
 const ADMIN_TO = process.env.ADMIN_MAIL;
 
 // ── Helper: confirmation to the user who booked ───────────────
@@ -43,15 +44,14 @@ export const sendUserConfirmation = async (demo) => {
     </div>
   `;
 
-  const result = await resend.emails.send({
+  const result = await transporter.sendMail({
     from: FROM,
-    to: [process.env.ADMIN_MAIL],
+    to: demo.email,         // ← sends to the actual user who booked
     subject: "✅ Your EduAItor Demo is Booked!",
     html,
   });
 
-  // Log so you can see if Resend returns an error
-  console.log("User confirmation email result:", JSON.stringify(result));
+  console.log("User confirmation email result:", result.messageId);
   return result;
 };
 
@@ -92,13 +92,13 @@ export const sendAdminNotification = async (demo) => {
     </div>
   `;
 
-  const result = await resend.emails.send({
+  const result = await transporter.sendMail({
     from: FROM,
-    to: [ADMIN_TO],
+    to: ADMIN_TO,
     subject: `🆕 Demo Request – ${demo.instName} (${demo.instType})`,
     html,
   });
 
-  console.log("Admin notification email result:", JSON.stringify(result));
+  console.log("Admin notification email result:", result.messageId);
   return result;
 };

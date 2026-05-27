@@ -326,7 +326,7 @@ export default function SolutionPage() {
           <NavLink to="/bookademo" className="sp-btn sp-btn--primary sp-btn--lg">
             Get Started Free
           </NavLink>
-          <NavLink to="/pricing" className="sp-btn sp-btn--ghost sp-btn--lg">View Pricing</NavLink>
+          <NavLink to="/plans" className="sp-btn sp-btn--ghost sp-btn--lg">View Pricing</NavLink>
         </div>
       </section>
     </div>

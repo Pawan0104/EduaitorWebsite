@@ -106,6 +106,73 @@ const Fld = ({label, req, note, children}) => (
 // 
 const IS = { width:"100%",padding:"9px 13px",borderRadius:9,background:"var(--bg-base)",border:"1px solid var(--border)",color:"var(--text-primary)",fontSize:13,fontFamily:"'DM Sans',sans-serif",transition:"border-color 0.15s, box-shadow 0.15s" };
 
+/* ─────────────────────────────────────────────────────────────────────────────
+    AWARD VIEW MODAL
+───────────────────────────────────────────────────────────────────────────── */
+function AwardViewModal({ award, close }) {
+  if (!award) return null;
+
+  return (
+    <div className="lm-backdrop" onClick={close} style={{ zIndex: 1000 }}>
+      <div className="lm-anim-si" onClick={e => e.stopPropagation()} style={{
+        background: "var(--bg-surface)", border: "1px solid var(--border)",
+        borderRadius: 18, width: "100%", maxWidth: 440,
+        margin: 16, boxShadow: "var(--shadow)", overflow: "hidden",
+      }}>
+        {/* Header */}
+        <div style={{ padding: "15px 20px", borderBottom: "1px solid var(--border-sub)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <span className="lm-heading" style={{ fontWeight: 800, fontSize: 15, color: "var(--text-primary)" }}>
+            Award Details
+          </span>
+          <button onClick={close} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: 18 }}>✕</button>
+        </div>
+
+        {/* Hero Image Section */}
+        <div style={{ background: "var(--bg-base)", padding: "20px", textAlign: "center", borderBottom: "1px solid var(--border-sub)" }}>
+          <img 
+            src={award.imageUrl} 
+            alt={award.title} 
+            style={{ width: "100%", maxHeight: 200, borderRadius: 12, objectFit: "contain", background: "#fff", border: "1px solid var(--border)" }} 
+          />
+        </div>
+
+        {/* Content Section */}
+        <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: 14 }}>
+          <div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: "var(--text-primary)" }}>{award.title}</div>
+            <div style={{ fontSize: 13, color: "var(--accent)", fontWeight: 600, marginTop: 4 }}>Recognized in {award.year}</div>
+          </div>
+
+          {award.description && (
+            <div style={{ fontSize: 13, color: "var(--text-sec)", lineHeight: 1.6, background: "var(--bg-elevated)", padding: "12px 14px", borderRadius: 10, borderLeft: "3px solid var(--accent)" }}>
+              {award.description}
+            </div>
+          )}
+
+          {/* Meta Information */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 10, borderTop: "1px dashed var(--border)" }}>
+            <div style={{ display: "flex", gap: 15 }}>
+               <div style={{ fontSize: 12, color: "var(--text-muted)" }}>
+                  Order: <b style={{ color: "var(--text-primary)" }}>{award.order}</b>
+               </div>
+               <div style={{ fontSize: 12, color: "var(--text-muted)" }}>
+                  Visibility: <Badge on={award.isActive} />
+               </div>
+            </div>
+            
+            {/* Copy Link Button */}
+            <button
+              onClick={() => { navigator.clipboard.writeText(award.imageUrl); toast("Image Link copied!"); }}
+              style={{ background: "var(--bg-base)", border: "1px solid var(--border)", borderRadius: 6, padding: "5px 10px", fontSize: 11, cursor: "pointer", color: "var(--text-sec)" }}
+            >
+              Copy Image URL
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 /* ─────────────────────────────────────────────────────────────────────────────
    DROP ZONE
@@ -230,22 +297,72 @@ function AwardForm({ editTarget, onSuccess, clearEdit }) {
 /* ─────────────────────────────────────────────────────────────────────────────
    AWARD LIST (Right Panel)
 ───────────────────────────────────────────────────────────────────────────── */
-function AwardList({ awards, loading, onEdit, onDel, onToggle }) {
+function AwardList({ awards, loading, onEdit, onDel,onView }) {
   if (loading) return <div style={{ padding: 40, textAlign: "center" }}><Spin s={20} /></div>;
 
   return (
     <div className="lm-list" style={{ overflowY: "auto", maxHeight: "calc(100vh - 220px)" }}>
-      {awards.map((a, i) => (
-        <div key={a._id} className="lm-row" style={{ display: "grid", gridTemplateColumns: "60px 1fr 80px 100px", padding: "12px 16px", alignItems: "center", borderBottom: "1px solid var(--border-sub)" }}>
-          <img src={a.imageUrl} style={{ width: 45, height: 45, borderRadius: 8, objectFit: "cover" }} />
-          <div>
-            <p style={{ margin: 0, fontWeight: 600, fontSize: 13 }}>{a.title}</p>
-            <p style={{ margin: 0, fontSize: 11, color: "var(--text-muted)" }}>{a.year}</p>
+      {awards.map((a) => (
+        <div 
+          key={a._id} 
+          className="lm-row" 
+          style={{ 
+            display: "flex", 
+            flexWrap: "wrap",      /* Allows wrapping on very small screens */
+            gap: 16,               /* Increased global gap */
+            padding: "16px 20px",  /* More breathing room */
+            alignItems: "center", 
+            borderBottom: "1px solid var(--border-sub)" 
+          }}
+        >
+          {/* Left Section: Image and Info */}
+          <div style={{ display: "flex", alignItems: "center", gap: 14, flex: 1, minWidth: "200px" }}>
+            <img 
+              src={a.imageUrl} 
+              style={{ width: 48, height: 48, borderRadius: 10, objectFit: "cover", flexShrink: 0 }} 
+            />
+            <div style={{ minWidth: 0 }}> {/* minWidth 0 allows text truncation if needed */}
+              <p style={{ margin: "0 0 2px 0", fontWeight: 600, fontSize: 14, lineHeight: 1.2 }}>{a.title}</p>
+              <p style={{ margin: 0, fontSize: 12, color: "var(--text-muted)" }}>{a.year}</p>
+            </div>
           </div>
-          <Badge on={a.isActive} />
-          <div style={{ display: "flex", gap: 5 }}>
-            <IBtn onClick={() => onEdit(a)}>Edit</IBtn>
-            <IBtn danger onClick={() => onDel(a)}>Del</IBtn>
+
+          {/* Right Section: Status and Actions */}
+          <div style={{ 
+            display: "flex", 
+            alignItems: "center", 
+            gap: 16,               /* Spacing between Badge and Buttons */
+            justifyContent: "flex-end",
+            marginLeft: "auto"     /* Pushes this group to the right */
+          }}>
+            <Badge on={a.isActive} />
+            
+            <div style={{ display: "flex", gap: 8 }}> {/* Increased gap between Edit and Del */}
+              <IBtn title="View details" onClick={() => onView(a)}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+              </IBtn>
+
+              <IBtn 
+                onClick={() => onEdit(a)} 
+                style={{ padding: "6px 12px" }} /* Larger touch target */
+              >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--accent-text)" strokeWidth="2">
+                  <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" strokeLinecap="round" />
+                  <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" strokeLinecap="round" />
+                </svg>
+              </IBtn>
+             <IBtn 
+  danger 
+  onClick={() => onDel(a)} 
+  style={{ padding: "6px 10px" }}
+  title="Delete Award"
+>
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="3 6 5 6 21 6" />
+    <path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
+  </svg>
+</IBtn>
+            </div>
           </div>
         </div>
       ))}
@@ -254,6 +371,61 @@ function AwardList({ awards, loading, onEdit, onDel, onToggle }) {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
+   DELETE CONFIRMATION MODAL
+───────────────────────────────────────────────────────────────────────────── */
+function DelModal({ item, close, confirm }) {
+  if (!item) return null;
+
+  return (
+    <div className="lm-backdrop" onClick={close} style={{ zIndex: 1100 }}>
+      <div className="lm-anim-si" onClick={e => e.stopPropagation()} style={{
+        background: "var(--bg-surface)", border: "1px solid var(--border)",
+        borderRadius: 16, maxWidth: 380, width: "100%", margin: 16,
+        boxShadow: "var(--shadow)", padding: 24,
+      }}>
+        {/* Icon & Title Row */}
+        <div style={{ display: "flex", alignItems: "center", gap: 13, marginBottom: 14 }}>
+          <div style={{ 
+            width: 40, height: 40, borderRadius: 10, 
+            background: "var(--danger-soft)", border: "1px solid var(--danger-border)", 
+            display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 
+          }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--danger-text)" strokeWidth="2">
+              <polyline points="3 6 5 6 21 6" strokeLinecap="round" />
+              <path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" strokeLinecap="round" />
+            </svg>
+          </div>
+          <div>
+            <p className="lm-heading" style={{ margin: 0, fontWeight: 800, fontSize: 15, color: "var(--text-primary)" }}>Delete Award</p>
+            <p style={{ margin: "2px 0 0", fontSize: 11, color: "var(--text-muted)" }}>This will permanently remove the record.</p>
+          </div>
+        </div>
+
+        {/* Message */}
+        <p style={{ margin: "0 0 18px", fontSize: 13, color: "var(--text-sec)", lineHeight: 1.7 }}>
+          Are you sure you want to delete <strong style={{ color: "var(--text-primary)" }}>{item.title}</strong>? This action cannot be undone.
+        </p>
+
+        {/* Buttons */}
+        <div style={{ display: "flex", gap: 10 }}>
+          <button 
+            onClick={close} 
+            style={{ flex: 1, padding: "10px 0", borderRadius: 9, border: "1px solid var(--border)", background: "var(--bg-base)", color: "var(--text-sec)", fontWeight: 600, fontSize: 13, cursor: "pointer" }}
+          >
+            Cancel
+          </button>
+          <button 
+            onClick={() => confirm(item._id)} 
+            style={{ flex: 1, padding: "10px 0", borderRadius: 9, border: "1px solid var(--danger-border)", background: "var(--danger-soft)", color: "var(--danger-text)", fontWeight: 700, fontSize: 13, cursor: "pointer" }}
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+/* ─────────────────────────────────────────────────────────────────────────────
    ROOT PAGE
 ───────────────────────────────────────────────────────────────────────────── */
 export default function Award() {
@@ -261,6 +433,7 @@ export default function Award() {
   const [loading, setLoading] = useState(true);
   const [editT, setEditT] = useState(null);
   const [delT, setDelT] = useState(null);
+  const [viewT, setViewT] = useState(null);
 
   const load = useCallback(async () => {
     try {
@@ -290,16 +463,23 @@ export default function Award() {
           <p style={{ fontSize: 13, color: "var(--text-muted)" }}>Manage the items appearing in the Awards section of the frontend.</p>
         </div>
 
-        <div className="institute-grid" style={{ display: "grid", gridTemplateColumns: "400px 1fr", gap: 24, alignItems: "start" }}>
+        <div className="institute-grid" style={{ display: "grid", gridTemplateColumns: "autofit", gap: 24, alignItems: "start" }}>
           <AwardForm editTarget={editT} onSuccess={load} clearEdit={() => setEditT(null)} />
           
           <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 16, overflow: "hidden" }}>
             <div style={{ padding: "14px 18px", borderBottom: "1px solid var(--border-sub)", fontWeight: 700 }}>Active Awards ({awards.length})</div>
-            <AwardList awards={awards} loading={loading} onEdit={setEditT} onDel={setDelT} />
+            <AwardList awards={awards} loading={loading} onEdit={setEditT} onDel={setDelT}  onView={setViewT}/>
           </div>
         </div>
       </div>
-      {delT && <DelModal logo={delT} close={() => setDelT(null)} confirm={doDelete} />}
+   {delT && (
+  <DelModal 
+    item={delT} 
+    close={() => setDelT(null)} 
+    confirm={() => doDelete(delT._id)} 
+  />
+)}
+        <AwardViewModal award={viewT} close={() => setViewT(null)} />
       <Toasts />
     </>
   );

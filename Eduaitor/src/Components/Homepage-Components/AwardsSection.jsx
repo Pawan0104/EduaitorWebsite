@@ -22,7 +22,9 @@ const pressLogos = [
 
 export default function AwardsSection() {
   const [visible, setVisible] = useState(false);
+  const [awards,setAwards] =useState([]);
   const ref = useRef(null);
+
   useEffect(() => {
     const obs = new IntersectionObserver(
       ([e]) => { if (e.isIntersecting) setVisible(true); },
@@ -31,6 +33,17 @@ export default function AwardsSection() {
     if (ref.current) obs.observe(ref.current);
     return () => obs.disconnect();
   }, []);
+
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_URL}/awards`)
+    .then(res => res.json()).then(data => {
+      console.log("Fetched awards:", data.awards);
+      setAwards(data.awards);
+      // Here you would typically set the awards state with the fetched data
+    }).catch(err => {
+      console.error("Error fetching awards:", err);
+    });
+  }, [visible]);
 
   return (
     <section className="aw" ref={ref}>
@@ -62,10 +75,10 @@ export default function AwardsSection() {
                 Award
               </div>
               <div className="aw__logo-wrap">
-                <img src={a.logo} alt={a.title} />
+                <img src={a.imageUrl} alt={a.title} />
               </div>
               <h3 className="aw__card-title">{a.title}</h3>
-              <p className="aw__card-org">{a.org}</p>
+              <p className="aw__card-org">{a.description} - {a.year}</p>
             </div>
           ))}
         </div>

@@ -29,6 +29,7 @@ export const getAllAwards = async (req, res) => {
 
 export const createAward = async (req, res) => {
   try {
+    console.log("api hit")
     const { title, year, description, isActive, order } = req.body;
     if (!req.file) return res.status(400).json({ message: "Image required" });
 

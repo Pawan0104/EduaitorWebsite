@@ -52,7 +52,6 @@ export default function TestimonialsSection() {
 
 useEffect(() => {
   fetch(`${import.meta.env.VITE_API_URL}/testimonials?activeOnly=true`)
-  //              ^^^^ .env — not just .meta
     .then((res) => {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return res.json();
@@ -61,7 +60,6 @@ useEffect(() => {
       if (data.success) {setTestimonials(data.data);
         console.log("Loaded testimonials:", data.data);
       }
-      //                                     ^^^^^ data.data, not data
       else console.error("Failed to load testimonials:", data.message);
     })
     .catch((err) => console.error("Error fetching testimonials:", err));
@@ -124,7 +122,7 @@ useEffect(() => {
 
               <div className="testi__user">
                 <div className="testi__avatar-wrap">
-                  <img src={t.image} alt={t.name} className="testi__avatar" />
+                  <img src={t.image} alt="user image" className="testi__avatar" />
                   <div className="testi__avatar-ring" />
                 </div>
                 <div>

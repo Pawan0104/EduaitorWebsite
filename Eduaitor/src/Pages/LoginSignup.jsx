@@ -95,7 +95,7 @@ const LoginSignup = () => {
               >
                 Login
               </button>
-              <button
+              {/* <button
                 className={`toggle-btn ${!isLogin ? 'active' : ''}`}
                 onClick={() => {
                   setIsLogin(false);
@@ -104,7 +104,7 @@ const LoginSignup = () => {
                 }}
               >
                 Sign Up
-              </button>
+              </button> */}
             </div>
           </div>
         </div>

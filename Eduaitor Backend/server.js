@@ -8,6 +8,7 @@ import settingRoute from "./routes/settingRoute.js";
 import demoRoute from "./routes/demoRoute.js";
 import logoRoute from "./routes/logoRoutes.js";
 import testimonialRoute from "./routes/testimonialsRoute.js";
+import  awardRoute from "./routes/awardRoute.js";
 dotenv.config();
 
 const app = express();
@@ -21,7 +22,8 @@ const allowedOrigins = [
     process.env.CLIENT_URL_2,
     process.env.CLIENT_URL_3,
     "http://localhost:5173",
-    "http://localhost:5174"
+    "http://localhost:5174",
+    "http://localhost:5175"
 ].filter(Boolean); // .filter(Boolean) removes undefined if CLIENT_URL isn't set
 
 app.use(
@@ -54,6 +56,7 @@ app.use("/api/settings", settingRoute);
 app.use("/api/demo", demoRoute);
 app.use("/api/logos", logoRoute);
 app.use("/api/testimonials", testimonialRoute);
+app.use("/api/awards", awardRoute);
 
 /* ─── 404 ─── */
 app.use((req, res) => {
