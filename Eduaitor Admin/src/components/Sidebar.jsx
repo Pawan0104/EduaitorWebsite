@@ -32,8 +32,21 @@ const NAV_SECTIONS = [
   {
     label: "Content",
     links: [
+<<<<<<< HEAD
       { name: "Institutions Logos", path: "/admin/institute", icon: <FaEnvelope /> },
       { name: "Testimonials", path: "/admin/testimonial", icon: <FaEnvelope /> },
+=======
+      {
+        name: "Institutions Logos",
+        path: "/admin/institute",
+        icon: <FaEnvelope />,
+      },
+      {
+        name: "Testimonials",
+        path: "/admin/testimonial",
+        icon: <FaEnvelope />,
+      },
+>>>>>>> 82f31ec9eb5efc04382e40f75ee6b105d395f8e6
       { name: "Awards", path: "/admin/award", icon: <FaEnvelope /> },
       { name: "Contacts", path: "/admin/contact", icon: <FaEnvelope /> },
       { name: "Gallery", path: "/admin/gallery", icon: <FaImages /> },

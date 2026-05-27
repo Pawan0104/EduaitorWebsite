@@ -319,6 +319,7 @@
 
 .pricing-page .pricing-footnote a:hover {
   text-decoration: underline;
+<<<<<<< HEAD
 }
 .plans-loading {
   display: flex;
@@ -357,3 +358,6 @@
   font-weight: 500;
 }
  
+=======
+}
+>>>>>>> 82f31ec9eb5efc04382e40f75ee6b105d395f8e6
