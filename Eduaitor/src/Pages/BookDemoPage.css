@@ -363,7 +363,6 @@ input.error, select.error {
   padding: 50px 0;
   background: linear-gradient(135deg, #f5f3ff 0%, #e0e7ff 100%);
   text-align: center;
-  margin-bottom: 3vh;
 }
 
 .trust-footer p {

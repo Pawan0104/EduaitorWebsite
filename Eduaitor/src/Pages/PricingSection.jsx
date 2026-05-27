@@ -171,7 +171,7 @@ export default function PricingSection() {
         {!loading &&
           plans.map((plan) => {
             const rate =
-              plan?.price?.[billing] ?? plan?.pricing?.[billing] ?? 0;
+              plan?.price?.[billing] ?? plan?.pricing?.[billing] ?? "N/A";
             const totalPerMonth = rate * effectiveStudents;
 
             const isInherited = (f) =>

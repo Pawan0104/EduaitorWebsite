@@ -20,7 +20,7 @@ const Navbar = () => {
         <div className="logo">
           {
             <a href="/">
-              <img src="/eduaitorlogo.jpeg" alt="" />
+              <img src="/eduaitor.png" alt="" />
             </a>
           }
         </div>

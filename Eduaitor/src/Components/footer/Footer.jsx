@@ -8,7 +8,7 @@ const Footer = () => {
       <div className="footer-container">
         {/* Brand Section */}
         <div className="footer-column footer-brand">
-          <img className="logo" src="/logo1-Photoroom.png" alt="" />
+          <img className="logo" src="/eduaitor.png" alt="" />
           <p className="brand-description">
             An all-in-one SaaS platform that simplifies educational institute
             management and enriches the experiences of all stakeholders.
@@ -54,23 +54,23 @@ const Footer = () => {
         <div className="footer-column">
           <h3 className="column-title">Solutions</h3>
           <ul className="footer-links">
-            <li><a href="#">Admission Management</a></li>
-            <li><a href="#">Fee & Payroll Management</a></li>
-            <li><a href="#">Faculty Administration</a></li>
-            <li><a href="#">Student Information & Tracking</a></li>
-            <li><a href="#">Assessments & Results</a></li>
-            <li><a href="#">Transport Tracking System</a></li>
-            <li><a href="#">Inventory Management</a></li>
-            <li><a href="#">Classroom Management</a></li>
-            <li><a href="#">Curriculum Planning</a></li>
-            <li><a href="#">Online Learning</a></li>
-            <li><a href="#">Real-Time Communication System</a></li>
-            <li><a href="#">Documents & Data Management System</a></li>
-            <li><a href="#">Custom Reports & Analytics</a></li>
-            <li><a href="#">Teacher Training Programs</a></li>
-            <li><a href="#">Skill Development Courses</a></li>
-            <li><a href="#">Learning Marketplace</a></li>
-            <li><a href="#">Online Library</a></li>
+            <li><NavLink to="/solution">Admission Management</NavLink></li>
+            <li><NavLink to="/solution">Fee & Payroll Management</NavLink></li>
+            <li><NavLink to="/solution">Faculty Administration</NavLink></li>
+            <li><NavLink to="/solution">Student Information & Tracking</NavLink></li>
+            <li><NavLink to="/solution">Assessments & Results</NavLink></li>
+            {/* <li><NavLink to="/solution">Transport Tracking System</NavLink></li>
+            <li><NavLink to="/solution">Inventory Management</NavLink></li>
+            <li><NavLink to="/solution">Classroom Management</NavLink></li>
+            <li><NavLink to="/solution">Curriculum Planning</NavLink></li>
+            <li><NavLink to="/solution">Online Learning</NavLink></li>
+            <li><NavLink to="/solution">Real-Time Communication System</NavLink></li>
+            <li><NavLink to="/solution">Documents & Data Management System</NavLink></li>
+            <li><NavLink to="/solution">Custom Reports & Analytics</NavLink></li>
+            <li><NavLink to="/solution">Teacher Training Programs</NavLink></li>
+            <li><NavLink to="/solution">Skill Development Courses</NavLink></li>
+            <li><NavLink to="/solution">Learning Marketplace</NavLink></li>
+            <li><NavLink to="/solution">Online Library</NavLink></li> */}
           </ul>
         </div>
 
@@ -90,10 +90,10 @@ const Footer = () => {
         <div className="footer-column">
           <h3 className="column-title">Policies</h3>
           <ul className="footer-links">
-            <li><a href="#">Terms of Use</a></li>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Help & Support</a></li>
-            <li><a href="#">FAQs</a></li>
+            <li><NavLink to="/legal">Terms of Use</NavLink></li>
+            <li><NavLink to="/legal">Privacy Policy</NavLink></li>
+            <li><NavLink to="/legal">Help & Support</NavLink></li>
+            <li><NavLink to="/legal">FAQs</NavLink></li>
           </ul>
         </div>
       </div>

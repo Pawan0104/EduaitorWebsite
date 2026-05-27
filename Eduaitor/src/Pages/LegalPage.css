@@ -1,0 +1,430 @@
+/* ─────────────────────────────────────────────────────────
+   LegalPages.css  –  EduManage School Management
+   Depends on the project's :root variables (purple theme)
+───────────────────────────────────────────────────────── */
+
+/* ── Root wrapper ────────────────────────────────────── */
+.lp-root {
+  margin: 0 auto;
+  font-family: "Poppins", sans-serif;
+  padding: 100px;
+}
+
+/* ── Tab bar ─────────────────────────────────────────── */
+.lp-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  background: var(--purple-100);
+  border-radius: var(--radius-lg);
+  padding: 0.5rem;
+  margin-bottom: 2rem;
+  border: 1.5px solid var(--border-md);
+}
+
+.lp-tab {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.6rem 1rem;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-md);
+  font-family: "Poppins", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+  transition:
+    background 0.22s var(--ease-out),
+    color 0.22s var(--ease-out),
+    transform 0.18s var(--ease-spring);
+  white-space: nowrap;
+}
+
+.lp-tab:hover {
+  background: var(--purple-200);
+  color: var(--purple-700);
+  transform: translateY(-1px);
+}
+
+.lp-tab--active {
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 4px 14px var(--purple-glow);
+}
+
+.lp-tab--active:hover {
+  background: var(--primary-hover);
+  color: #ffffff;
+}
+
+.lp-tab-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.lp-tab-label {
+  font-size: 0.82rem;
+}
+
+/* ── Content wrapper ─────────────────────────────────── */
+.lp-content {
+  animation: lpFadeUp 0.35s var(--ease-out) both;
+}
+
+@keyframes lpFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Page shell ──────────────────────────────────────── */
+.lp-page {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Page header ─────────────────────────────────────── */
+.lp-page-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1.5px solid var(--border-md);
+}
+
+.lp-page-icon {
+  font-size: 2.2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.lp-page-title {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--purple-800);
+  margin: 0 0 0.2rem;
+  line-height: 1.2;
+}
+
+.lp-page-meta {
+  font-size: 0.8rem;
+  color: var(--text-3);
+  margin: 0;
+}
+
+/* ── Sub-section heading ─────────────────────────────── */
+.lp-sub-heading {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--purple-700);
+  margin: 0 0 1rem;
+}
+
+/* ── Section cards (Terms & Privacy) ────────────────── */
+.lp-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.lp-section-card {
+  display: flex;
+  gap: 1.1rem;
+  background: var(--purple-50);
+  border: 1.5px solid var(--border-md);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius-md);
+  padding: 1.1rem 1.25rem;
+  transition:
+    box-shadow 0.2s var(--ease-out),
+    transform 0.2s var(--ease-spring);
+}
+
+.lp-section-card:hover {
+  box-shadow: 0 6px 20px var(--purple-dim);
+  transform: translateY(-2px);
+}
+
+.lp-section-card--teal {
+  border-left-color: var(--teal);
+}
+
+.lp-section-num {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--purple-200);
+  line-height: 1;
+  flex-shrink: 0;
+  min-width: 2rem;
+}
+
+.lp-section-num--teal {
+  color: #a8eed9;
+}
+
+.lp-section-heading {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--purple-800);
+  margin: 0 0 0.4rem;
+}
+
+.lp-section-body {
+  font-size: 0.83rem;
+  color: var(--text-2);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ── Help & Support – channels grid ─────────────────── */
+.lp-channels-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.lp-channel-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1.2rem 1.1rem;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-md);
+  background: var(--purple-50);
+  transition:
+    transform 0.2s var(--ease-spring),
+    box-shadow 0.2s var(--ease-out);
+}
+
+.lp-channel-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px var(--purple-dim);
+}
+
+.lp-channel-card--purple {
+  border-top: 3px solid var(--primary);
+}
+.lp-channel-card--teal {
+  border-top: 3px solid var(--teal);
+}
+.lp-channel-card--gold {
+  border-top: 3px solid var(--gold);
+}
+
+.lp-channel-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.lp-channel-value {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--purple-800);
+}
+
+.lp-channel-btn {
+  margin-top: 0.6rem;
+  align-self: flex-start;
+  background: transparent;
+  border: 1.5px solid var(--primary);
+  color: var(--primary);
+  border-radius: var(--radius-sm);
+  padding: 0.3rem 0.8rem;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.18s,
+    color 0.18s;
+}
+
+.lp-channel-btn:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* ── Help – guides grid ──────────────────────────────── */
+.lp-guides-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.85rem;
+}
+
+.lp-guide-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1rem 1.1rem;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-md);
+  background: #ffffff;
+  transition:
+    box-shadow 0.2s var(--ease-out),
+    transform 0.2s var(--ease-spring);
+  cursor: pointer;
+}
+
+.lp-guide-card:hover {
+  box-shadow: 0 6px 18px var(--purple-dim);
+  transform: translateY(-2px);
+}
+
+.lp-guide-tag {
+  display: inline-block;
+  background: var(--purple-100);
+  color: var(--purple-700);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  width: fit-content;
+}
+
+.lp-guide-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--purple-900);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.lp-guide-link {
+  font-size: 0.78rem;
+  color: var(--primary);
+  font-weight: 500;
+  margin-top: 0.2rem;
+}
+
+/* ── FAQ ─────────────────────────────────────────────── */
+.lp-faq-category {
+  margin-bottom: 1.75rem;
+}
+
+.lp-faq-cat-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.3rem 0.9rem;
+  border-radius: 999px;
+  margin-bottom: 0.9rem;
+}
+
+.lp-faq-category--purple {
+  background: var(--purple-100);
+  color: var(--purple-700);
+}
+.lp-faq-category--gold {
+  background: #fef9e7;
+  color: #92600a;
+}
+.lp-faq-category--teal {
+  background: #e6faf5;
+  color: #0a6e56;
+}
+
+.lp-faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.lp-faq-item {
+  border: 1.5px solid var(--border-md);
+  border-radius: var(--radius-md);
+  padding: 0.95rem 1.1rem;
+  background: #ffffff;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s var(--ease-out);
+}
+
+.lp-faq-item:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 14px var(--purple-dim);
+}
+
+.lp-faq-item--open {
+  border-color: var(--primary);
+  background: var(--purple-50);
+}
+
+.lp-faq-q {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--purple-800);
+  line-height: 1.4;
+}
+
+.lp-faq-chevron {
+  font-size: 0.65rem;
+  color: var(--primary);
+  flex-shrink: 0;
+  transition: transform 0.2s var(--ease-spring);
+}
+
+.lp-faq-a {
+  margin: 0.7rem 0 0;
+  font-size: 0.83rem;
+  color: var(--text-2);
+  line-height: 1.7;
+}
+
+/* ── Responsive ──────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .lp-root {
+    padding: 100px 60px;
+  }
+}
+
+@media (max-width: 600px) {
+  .lp-root {
+    padding: 100px 30px;
+  }
+  .lp-tab-label {
+    display: none;
+  }
+
+  .lp-tab {
+    padding: 0.65rem;
+  }
+
+  .lp-tab-icon {
+    font-size: 1.25rem;
+  }
+
+  .lp-page-title {
+    font-size: 1.25rem;
+  }
+
+  .lp-channels-grid,
+  .lp-guides-grid {
+    grid-template-columns: 1fr;
+  }
+}
