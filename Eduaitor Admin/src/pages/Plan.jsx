@@ -14,7 +14,7 @@ const S = {
     fontFamily: "'Poppins', sans-serif",
   },
   card: {
-    background: "#fff",
+    background: "var(--surface)",
     border: "1px solid var(--border-md, rgba(147,51,234,0.2))",
     borderRadius: 16,
     padding: "1.25rem 1.5rem",
@@ -71,7 +71,6 @@ const S = {
     display: "block",
     fontSize: 12,
     fontWeight: 600,
-    color: "#6b7280",
     marginBottom: 5,
     textTransform: "uppercase",
     letterSpacing: "0.04em",
@@ -180,7 +179,7 @@ function PlanCard({ plan, onEdit, onDelete, onToggle }) {
             margin: 0,
             fontSize: 18,
             fontWeight: 800,
-            color: "#111827",
+            color: "var(--text-primary)",
           }}
         >
           {plan.name}
@@ -189,8 +188,8 @@ function PlanCard({ plan, onEdit, onDelete, onToggle }) {
           style={{
             margin: "4px 0 0",
             fontSize: 12,
-            color: "#6b7280",
             lineHeight: 1.5,
+            color: "var(--text-secondary)",
           }}
         >
           {plan.short}
@@ -200,7 +199,7 @@ function PlanCard({ plan, onEdit, onDelete, onToggle }) {
       {/* Pricing */}
       <div
         style={{
-          background: "var(--purple-50,#faf5ff)",
+          background: "var(--bg-hover)",
           borderRadius: 10,
           padding: "10px 14px",
           display: "grid",
@@ -221,14 +220,14 @@ function PlanCard({ plan, onEdit, onDelete, onToggle }) {
           >
             ₹{plan.price?.monthly}
             <span
-              style={{ fontSize: 11, fontWeight: 500, color: "#9ca3af" }}
+              style={{ fontSize: 11, fontWeight: 500, }}
             >
               /student
             </span>
           </div>
         </div>
         <div>
-          <div style={{ fontSize: 11, color: "#9ca3af", fontWeight: 600 }}>
+          <div style={{ fontSize: 11, fontWeight: 600 }}>
             YEARLY
           </div>
           <div
@@ -240,7 +239,7 @@ function PlanCard({ plan, onEdit, onDelete, onToggle }) {
           >
             ₹{plan.price?.yearly}
             <span
-              style={{ fontSize: 11, fontWeight: 500, color: "#9ca3af" }}
+              style={{ fontSize: 11, fontWeight: 500, }}
             >
               /student
             </span>
@@ -254,7 +253,7 @@ function PlanCard({ plan, onEdit, onDelete, onToggle }) {
           style={{
             fontSize: 11,
             fontWeight: 700,
-            color: "#9ca3af",
+            color: "var(--text-secondary)",
             textTransform: "uppercase",
             letterSpacing: "0.04em",
             marginBottom: 6,
@@ -268,7 +267,7 @@ function PlanCard({ plan, onEdit, onDelete, onToggle }) {
               key={i}
               style={{
                 fontSize: 12,
-                color: "#374151",
+                color: "var(--text-primary)",
                 display: "flex",
                 alignItems: "center",
                 gap: 6,
@@ -281,7 +280,7 @@ function PlanCard({ plan, onEdit, onDelete, onToggle }) {
             </div>
           ))}
           {(plan.features?.length ?? 0) > 4 && (
-            <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 2 }}>
+            <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 2 }}>
               +{plan.features.length - 4} more…
             </div>
           )}
@@ -292,14 +291,14 @@ function PlanCard({ plan, onEdit, onDelete, onToggle }) {
       <div
         style={{
           fontSize: 11,
-          color: "#9ca3af",
+          color: "var(--text-secondary)",
           borderTop: "1px solid #f3f4f6",
           paddingTop: 10,
         }}
       >
         CTA Button:{" "}
-        <strong style={{ color: "#374151" }}>{plan.CTA || "Request Demo"}</strong>
-        &nbsp;·&nbsp; Order: <strong style={{ color: "#374151" }}>{plan.order ?? 0}</strong>
+        <strong>{plan.CTA || "Request Demo"}</strong>
+        &nbsp;·&nbsp; Order: <strong style={{ color: "var(--text-primary)" }}>{plan.order ?? 0}</strong>
       </div>
 
       {/* Actions */}
@@ -879,7 +878,7 @@ export default function Plan() {
           >
             Plans
           </h1>
-          <p style={{ margin: "4px 0 0", fontSize: 13, color: "#9ca3af" }}>
+          <p style={{ margin: "4px 0 0", fontSize: 13, }}>
             Manage pricing plans shown on the website
           </p>
         </div>
