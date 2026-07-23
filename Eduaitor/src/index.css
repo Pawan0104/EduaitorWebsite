@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
 *{
   margin: 0;
   padding: 0;
@@ -6,19 +7,41 @@
   font-family: "Poppins", sans-serif;
 }
 
-html,body{
-  /* height: 100%; */
-  width: 100%;
-  overflow-x: hidden;
+html {
+  scroll-behavior: smooth;
 }
 
+html,body{
+  width: 100%;
+  overflow-x: hidden;
+  background: #ffffff;
+  color: #0f172a;
+}
 
 .main-content{
-  padding-top: 30px;
+  padding-top: 88px;
 }
 
 :root {
-  /* ── Purple Palette ── */
+  /* ── Blue Brand Palette (design system) ── */
+  --blue-50:  #eff6ff;
+  --blue-100: #dbeafe;
+  --blue-200: #bfdbfe;
+  --blue-400: #60a5fa;
+  --blue-500: #3b82f6;
+  --blue-600: #2563eb;
+  --blue-700: #1d4ed8;
+  --blue-800: #1e40af;
+  --blue-900: #1e3a8a;
+  --navy:     #0b1f3a;
+  --navy-2:   #132f54;
+
+  /* ── Brand Tokens ── */
+  --primary:        var(--blue-600);
+  --primary-hover:  var(--blue-700);
+  --bg-color:       var(--blue-50);
+
+  /* ── Shared Dims & Glows ── */
   --purple-50:  #faf5ff;
   --purple-100: #f3e8ff;
   --purple-200: #e9d5ff;
@@ -29,17 +52,10 @@ html,body{
   --purple-800: #6b21a8;
   --purple-900: #3b0764;
   --purple-950: #2e0650;
-
-  /* ── Brand Tokens ── */
-  --primary:        var(--purple-600);
-  --primary-hover:  var(--purple-700);
-  --bg-color:       var(--purple-50);
-
-  /* ── Shared Dims & Glows ── */
-  --purple-dim:   rgba(147, 51, 234, 0.12);
-  --purple-glow:  rgba(147, 51, 234, 0.35);
-  --border-glow:  rgba(147, 51, 234, 0.3);
-  --border-md:    rgba(147, 51, 234, 0.2);
+  --purple-dim:   rgba(37, 99, 235, 0.12);
+  --purple-glow:  rgba(37, 99, 235, 0.35);
+  --border-glow:  rgba(37, 99, 235, 0.3);
+  --border-md:    rgba(37, 99, 235, 0.2);
 
   /* ── Radii & Motion ── */
   --radius-sm: 10px;
@@ -49,20 +65,23 @@ html,body{
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
 
-  /* ── LIGHT theme defaults (Home page) ── */
-  --ink:      #0d0d14;
+  /* ── LIGHT theme defaults ── */
+  --ink:      #0b1f3a;
   --surface:  #ffffff;
-  --border:   rgba(147, 51, 234, 0.12);
-  --text-1:   #0f0f1a;
-  --text-2:   #4b5563;
-  --text-3:   #9ca3af;
+  --border:   rgba(37, 99, 235, 0.12);
+  --text-1:   #0b1f3a;
+  --text-2:   #475569;
+  --text-3:   #94a3b8;
 
   /* ── Fonts ── */
-  --font-display: 'Sora', sans-serif;
-  --font-body:    'Plus Jakarta Sans', sans-serif;
+  --font-display: 'Poppins', sans-serif;
+  --font-body:    'Poppins', sans-serif;
 
-  /* ── Accents (Solution page extras) ── */
-  --teal: #00C9A7;
+  /* ── Accents ── */
+  --teal: #14b8a6;
   --gold: #F7C948;
-  --red:  #FF6B6B;
+  --red:  #ef4444;
+  --green: #16a34a;
+  --orange: #f97316;
+  --pink: #ec4899;
 }

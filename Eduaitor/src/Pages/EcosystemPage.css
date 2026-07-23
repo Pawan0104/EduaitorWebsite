@@ -1,0 +1,553 @@
+.eco-page {
+  --eco-blue: #2563eb;
+  --eco-navy: #0b1f3a;
+  --eco-purple: #7c3aed;
+  --eco-orange: #ea580c;
+  --eco-teal: #0d9488;
+  --eco-green: #16a34a;
+  --eco-pink: #db2777;
+  background: #f5f8fd;
+  color: var(--eco-navy);
+  padding-bottom: 40px;
+}
+
+.eco-container {
+  width: min(1240px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.eco-hero {
+  padding: 48px 0 28px;
+  text-align: center;
+  background:
+    radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.08), transparent 40%),
+    radial-gradient(circle at 90% 10%, rgba(124, 58, 237, 0.07), transparent 35%),
+    #f8fbff;
+}
+
+.eco-hero__badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--eco-blue);
+  background: #e8f0ff;
+  border-radius: 999px;
+  padding: 6px 12px;
+  margin-bottom: 14px;
+}
+
+.eco-hero__title {
+  font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+
+.eco-hero__title span {
+  color: var(--eco-blue);
+}
+
+.eco-hero__sub {
+  max-width: 720px;
+  margin: 0 auto;
+  color: #64748b;
+  line-height: 1.65;
+  font-size: 0.98rem;
+}
+
+.eco-shell {
+  padding: 12px 0 20px;
+}
+
+.eco-shell__grid {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.eco-sidebar {
+  position: sticky;
+  top: 88px;
+  background: #fff;
+  border: 1px solid #e5eef9;
+  border-radius: 18px;
+  padding: 16px 12px;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.05);
+  max-height: calc(100vh - 110px);
+  overflow: auto;
+}
+
+.eco-sidebar__label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  padding: 4px 10px 12px;
+  margin: 0;
+}
+
+.eco-sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.eco-sidebar__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  border-radius: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+  color: #334155;
+  transition: background 0.15s, color 0.15s;
+}
+
+.eco-sidebar__item:hover {
+  background: #f1f5f9;
+}
+
+.eco-sidebar__item.is-active {
+  background: var(--eco-blue);
+  color: #fff;
+}
+
+.eco-sidebar__num {
+  font-size: 0.72rem;
+  font-weight: 700;
+  opacity: 0.8;
+  min-width: 22px;
+}
+
+.eco-sidebar__text {
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.eco-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.eco-design {
+  background: #fff;
+  border: 1px solid #e5eef9;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.05);
+}
+
+.eco-design__img {
+  width: 100%;
+  height: auto;
+  display: block;
+  vertical-align: top;
+  /* Soften browser blur when scaling large panels down */
+  image-rendering: auto;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.eco-panel__inner {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 18px;
+  background: #fff;
+  border: 1px solid #e5eef9;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.05);
+}
+
+.eco-panel__badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.eco-panel__num {
+  display: inline-grid;
+  place-items: center;
+  min-width: 34px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 8px;
+  background: #dbeafe;
+  color: var(--eco-blue);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.eco-panel__badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: var(--eco-blue);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 5px 10px;
+}
+
+.eco-panel__inner--purple .eco-panel__num,
+.eco-panel__inner--purple .eco-panel__badge {
+  background: #f3e8ff;
+  color: var(--eco-purple);
+}
+
+.eco-panel__inner--orange .eco-panel__num,
+.eco-panel__inner--orange .eco-panel__badge {
+  background: #ffedd5;
+  color: var(--eco-orange);
+}
+
+.eco-panel__inner--teal .eco-panel__num,
+.eco-panel__inner--teal .eco-panel__badge {
+  background: #ccfbf1;
+  color: var(--eco-teal);
+}
+
+.eco-panel__inner--green .eco-panel__num,
+.eco-panel__inner--green .eco-panel__badge {
+  background: #dcfce7;
+  color: var(--eco-green);
+}
+
+.eco-panel__inner--pink .eco-panel__num,
+.eco-panel__inner--pink .eco-panel__badge {
+  background: #fce7f3;
+  color: var(--eco-pink);
+}
+
+.eco-panel__title {
+  font-size: clamp(1.35rem, 2.4vw, 1.9rem);
+  font-weight: 800;
+  margin-bottom: 6px;
+  line-height: 1.2;
+}
+
+.eco-panel__tagline {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--eco-blue);
+  margin-bottom: 10px;
+}
+
+.eco-panel__inner--purple .eco-panel__tagline { color: var(--eco-purple); }
+.eco-panel__inner--orange .eco-panel__tagline { color: var(--eco-orange); }
+.eco-panel__inner--teal .eco-panel__tagline { color: var(--eco-teal); }
+.eco-panel__inner--green .eco-panel__tagline { color: var(--eco-green); }
+.eco-panel__inner--pink .eco-panel__tagline { color: var(--eco-pink); }
+
+.eco-panel__desc {
+  color: #64748b;
+  line-height: 1.6;
+  font-size: 0.92rem;
+  margin-bottom: 18px;
+}
+
+.eco-features {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.eco-feature {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: #f8fafc;
+  border: 1px solid #eef2f7;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.eco-feature h3 {
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin: 0 0 2px;
+}
+
+.eco-feature p {
+  margin: 0;
+  font-size: 0.72rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.eco-feat-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  margin-top: 0;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: #dbeafe;
+  color: var(--eco-blue);
+}
+
+.eco-feat-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.eco-feat-icon--purple { background: #ede9fe; color: var(--eco-purple); }
+.eco-feat-icon--orange { background: #ffedd5; color: var(--eco-orange); }
+.eco-feat-icon--teal { background: #ccfbf1; color: var(--eco-teal); }
+.eco-feat-icon--green { background: #dcfce7; color: var(--eco-green); }
+.eco-feat-icon--pink { background: #fce7f3; color: var(--eco-pink); }
+.eco-feat-icon--blue { background: #dbeafe; color: var(--eco-blue); }
+
+.eco-love {
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+
+.eco-panel__inner--purple .eco-love {
+  background: #f5f3ff;
+  border-color: #e9d5ff;
+}
+
+.eco-love h3 {
+  font-size: 0.9rem;
+  margin: 0 0 8px;
+}
+
+.eco-love ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+
+.eco-love li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 0.8rem;
+  color: #334155;
+  line-height: 1.4;
+}
+
+.eco-love li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--eco-blue);
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+.eco-panel__visual {
+  min-width: 0;
+}
+
+.eco-preview {
+  height: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  background: #0b1f3a;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
+}
+
+.eco-preview img {
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+  object-fit: cover;
+  object-position: right center;
+  display: block;
+}
+
+.eco-preview--fallback {
+  background: linear-gradient(160deg, #0b1f3a, #1e3a8a);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.eco-preview__card {
+  width: 100%;
+  background: #fff;
+  border-radius: 16px;
+  padding: 22px;
+  color: var(--eco-navy);
+}
+
+.eco-preview__card strong {
+  display: block;
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+}
+
+.eco-preview__card > p {
+  color: #64748b;
+  margin: 0 0 14px;
+  font-size: 0.9rem;
+}
+
+.eco-preview__card ul {
+  margin: 0 0 18px;
+  padding-left: 18px;
+  color: #475569;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.eco-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 18px;
+  padding: 22px 24px;
+}
+
+.eco-cta--purple {
+  background: #f5f3ff;
+  border-color: #e9d5ff;
+}
+
+.eco-cta--orange {
+  background: #fff7ed;
+  border-color: #ffedd5;
+}
+
+.eco-cta--teal {
+  background: #f0fdfa;
+  border-color: #ccfbf1;
+}
+
+.eco-cta--green {
+  background: #f0fdf4;
+  border-color: #dcfce7;
+}
+
+.eco-cta--pink {
+  background: #fdf2f8;
+  border-color: #fce7f3;
+}
+
+.eco-cta__copy {
+  flex: 1;
+  min-width: 240px;
+}
+
+.eco-cta__copy h3 {
+  margin: 0 0 6px;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.eco-cta__copy p {
+  margin: 0;
+  color: #475569;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.eco-cta__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.eco-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border: 2px solid transparent;
+  transition: transform 0.15s, background 0.15s, color 0.15s;
+}
+
+.eco-btn:hover {
+  transform: translateY(-1px);
+}
+
+.eco-btn--primary {
+  background: var(--eco-blue);
+  color: #fff;
+  border-color: var(--eco-blue);
+}
+
+.eco-cta--purple .eco-btn--primary {
+  background: var(--eco-purple);
+  border-color: var(--eco-purple);
+}
+
+.eco-btn--outline {
+  background: #fff;
+  color: var(--eco-navy);
+  border-color: #cbd5e1;
+}
+
+@media (max-width: 1100px) {
+  .eco-panel__inner {
+    grid-template-columns: 1fr;
+  }
+
+  .eco-preview img {
+    min-height: 320px;
+    object-position: center top;
+  }
+}
+
+@media (max-width: 980px) {
+  .eco-shell__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .eco-sidebar {
+    position: relative;
+    top: 0;
+    max-height: none;
+  }
+
+  .eco-sidebar__nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .eco-features {
+    grid-template-columns: 1fr;
+  }
+
+  .eco-sidebar__nav {
+    grid-template-columns: 1fr;
+  }
+
+  .eco-cta__actions {
+    width: 100%;
+  }
+
+  .eco-btn {
+    flex: 1;
+  }
+}

@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EduAItor — Smarter Schools. Stronger Students.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --blue: #1f6bff;
+    --blue-dark: #1550c9;
+    --navy: #0e2a54;
+    --navy-deep: #0a1f42;
+    --ink: #12213f;
+    --text: #4a5a75;
+    --muted: #7b8aa3;
+    --line: #e6ecf5;
+    --bg: #ffffff;
+    --bg-soft: #f4f8ff;
+    --green: #2fa96a;
+    --purple: #7c4dd4;
+    --orange: #f08a2c;
+    --teal: #17a5a0;
+    --pink: #e0447a;
+    --radius: 18px;
+    --shadow: 0 18px 45px rgba(20, 45, 95, 0.08);
+    --shadow-sm: 0 8px 24px rgba(20, 45, 95, 0.07);
+    --maxw: 1500px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "Inter", system-ui, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 { font-family: "Poppins", sans-serif; color: var(--ink); line-height: 1.15; }
+  a { text-decoration: none; color: inherit; }
+  img { max-width: 100%; display: block; }
+
+  /* ===== inline SVG icon system ===== */
+  svg.ico { width: 1em; height: 1em; flex: none; stroke: currentColor; fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    display: inline-block; vertical-align: -0.14em; }
+  svg.ico-fill { fill: currentColor; stroke: none; }
+  .icon-badge svg.ico { width: 30px; height: 30px; stroke-width: 1.8; }
+  .sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+  .wrap { width: 92%; max-width: var(--maxw); margin: 0 auto; padding: 0; }
+  .blue { color: var(--blue); }
+  .center { text-align: center; }
+
+  section { padding: 84px 0; position: relative; }
+  .eyebrow {
+    display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--blue);
+  }
+  .pill {
+    display: inline-block; background: var(--blue); color: #fff; font-size: 12px;
+    font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 7px 18px; border-radius: 999px;
+  }
+  .pill.grad { background: linear-gradient(90deg, #1f6bff, #37a0ff); }
+  .sec-title { font-size: clamp(28px, 4vw, 44px); font-weight: 800; }
+  .sec-sub { max-width: 720px; margin: 18px auto 0; color: var(--text); font-size: 17px; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px; font-weight: 600;
+    font-family: "Poppins", sans-serif; border-radius: 12px; padding: 14px 26px;
+    cursor: pointer; border: none; font-size: 15px; transition: transform .15s ease, box-shadow .2s;
+  }
+  .btn-primary { background: var(--blue); color: #fff; box-shadow: 0 12px 26px rgba(31,107,255,.32); }
+  .btn-primary:hover { transform: translateY(-2px); }
+  .btn-ghost { background: #fff; color: var(--blue); border: 1.5px solid #cdddff; }
+  .btn-ghost:hover { transform: translateY(-2px); }
+
+  .dots-bg::before {
+    content:""; position:absolute; inset:0;
+    background-image: radial-gradient(rgba(31,107,255,.10) 1.4px, transparent 1.4px);
+    background-size: 22px 22px; opacity:.5; pointer-events:none;
+  }
+
+  /* ================= NAVBAR ================= */
+  .nav {
+    position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,.92);
+    backdrop-filter: blur(10px); border-bottom: 1px solid var(--line);
+  }
+  .nav-inner { display: flex; align-items: center; gap: 32px; height: 74px; }
+  .logo { font-family:"Poppins"; font-weight: 800; font-size: 26px; color: var(--navy); letter-spacing: -.5px; }
+  .logo small { display:block; font-size: 10px; font-weight:600; letter-spacing:.5px; color: var(--muted); margin-top:-4px;}
+  .nav-links { display: flex; gap: 26px; margin-left: 18px; }
+  .nav-links a { font-size: 15px; font-weight: 500; color: var(--ink); padding: 6px 2px; }
+  .nav-links a.active { color: var(--blue); border-bottom: 2px solid var(--blue); }
+  .nav-links a:hover { color: var(--blue); }
+  .nav-cta { margin-left: auto; display: flex; gap: 12px; }
+  .nav-cta .btn { padding: 10px 22px; }
+
+  /* ================= HERO ================= */
+  .hero { background: linear-gradient(180deg,#f2f7ff 0%, #ffffff 100%); overflow: hidden; }
+  .hero-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 40px; align-items: center; }
+  .hero h1 { font-size: clamp(38px, 5.5vw, 62px); font-weight: 800; }
+  .hero .sub { font-family:"Poppins"; font-weight:600; font-size: 22px; color: var(--ink); margin-top: 18px; }
+  .hero p.lead { margin-top: 18px; font-size: 16px; max-width: 500px; }
+  .hero-btns { display:flex; gap:16px; margin-top: 30px; flex-wrap: wrap; }
+
+  .hero-visual { position: relative; padding: 10px; display:flex; justify-content:center; }
+  .hero-banner { width:100%; max-width:640px; height:auto; display:block; mix-blend-mode:multiply; }
+
+  .hero-features {
+    margin-top: 44px; display:grid; grid-template-columns: repeat(5,1fr); gap: 12px;
+    background:#fff; border:1px solid var(--line); border-radius: 18px; padding: 22px;
+    box-shadow: var(--shadow-sm);
+  }
+  .hf { display:flex; gap:10px; align-items:center; font-size:13px; font-weight:600; color:var(--ink); }
+  .hf .ic { width:38px;height:38px;border-radius:10px;background:#eef4ff;display:grid;place-items:center;color:var(--blue);flex:none;font-size:18px; }
+  .supports { margin-top:22px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; justify-content:center; color:var(--muted); font-size:13px; }
+  .supports span { display:inline-flex; align-items:center; gap:6px; }
+  .chip { border:1px solid var(--line); border-radius: 8px; padding:6px 14px; font-weight:600; color:var(--ink); display:inline-flex; align-items:center; gap:6px; }
+
+  /* ============= generic card grid ============= */
+  .grid { display:grid; gap: 22px; }
+  .g3 { grid-template-columns: repeat(3,1fr); }
+  .g5 { grid-template-columns: repeat(5,1fr); }
+  .g6 { grid-template-columns: repeat(6,1fr); }
+  .card {
+    background:#fff; border:1px solid var(--line); border-radius: var(--radius); padding: 26px;
+    box-shadow: var(--shadow-sm);
+  }
+  .icon-badge { width:60px;height:60px;border-radius:16px;display:grid;place-items:center;font-size:26px;color:#fff;margin-bottom:16px; }
+  .card h3 { font-size:19px; margin-bottom:10px; }
+  .card p { font-size:14.5px; }
+  .card .divider { height:1px; background:var(--line); margin:16px 0; }
+  .card .note { font-size:13px; color:var(--muted); }
+
+  .banner {
+    margin-top: 34px; background: var(--bg-soft); border:1px solid #e2ecff; border-radius:16px;
+    padding: 22px 28px; display:flex; gap:22px; align-items:center;
+  }
+  .banner .ic { width:52px;height:52px;border-radius:14px;background:#e2ecff;display:grid;place-items:center;color:var(--blue);font-size:24px;flex:none; }
+  .banner b { color:var(--ink); font-family:"Poppins"; }
+
+  /* ============ REAL IMPACT (home-2) ============ */
+  .ri-card { position:relative; overflow:hidden; }
+  .ri-card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;}
+  .ri-1::before{background:var(--green);} .ri-2::before{background:var(--blue);} .ri-3::before{background:var(--purple);}
+  .ri-4::before{background:var(--orange);} .ri-5::before{background:var(--teal);} .ri-6::before{background:var(--pink);}
+  .ri-head { display:flex; gap:16px; align-items:flex-start; }
+  .ri-head .icon-badge{ margin:0; }
+
+  /* ============ THE CHALLENGE (home-3) ============ */
+  .challenge { background: linear-gradient(180deg,#ffffff, #f5f9ff); }
+  .ch-top { display:grid; grid-template-columns: 1fr 1fr; gap:40px; align-items:center; }
+  .ch-note { background:#eef4ff; border-left:4px solid var(--blue); border-radius:12px; padding:20px 22px; margin-top:24px; display:flex; gap:16px; }
+  .ch-note .mark{width:34px;height:34px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:800;flex:none;}
+  .ch-photo{ border-radius:18px; background:radial-gradient(120% 120% at 70% 10%,#e3ecfb,#f4f8ff); aspect-ratio:16/11; position:relative; border:1px solid #e6eefc; color:var(--navy); overflow:hidden;}
+  .ch-photo .man{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;}
+  .mini-tag{position:absolute;background:#fff;border-radius:10px;padding:8px 12px;font-size:11px;font-weight:600;color:var(--ink);box-shadow:var(--shadow-sm);display:flex;gap:8px;align-items:center;max-width:170px;}
+  .mini-tag .d{width:22px;height:22px;border-radius:6px;background:#eef4ff;display:grid;place-items:center;flex:none;font-size:12px;color:var(--blue);}
+  .ch-cards{ margin-top:46px; }
+  .ch-card{ text-align:center; }
+  .ch-card .icon-badge{ margin:0 auto 14px; background:#f0f4fb; color:var(--blue); }
+  .ch-card h4{font-size:16px;margin-bottom:8px;}
+  .ch-card p{font-size:13px;}
+  .ch-foot{ text-align:center; margin-top:40px; font-family:"Poppins"; font-weight:600; color:var(--ink); font-size:18px; }
+
+  /* ============ SOLUTION (home-4) ============ */
+  .solution{ background: linear-gradient(180deg,#f5f9ff,#ffffff); }
+  .sol-grid{ display:grid; grid-template-columns: 1fr 1.1fr; gap:44px; align-items:center; }
+  .sol-grid h2{ font-size: clamp(40px,6vw,64px); font-weight:800; }
+  .sol-note{ background:#e9f1ff; border-radius:14px; padding:18px 20px; margin-top:22px; display:flex; gap:14px; align-items:flex-start;}
+  .sol-note .ic{width:40px;height:40px;border-radius:12px;background:var(--blue);color:#fff;display:grid;place-items:center;flex:none;font-size:18px;}
+  .dash-img{ width:100%; border-radius:18px; display:block; }
+  .dash-mock{ background:var(--navy); border-radius:18px; padding:16px; box-shadow: 0 30px 60px rgba(14,42,84,.28); }
+  .dash-bar{display:flex;align-items:center;gap:8px;color:#cfe0ff;font-size:12px;margin-bottom:12px;}
+  .dash-body{background:#fff;border-radius:12px;padding:16px;}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+  .kpi{background:#f4f8ff;border-radius:10px;padding:12px;}
+  .kpi .n{font-family:"Poppins";font-weight:800;font-size:20px;color:var(--ink);}
+  .kpi .l{font-size:11px;color:var(--muted);}
+  .kpi .up{font-size:11px;color:var(--green);font-weight:700;}
+  .chart{height:120px;border-radius:10px;background:linear-gradient(180deg,#eaf2ff,#fff);position:relative;overflow:hidden;border:1px solid #eef3fb;}
+  .chart svg{position:absolute;inset:0;width:100%;height:100%;}
+  .sol-feats{ margin-top:40px; display:grid; grid-template-columns:repeat(5,1fr); gap:16px;}
+  .sol-feat{text-align:center;}
+  .sol-feat .icon-badge{margin:0 auto 12px;width:54px;height:54px;font-size:22px;}
+  .sol-feat b{color:var(--ink);font-size:14px;display:block;}
+  .sol-feat span{font-size:12px;}
+  .promise{ margin-top:34px; background:var(--blue); color:#fff; border-radius:16px; padding:26px 30px; display:flex; gap:20px; align-items:center;}
+  .promise .star{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.18);display:grid;place-items:center;font-size:26px;flex:none;}
+  .promise b{font-family:"Poppins";}
+
+  /* ============ ECOSYSTEM (home-5) ============ */
+  .eco-card{ padding:24px; }
+  .eco-head{display:flex;gap:12px;align-items:center;margin-bottom:12px;}
+  .eco-head .ic{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;color:#fff;font-size:22px;flex:none;}
+  .eco-head h4{font-size:16px;}
+  .eco-card p{font-size:13px;}
+  .eco-cta{ text-align:center; margin-top:40px; }
+  .eco-foot{ text-align:center; margin-top:20px; color:var(--muted); font-size:14px; display:flex; align-items:center; justify-content:center; gap:8px;}
+
+  /* ============ STAKEHOLDERS (home-6) ============ */
+  .stake{ background: linear-gradient(180deg,#f7faff,#fff); }
+  .stake-card{ padding:0; overflow:hidden; }
+  .stake-card .photo{ height:150px; display:grid; place-items:center; font-size:66px; }
+  .stake-card .body{ padding:20px; }
+  .stake-card h4{ font-size:17px; margin-bottom:12px; }
+  .stake-card li{ list-style:none; font-size:13px; display:flex; gap:8px; align-items:center; margin-bottom:8px; color:var(--text);}
+  .stake-card li::before{content:"✓";color:var(--green);font-weight:800;}
+  .stake-banner{ margin-top:36px; background:#eef4ff; border-radius:18px; padding:30px; display:flex; align-items:center; gap:26px;}
+  .stake-banner .ic{width:64px;height:64px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-size:28px;flex:none;}
+  .stake-banner h3{font-size:24px;}
+
+  /* ============ DIFFERENCE grid (home-7) ============ */
+  .d7-card{ text-align:center; padding:24px 18px; }
+  .d7-card .icon-badge{ margin:0 auto 14px; }
+  .d7-card h4{font-size:16px;margin-bottom:8px;}
+  .d7-card p{font-size:13px;}
+  .d7-foot{ margin-top:34px; background:var(--bg-soft); border:1px solid #e6eefc; border-radius:16px; padding:24px 28px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;}
+  .d7-foot .mini{display:flex;gap:22px;}
+  .d7-foot .mini div{text-align:center;font-size:12px;font-weight:600;color:var(--ink);}
+  .d7-foot .mini i{display:block;font-size:22px;font-style:normal;margin-bottom:4px;color:var(--blue);}
+
+  /* ============ PURPOSE (home-8) ============ */
+  .purpose{ background: linear-gradient(180deg,#ffffff,#f6f9ff); }
+  .pp-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:44px; align-items:center;}
+  .pp-list li{ list-style:none; display:flex; gap:16px; margin-bottom:22px; }
+  .pp-list .ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex:none;}
+  .pp-list b{color:var(--ink);}
+  .pp-photo{ border-radius:20px; background:radial-gradient(120% 120% at 70% 10%,#e6effd,#f6f9ff); aspect-ratio:4/3; position:relative; border:1px solid #e6eefc; color:var(--navy); overflow:hidden;}
+  .pp-photo .pp-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .pp-quote{ position:absolute; right:16px; top:16px; background:var(--navy); color:#fff; border-radius:14px; padding:14px 18px; font-family:"Poppins"; font-weight:600; font-size:18px; line-height:1.3; max-width:260px;}
+  .pp-mission{ margin-top:40px; background:#eef4ff; border-radius:16px; padding:26px 30px; display:flex; align-items:center; gap:26px; flex-wrap:wrap;}
+  .pp-mission .logo-badge{width:56px;height:56px;border-radius:14px;background:var(--blue);color:#fff;display:grid;place-items:center;font-size:24px;flex:none;}
+  .pp-mission .items{display:flex;gap:26px;flex-wrap:wrap;}
+  .pp-mission .items div{font-size:12px;font-weight:600;color:var(--ink);text-align:center;}
+  .pp-mission .items i{display:block;font-size:22px;font-style:normal;margin-bottom:4px;color:var(--blue);}
+  .pp-cite{ text-align:center; margin-top:34px; font-family:"Poppins"; font-weight:600; color:var(--navy); font-size:20px;}
+
+  /* ============ EDUAITOR DIFFERENCE vs (home-9) ============ */
+  .diff9{ background:linear-gradient(180deg,#f6f9ff,#fff); overflow:hidden; }
+  .d9-hero-photo{ position:absolute; top:64px; right:calc((100% - min(92%, var(--maxw))) / 2);
+    width:300px; border-radius:16px; box-shadow:var(--shadow); z-index:3; }
+  @media(max-width:1180px){ .d9-hero-photo{ display:none; } }
+  .d9-top{ display:grid; grid-template-columns: 240px 1fr; gap:40px; align-items:start;}
+  .d9-side li{ list-style:none; display:flex; gap:12px; margin-bottom:20px;}
+  .d9-side .ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;color:#fff;font-size:18px;flex:none;}
+  .d9-side b{color:var(--ink);font-size:14px;display:block;}
+  .d9-side span{font-size:12px;}
+  .d9-cards{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+  .d9-card{ text-align:center; padding:22px 16px;}
+  .d9-card .icon-badge{margin:0 auto 12px;background:#f0f4fb;}
+  .d9-card h4{font-size:15px;margin-bottom:8px;}
+  .d9-card p{font-size:12.5px;}
+  .vs-row{ margin-top:34px; display:grid; grid-template-columns:1fr auto 1fr; gap:24px; align-items:center;}
+  .vs-box{ background:#fff; border:1px solid var(--line); border-radius:16px; padding:24px; box-shadow:var(--shadow-sm);}
+  .vs-box.trad li::before{content:"✕";color:var(--pink);}
+  .vs-box.edu{ background:#eef4ff; }
+  .vs-box.edu li::before{content:"✓";color:var(--blue);}
+  .vs-box li{list-style:none;display:flex;gap:10px;font-size:13px;margin-bottom:10px;color:var(--text);}
+  .vs-box h4{margin-bottom:14px;}
+  .vs-mid{width:58px;height:58px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:800;font-family:"Poppins";}
+  .d9-strip{ margin-top:30px; background:var(--navy); color:#fff; border-radius:16px; padding:26px 30px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;}
+  .d9-strip .mini{display:flex;gap:26px;}
+  .d9-strip .mini div{text-align:center;font-size:12px;font-weight:600;}
+  .d9-strip .mini i{display:block;font-size:22px;font-style:normal;margin-bottom:4px;}
+
+  /* ============ PRICING (home-10) ============ */
+  .pricing{ background:linear-gradient(180deg,#fff,#f4f8ff); }
+  .pr-grid{ margin-top:40px; display:grid; grid-template-columns: 1fr 1.5fr 1fr; gap:22px; align-items:start;}
+  .pr-side h5{ font-size:12px; letter-spacing:1px; text-transform:uppercase; color:var(--blue); margin-bottom:16px; font-family:"Poppins";}
+  .pr-side li{ list-style:none; display:flex; gap:12px; margin-bottom:18px;}
+  .pr-side .ic{width:38px;height:38px;border-radius:10px;background:#eef4ff;color:var(--blue);display:grid;place-items:center;flex:none;font-size:18px;}
+  .pr-side b{color:var(--ink);font-size:14px;display:block;}
+  .pr-side span{font-size:12px;}
+  .plans{ display:grid; grid-template-columns:1fr 1fr; gap:18px; position:relative;}
+  .plan{ background:#fff; border:1px solid var(--line); border-radius:18px; padding:26px; box-shadow:var(--shadow-sm); text-align:center;}
+  .plan .tag{display:inline-flex;gap:8px;align-items:center;justify-content:center;font-weight:700;color:var(--ink);font-family:"Poppins";margin-bottom:6px;}
+  .plan .price{font-family:"Poppins";font-weight:800;font-size:52px;color:var(--blue);line-height:1;}
+  .plan.year .price{color:var(--green);}
+  .plan .per{font-size:12px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:14px;}
+  .plan .billed{display:inline-block;background:#eef4ff;color:var(--blue);font-size:12px;font-weight:700;border-radius:8px;padding:6px 14px;margin-bottom:16px;}
+  .plan.year .billed{background:#e7f6ee;color:var(--green);}
+  .plan li{list-style:none;font-size:13px;display:flex;gap:8px;align-items:center;justify-content:center;margin-bottom:10px;color:var(--text);}
+  .plan li::before{content:"✓";color:var(--green);font-weight:800;}
+  .save-badge{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);width:96px;height:96px;border-radius:50%;background:#fff;box-shadow:var(--shadow);display:grid;place-items:center;text-align:center;z-index:2;border:2px solid #e7f6ee;}
+  .save-badge b{color:var(--green);font-family:"Poppins";font-size:22px;line-height:1;}
+  .save-badge span{font-size:9px;color:var(--muted);}
+  .pr-foot{ margin-top:34px; background:var(--navy); color:#fff; border-radius:18px; padding:26px 30px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:24px;}
+  .pr-foot .mini{display:flex;gap:26px;flex-wrap:wrap;}
+  .pr-foot .mini div{font-size:12px;font-weight:600;text-align:center;}
+  .pr-foot .mini i{display:block;font-size:22px;font-style:normal;margin-bottom:4px;}
+  .pr-foot .mini .cur{font-family:"Poppins";}
+
+  /* ============ IMPACT LOOP (home-11) ============ */
+  .loop{ background:linear-gradient(180deg,#f6f9ff,#fff); }
+  .loop-grid{ margin-top:34px; display:grid; grid-template-columns: 1fr 1.3fr 1fr; gap:30px; align-items:center;}
+  .loop-side h5{font-family:"Poppins";font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--blue);margin-bottom:18px;display:flex;gap:8px;align-items:center;}
+  .loop-side li{list-style:none;display:flex;gap:12px;margin-bottom:18px;}
+  .loop-side .ic{width:36px;height:36px;border-radius:9px;display:grid;place-items:center;color:#fff;font-size:16px;flex:none;}
+  .loop-side b{color:var(--ink);font-size:13px;display:block;}
+  .loop-side span{font-size:11.5px;}
+  .loop-center{ position:relative; aspect-ratio:1/1; display:grid; place-items:center;}
+  .loop-ring{ position:absolute; inset:6%; border-radius:50%; border:2px dashed #c9d9f5;}
+  .loop-core{ width:52%; aspect-ratio:1/1; border-radius:50%; background:#fff; box-shadow:var(--shadow); display:grid; place-items:center; text-align:center; border:1px solid #eaf1fc; z-index:2;}
+  .loop-core .lg{font-family:"Poppins";font-weight:800;font-size:24px;color:var(--navy);}
+  .loop-core small{font-size:11px;color:var(--muted);display:block;margin-top:4px;}
+  .loop-node{ position:absolute; width:64px;height:64px;border-radius:50%; display:grid; place-items:center; color:#fff; font-size:24px; box-shadow:var(--shadow-sm);}
+  .ln1{background:var(--blue);top:2%;left:50%;transform:translateX(-50%);}
+  .ln2{background:var(--green);top:24%;right:2%;}
+  .ln3{background:var(--purple);bottom:24%;right:2%;}
+  .ln4{background:var(--orange);bottom:2%;left:50%;transform:translateX(-50%);}
+  .ln5{background:var(--teal);bottom:24%;left:2%;}
+  .ln6{background:var(--pink);top:24%;left:2%;}
+  .loop-strip{ margin-top:34px; background:var(--navy); color:#fff; border-radius:18px; padding:26px 30px; display:flex; gap:40px; align-items:center; justify-content:space-between; flex-wrap:wrap;}
+  .loop-strip div{display:flex;gap:12px;align-items:center;font-size:13px;}
+  .loop-strip .ic{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.15);display:grid;place-items:center;font-size:20px;flex:none;}
+
+  /* ============ FUTURE CTA (home-12) ============ */
+  .future{ background:linear-gradient(180deg,#fff,#f4f8ff); }
+  .fu-grid{ display:grid; grid-template-columns: 1fr 340px 1fr; gap:34px; align-items:center;}
+  .fu-list li{list-style:none;display:flex;gap:16px;margin-bottom:24px;}
+  .fu-list .ic{width:46px;height:46px;border-radius:12px;background:#eef4ff;color:var(--blue);display:grid;place-items:center;font-size:20px;flex:none;}
+  .fu-list b{color:var(--ink);display:block;font-size:15px;}
+  .fu-list span{font-size:13px;}
+  .fu-center{ background:var(--navy); color:#fff; border-radius:20px; padding:36px 28px; text-align:center; box-shadow:0 30px 60px rgba(14,42,84,.3);}
+  .fu-center .rocket{font-size:40px;color:#37e08a;}
+  .fu-center h3{color:#fff;font-size:22px;margin:10px 0 4px;}
+  .fu-center .now{font-family:"Poppins";font-weight:800;font-size:44px;color:#37e08a;line-height:1;}
+  .fu-center p{color:#cfe0ff;font-size:13px;margin-top:14px;}
+  .fu-photo{ border-radius:20px; background:radial-gradient(120% 120% at 70% 10%,#e6effd,#f4f8ff); aspect-ratio:3/4; overflow:hidden; border:1px solid #e6eefc; color:var(--navy);}
+  .fu-photo img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .fu-strip{ margin-top:34px; background:var(--navy); color:#fff; border-radius:18px; padding:28px 32px;}
+  .fu-strip h4{color:#fff;text-align:center;margin-bottom:20px;font-size:20px;}
+  .fu-strip .row{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
+  .fu-strip .row div{display:flex;gap:12px;align-items:flex-start;font-size:12px;color:#cfe0ff;}
+  .fu-strip .row .ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:#fff;font-size:18px;flex:none;}
+  .fu-strip .row b{color:#fff;display:block;font-size:13px;}
+  .fu-bottom{ margin-top:30px; text-align:center;}
+  .fu-bottom .logo{font-size:28px;}
+  .fu-bottom .tagline{font-family:"Poppins";font-weight:700;color:var(--navy);font-size:22px;margin:10px 0;}
+  .fu-bottom .contact{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;color:var(--text);font-size:13px;}
+  .fu-bottom .contact span{display:inline-flex;align-items:center;gap:8px;}
+
+  /* ============ FOOTER (home-13) ============ */
+  .footer{ padding:0; background:#fff; }
+  .foot-main{ padding:60px 0; }
+  .foot-grid{ display:grid; grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr 1.2fr; gap:28px; }
+  .foot-grid h5{ font-family:"Poppins"; font-size:12px; letter-spacing:1.5px; text-transform:uppercase; color:var(--navy); margin-bottom:18px;}
+  .foot-grid a{ display:flex; gap:8px; align-items:center; font-size:13.5px; color:var(--text); margin-bottom:12px;}
+  .foot-grid a .lead-ic{ color:var(--blue); }
+  .foot-grid a .chev{ margin-left:auto; color:var(--muted); }
+  .foot-grid a:hover{ color:var(--blue);}
+  .foot-about .logo{ font-size:26px;}
+  .foot-about p{ font-size:13px; margin:16px 0;}
+  .foot-note{ background:#eef4ff; border-radius:12px; padding:14px 16px; font-size:13px; color:var(--navy); font-family:"Poppins"; font-weight:600; display:flex; gap:8px; align-items:center;}
+  .foot-cta .btn{ width:100%; justify-content:center; margin-bottom:12px;}
+  .foot-bar{ background:var(--navy-deep); color:#cfe0ff; }
+  .foot-bar-inner{ padding:28px 0; display:flex; gap:30px; flex-wrap:wrap; align-items:center; justify-content:space-between; font-size:13px;}
+  .foot-bar-inner > div{ display:flex; gap:10px; }
+  .foot-bar-inner .bic{ color:#7fa6e6; flex:none; margin-top:2px; }
+  .foot-bar .social{ display:flex; gap:12px;}
+  .foot-bar .social a{ width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.1);display:grid;place-items:center;color:#fff;}
+  .foot-copy{ border-top:1px solid rgba(255,255,255,.12); padding:16px 0; text-align:center; font-size:12px; color:#9db4d8;}
+
+  /* ============ responsive ============ */
+  @media (max-width: 980px){
+    .hero-grid,.ch-top,.sol-grid,.pp-grid,.fu-grid,.d9-top,.pr-grid,.loop-grid{grid-template-columns:1fr;}
+    .g6,.g5{grid-template-columns:repeat(2,1fr);}
+    .g3{grid-template-columns:1fr;}
+    .hero-features,.sol-feats{grid-template-columns:repeat(2,1fr);}
+    .nav-links{display:none;}
+    .d9-cards,.fu-strip .row{grid-template-columns:1fr 1fr;}
+    .foot-grid{grid-template-columns:1fr 1fr;}
+    .vs-row{grid-template-columns:1fr;}
+    .save-badge{position:static;transform:none;margin:0 auto 16px;}
+    .hero-visual{display:none;}
+  }
+  @media (max-width:560px){
+    .g6,.g5,.hero-features,.sol-feats,.d9-cards,.fu-strip .row,.foot-grid,.kpis{grid-template-columns:1fr;}
+    section{padding:56px 0;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================ SVG ICON SPRITE ============================ -->
+<svg class="sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <symbol id="cap" viewBox="0 0 24 24"><path d="M12 4 2 9l10 5 10-5-10-5Z"/><path d="M6 11.5V16c0 1.2 2.7 2.5 6 2.5s6-1.3 6-2.5v-4.5"/><path d="M22 9v5"/></symbol>
+  <symbol id="ai" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M10 11h4M12 10.5v3"/><path d="M10 2v3M14 2v3M10 19v3M14 19v3M2 10h3M2 14h3M19 10h3M19 14h3"/></symbol>
+  <symbol id="users" viewBox="0 0 24 24"><path d="M16 20v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 20v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13A4 4 0 0 1 16 11"/></symbol>
+  <symbol id="user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="teacher" viewBox="0 0 24 24"><circle cx="8" cy="6" r="3"/><path d="M3 20v-1a5 5 0 0 1 5-5c1.3 0 2.5.5 3.4 1.3"/><rect x="12.5" y="12" width="9.5" height="7" rx="1"/><path d="M17 12v-1"/></symbol>
+  <symbol id="book" viewBox="0 0 24 24"><path d="M2 4h6a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H2Z"/><path d="M22 4h-6a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H22Z"/></symbol>
+  <symbol id="bar-chart" viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M6 21V12"/><path d="M11 21V6"/><path d="M16 21v-7"/><path d="M20 21V9"/></symbol>
+  <symbol id="line-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></symbol>
+  <symbol id="layers" viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="M2 12l10 5 10-5"/><path d="M2 17l10 5 10-5"/></symbol>
+  <symbol id="smartphone" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></symbol>
+  <symbol id="shield" viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5l-8-3Z"/></symbol>
+  <symbol id="lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c3 3 3 15 0 18-3-3-3-15 0-18Z"/></symbol>
+  <symbol id="cloud" viewBox="0 0 24 24"><path d="M17.5 19a4.5 4.5 0 0 0 .5-9 6 6 0 0 0-11.7-1.3A4 4 0 0 0 6 19Z"/></symbol>
+  <symbol id="monitor" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
+  <symbol id="clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></symbol>
+  <symbol id="database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></symbol>
+  <symbol id="school" viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V8l7-4 7 4v13"/><path d="M9 21v-6h6v6"/><path d="M9 11h.5M14.5 11h.5"/></symbol>
+  <symbol id="building" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 7h.5M14.5 7h.5M9 11h.5M14.5 11h.5M9 15h.5M14.5 15h.5M10 21v-3h4v3"/></symbol>
+  <symbol id="message" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></symbol>
+  <symbol id="cart" viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.4 12.4a1 1 0 0 0 1 .8h9.2a1 1 0 0 0 1-.8L21 7H6"/></symbol>
+  <symbol id="dollar" viewBox="0 0 24 24"><path d="M12 2v20"/><path d="M17 6a4 4 0 0 0-4-2h-1.5a3.5 3.5 0 0 0 0 7h3a3.5 3.5 0 0 1 0 7H10a4 4 0 0 1-4-2"/></symbol>
+  <symbol id="bus" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M3 11h18"/><circle cx="7.5" cy="20" r="1.2"/><circle cx="16.5" cy="20" r="1.2"/><path d="M6 17v2M18 17v2"/></symbol>
+  <symbol id="bed" viewBox="0 0 24 24"><path d="M2 18V8M2 13h13a5 5 0 0 1 5 5v0M22 18v-1M2 18h20"/><circle cx="7" cy="10.5" r="2"/></symbol>
+  <symbol id="settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></symbol>
+  <symbol id="target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></symbol>
+  <symbol id="heart" viewBox="0 0 24 24"><path d="M12 21C7 17 3 13.5 3 8.8 3 6 5 4 7.5 4c1.7 0 3.3 1 4.5 2.5C13.2 5 14.8 4 16.5 4 19 4 21 6 21 8.8c0 4.7-4 8.2-9 12.2Z"/></symbol>
+  <symbol id="check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></symbol>
+  <symbol id="calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></symbol>
+  <symbol id="phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.5 2.1L8 9.5a16 16 0 0 0 6 6l1.1-1.1a2 2 0 0 1 2.1-.5c.8.3 1.7.5 2.6.6a2 2 0 0 1 1.7 2Z"/></symbol>
+  <symbol id="handshake" viewBox="0 0 24 24"><path d="M11 6 8.5 3.8a1.8 1.8 0 0 0-2.5.1L2 8l3.5 3.5 2-2"/><path d="m13 6 2.5-2.2a1.8 1.8 0 0 1 2.5.1L22 8l-3.5 3.5"/><path d="m7.5 11.5 4 4a1.8 1.8 0 0 0 2.6 0l.4-.4"/><path d="m14 14 2 2"/></symbol>
+  <symbol id="rocket" viewBox="0 0 24 24"><path d="M5 15c-1 1-1.4 4-1.4 4s3-.4 4-1.4a1.7 1.7 0 0 0-2.6-2.6Z"/><path d="M9.5 15 7 12.5a12 12 0 0 1 8-8.5c2.2 0 3 .8 3 3a12 12 0 0 1-8.5 8Z"/><circle cx="14.5" cy="8.5" r="1.4"/></symbol>
+  <symbol id="mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></symbol>
+  <symbol id="map-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 0 1 4.5 1.5c0 1.5-2 2-2 3.3"/><path d="M12 17h.01"/></symbol>
+  <symbol id="video" viewBox="0 0 24 24"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="m16 10 6-3v10l-6-3"/></symbol>
+  <symbol id="download" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 11 5 4 5-4"/><path d="M4 21h16"/></symbol>
+  <symbol id="briefcase" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/></symbol>
+  <symbol id="file-text" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></symbol>
+  <symbol id="award" viewBox="0 0 24 24"><path d="M6 3h12v4a6 6 0 0 1-12 0Z"/><path d="M6 5H3a3 3 0 0 0 3 3M18 5h3a3 3 0 0 1-3 3"/><path d="M9 13v3h6v-3M8 21h8M12 16v5"/></symbol>
+  <symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
+  <symbol id="star" viewBox="0 0 24 24"><path d="m12 2 3 6.5 7 .8-5 4.8 1.3 7L12 18l-6.6 3 1.3-7-5-4.8 7-.8Z"/></symbol>
+  <symbol id="edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></symbol>
+  <symbol id="compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m16 8-2 6-6 2 2-6Z"/></symbol>
+  <symbol id="link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></symbol>
+  <symbol id="sparkles" viewBox="0 0 24 24"><path d="M12 3v6M12 15v6M3 12h6M15 12h6"/><path d="m6.5 6.5 3 3M14.5 14.5l3 3M17.5 6.5l-3 3M9.5 14.5l-3 3"/></symbol>
+  <symbol id="play" viewBox="0 0 24 24"><path d="M6 4v16l14-8Z"/></symbol>
+  <symbol id="apple" viewBox="0 0 24 24"><path d="M15.5 2.5c.1 1.4-1 2.9-2.7 2.8-.2-1.3 1-2.8 2.7-2.8Z"/><path d="M18.5 13.2c0-2.1 1.1-3.1 1.6-3.6-.9-1.3-2.3-1.6-3.2-1.6-1.3 0-2.1.6-3 .6s-1.7-.6-2.9-.6c-2 0-4 1.4-4 4.4 0 3 2.2 7 4 7 .9 0 1.3-.6 2.6-.6s1.6.6 2.6.6c1.4 0 3.2-2.6 3.2-5.1Z"/></symbol>
+  <symbol id="facebook" viewBox="0 0 24 24"><path d="M14 9h3V5.5h-3c-2.2 0-3.5 1.4-3.5 3.6V11H8v3.5h2.5V22H14v-7.5h2.6L17 11h-3V9.4c0-.3.2-.4.5-.4Z"/></symbol>
+  <symbol id="linkedin" viewBox="0 0 24 24"><path d="M4.5 3.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM3 9h3v12H3ZM9 9h3v1.7c.6-1 1.8-2 3.6-2 3 0 4.4 2 4.4 5.3V21h-3v-6c0-1.6-.6-2.6-2-2.6-1.2 0-1.9.8-2.2 1.6-.1.3-.1.7-.1 1.1V21H9Z"/></symbol>
+  <symbol id="youtube" viewBox="0 0 24 24"><path d="M22 8.2a3 3 0 0 0-2.1-2.1C18 5.5 12 5.5 12 5.5s-6 0-7.9.6A3 3 0 0 0 2 8.2 31 31 0 0 0 1.6 12 31 31 0 0 0 2 15.8a3 3 0 0 0 2.1 2.1c1.9.6 7.9.6 7.9.6s6 0 7.9-.6a3 3 0 0 0 2.1-2.1c.3-1.2.4-2.5.4-3.8s-.1-2.6-.4-3.8ZM10 15V9l5 3Z"/></symbol>
+  <symbol id="instagram" viewBox="0 0 24 24"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3Zm5 3.5A4.5 4.5 0 1 1 7.5 12 4.5 4.5 0 0 1 12 7.5Zm0 2A2.5 2.5 0 1 0 14.5 12 2.5 2.5 0 0 0 12 9.5ZM17.5 6a1 1 0 1 1-1 1 1 1 0 0 1 1-1Z"/></symbol>
+</svg>
+
+<!-- ============================ NAVBAR (home-1) ============================ -->
+<header class="nav">
+  <div class="wrap nav-inner">
+    <div class="logo">Edu<span class="blue">AI</span>tor<small>Smarter Schools. Stronger Students.</small></div>
+    <nav class="nav-links">
+      <a href="#" class="active">Home</a>
+      <a href="#ecosystem">Ecosystem</a>
+      <a href="#solutions">Solutions</a>
+      <a href="#why">Why EduAitor</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#resources">Resources</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <button class="btn btn-ghost">Login</button>
+      <button class="btn btn-primary">Book a Demo</button>
+    </div>
+  </div>
+</header>
+
+<!-- ============================ HERO (home-1) ============================ -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <h1><span class="blue">Smarter</span> Schools.<br><span class="blue">Stronger</span> Students.</h1>
+      <div class="sub">The <span class="blue">AI-Powered</span> School Operating System for Future-Ready Schools</div>
+      <p class="lead">EduAitor brings school management, academic excellence, artificial intelligence, parent engagement, and student success together on one intelligent platform—empowering schools to operate smarter, teach better, and deliver stronger educational outcomes.</p>
+      <div class="hero-btns">
+        <button class="btn btn-primary">Book a Demo →</button>
+        <button class="btn btn-ghost">Explore the Ecosystem →</button>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <img class="hero-banner" src="Eduaitor/public/home/hero-banner.png" alt="Student with EduAitor features: AI Assessment Generator, Parent App, AI Academic Assistant, Attendance, Analytics & Insights, Mobile Apps" />
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="hero-features">
+      <div class="hf"><span class="ic"><svg class="ico"><use href="#ai"/></svg></span> AI-Powered School OS</div>
+      <div class="hf"><span class="ic"><svg class="ico"><use href="#layers"/></svg></span> One Platform. Every Feature.</div>
+      <div class="hf"><span class="ic"><svg class="ico"><use href="#smartphone"/></svg></span> Mobile Apps Included</div>
+      <div class="hf"><span class="ic"><svg class="ico"><use href="#shield"/></svg></span> Enterprise Security</div>
+      <div class="hf"><span class="ic"><svg class="ico"><use href="#globe"/></svg></span> Scalable for Every School</div>
+    </div>
+    <div class="supports">
+      <b style="color:var(--muted)">Supports</b>
+      <span class="chip">CBSE</span><span class="chip">ICSE</span><span class="chip">State Boards</span>
+      <span class="chip">Cambridge</span><span class="chip">IB</span>
+      <span style="margin-left:10px"><svg class="ico"><use href="#cloud"/></svg> Cloud</span><span><svg class="ico"><use href="#cloud"/></svg> SaaS</span><span><svg class="ico"><use href="#monitor"/></svg> On-Premise</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ REAL IMPACT (home-2) ============================ -->
+<section class="dots-bg" id="why">
+  <div class="wrap center">
+    <span class="pill grad">Real Impact. Real Results.</span>
+    <h2 class="sec-title" style="margin-top:18px">Transforming Schools. Delivering <span class="blue">Outcomes.</span></h2>
+    <p class="sec-sub">EduAitor helps schools simplify operations, empower educators, engage parents and support students—driving measurable improvement every single day.</p>
+  </div>
+  <div class="wrap grid g3" style="margin-top:44px">
+    <div class="card ri-card ri-1"><div class="ri-head"><div class="icon-badge" style="background:var(--green)"><svg class="ico"><use href="#clock"/></svg></div><div><h3 style="color:var(--green)">90% Less Time</h3><p>Creating worksheets, assessments and question papers with AI.</p></div></div><div class="divider"></div><p class="note">Teachers save hours every week and focus more on teaching, not paperwork.</p></div>
+    <div class="card ri-card ri-2"><div class="ri-head"><div class="icon-badge" style="background:var(--blue)"><svg class="ico"><use href="#layers"/></svg></div><div><h3 style="color:var(--blue)">One Unified Platform</h3><p>Administration, academics, AI, communication, finance, transport, analytics and more.</p></div></div><div class="divider"></div><p class="note">Replace multiple disconnected systems with one intelligent, integrated ecosystem.</p></div>
+    <div class="card ri-card ri-3"><div class="ri-head"><div class="icon-badge" style="background:var(--purple)"><svg class="ico"><use href="#ai"/></svg></div><div><h3 style="color:var(--purple)">24×7 AI Academic Support</h3><p>Every student receives personalized learning assistance anytime, anywhere.</p></div></div><div class="divider"></div><p class="note">Doubt solving, explanations, summaries and recommendations—always on.</p></div>
+    <div class="card ri-card ri-4"><div class="ri-head"><div class="icon-badge" style="background:var(--orange)"><svg class="ico"><use href="#smartphone"/></svg></div><div><h3 style="color:var(--orange)">Real-Time Parent Engagement</h3><p>Homework, attendance, assessments and communication—all in one app.</p></div></div><div class="divider"></div><p class="note">Parents stay informed, involved and empowered to support their child better.</p></div>
+    <div class="card ri-card ri-5"><div class="ri-head"><div class="icon-badge" style="background:var(--teal)"><svg class="ico"><use href="#line-chart"/></svg></div><div><h3 style="color:var(--teal)">Smarter Decision Making</h3><p>AI-powered insights and predictive analytics for school leadership.</p></div></div><div class="divider"></div><p class="note">Identify trends, detect learning gaps and make data-driven decisions with confidence.</p></div>
+    <div class="card ri-card ri-6"><div class="ri-head"><div class="icon-badge" style="background:var(--pink)"><svg class="ico"><use href="#school"/></svg></div><div><h3 style="color:var(--pink)">Built for Every School</h3><p>From independent schools to multi-campus institutions.</p></div></div><div class="divider"></div><p class="note">Scalable, secure and future-ready for schools of all sizes.</p></div>
+  </div>
+  <div class="wrap"><div class="banner"><div class="ic"><svg class="ico"><use href="#shield"/></svg></div><div><b>One Goal. Better Education Outcomes for Every Student.</b><br><span>EduAitor turns everyday data into meaningful action—so schools can focus on what matters most: <b class="blue">Teaching better. Learning better. Achieving more.</b></span></div></div></div>
+</section>
+
+<!-- ============================ THE CHALLENGE (home-3) ============================ -->
+<section class="challenge">
+  <div class="wrap ch-top">
+    <div>
+      <span class="eyebrow">The Challenge</span>
+      <h2 class="sec-title" style="margin-top:12px">Education is Changing.<br><span class="blue">Schools Must Change Too.</span></h2>
+      <p style="margin-top:18px">Schools today face more complexity than ever before. Administrative burdens, disconnected systems, and data without insights are taking time away from what truly matters—teaching, learning and student success.</p>
+      <div class="ch-note"><div class="mark">!</div><div>Managing these challenges with disconnected software and manual processes is no longer enough.<br><b class="blue">Schools deserve better. They deserve an intelligent ecosystem.</b></div></div>
+    </div>
+    <div class="ch-photo">
+      <img class="man" src="Eduaitor/public/home/challenge-man.png" alt="Overwhelmed school principal" />
+      <div class="mini-tag" style="top:8%;left:6%"><span class="d"><svg class="ico"><use href="#file-text"/></svg></span> Increasing Administrative Complexity</div>
+      <div class="mini-tag" style="top:6%;right:6%"><span class="d"><svg class="ico"><use href="#users"/></svg></span> Parents Want to Be Involved but Lack the Right Tools</div>
+      <div class="mini-tag" style="top:42%;left:4%"><span class="d"><svg class="ico"><use href="#teacher"/></svg></span> Teachers Overwhelmed with Repetitive Tasks</div>
+      <div class="mini-tag" style="top:40%;right:2%"><span class="d"><svg class="ico"><use href="#cap"/></svg></span> Students Need Personalized Learning</div>
+      <div class="mini-tag" style="bottom:8%;right:8%"><span class="d"><svg class="ico"><use href="#link"/></svg></span> Disconnected Systems, Disconnected Outcomes</div>
+    </div>
+  </div>
+  <div class="wrap grid g5 ch-cards">
+    <div class="card ch-card"><div class="icon-badge"><svg class="ico"><use href="#clock"/></svg></div><h4>Too Much Time on Administration</h4><p>Manual processes and paperwork consume time that should be spent on students.</p></div>
+    <div class="card ch-card"><div class="icon-badge"><svg class="ico"><use href="#database"/></svg></div><h4>Data Without Direction</h4><p>Reports are generated but insights are missing. Decisions are delayed.</p></div>
+    <div class="card ch-card"><div class="icon-badge"><svg class="ico"><use href="#layers"/></svg></div><h4>Multiple Tools, Zero Integration</h4><p>Different systems for different needs—leading to duplication, errors and frustration.</p></div>
+    <div class="card ch-card"><div class="icon-badge"><svg class="ico"><use href="#users"/></svg></div><h4>Limited Parent Engagement</h4><p>Communication gaps keep parents disconnected from their child's learning journey.</p></div>
+    <div class="card ch-card"><div class="icon-badge"><svg class="ico"><use href="#bar-chart"/></svg></div><h4>No Visibility into Student Potential</h4><p>Difficult to identify challenges early and provide the right support at the right time.</p></div>
+  </div>
+  <div class="wrap ch-foot">It's time for a smarter way to run schools.<br><span class="blue">It's time for EduAitor.</span></div>
+</section>
+
+<!-- ============================ SOLUTION (home-4) ============================ -->
+<section class="solution" id="solutions">
+  <div class="wrap sol-grid">
+    <div>
+      <span class="pill">The Solution</span>
+      <h2 style="margin-top:16px">Meet<br>Edu<span class="blue">AI</span>tor</h2>
+      <p style="color:var(--blue);font-family:'Poppins';font-weight:600;font-size:20px;margin-top:8px;border-bottom:3px solid var(--blue);display:inline-block;padding-bottom:8px">The AI-Powered School Operating System</p>
+      <p style="margin-top:20px"><b style="color:var(--ink)">EduAitor transforms school management into school intelligence.</b></p>
+      <p style="margin-top:12px">By combining administration, academics, AI, parent engagement and student success into one intelligent ecosystem, EduAitor enables schools to spend less time managing processes and more time nurturing potential.</p>
+      <div class="sol-note"><div class="ic"><svg class="ico"><use href="#compass"/></svg></div><div><b style="color:var(--ink)">Intelligence at the core.</b><br>AI that simplifies operations, enhances teaching, personalizes learning and drives better outcomes.</div></div>
+    </div>
+    <img class="dash-img" src="Eduaitor/public/home/solution-dashboard.png" alt="EduAitor dashboard on laptop and mobile" />
+  </div>
+  <div class="wrap sol-feats">
+    <div class="sol-feat"><div class="icon-badge" style="background:var(--purple)"><svg class="ico"><use href="#users"/></svg></div><b>One Platform</b><span>Everything Connected.</span></div>
+    <div class="sol-feat"><div class="icon-badge" style="background:var(--blue)"><svg class="ico"><use href="#ai"/></svg></div><b>AI-Powered</b><span>Intelligence that makes a difference.</span></div>
+    <div class="sol-feat"><div class="icon-badge" style="background:var(--green)"><svg class="ico"><use href="#shield"/></svg></div><b>Secure &amp; Reliable</b><span>Enterprise-grade security you can trust.</span></div>
+    <div class="sol-feat"><div class="icon-badge" style="background:var(--orange)"><svg class="ico"><use href="#smartphone"/></svg></div><b>Mobile First</b><span>Powerful apps for every stakeholder.</span></div>
+    <div class="sol-feat"><div class="icon-badge" style="background:var(--blue)"><svg class="ico"><use href="#cloud"/></svg></div><b>Future Ready</b><span>Scalable, flexible and built to grow with you.</span></div>
+  </div>
+  <div class="wrap"><div class="promise"><div class="star"><svg class="ico"><use href="#star"/></svg></div><div><b>Our Promise</b> &nbsp; We don't just automate schools.<br><b>We empower educators, engage parents and support students to achieve more.</b></div></div></div>
+</section>
+
+<!-- ============================ ECOSYSTEM (home-5) ============================ -->
+<section class="dots-bg" id="ecosystem">
+  <div class="wrap center">
+    <span class="pill grad">Our Ecosystem</span>
+    <h2 class="sec-title" style="margin-top:18px">One Intelligent <span class="blue">Ecosystem.</span><br>Endless Possibilities.</h2>
+    <p class="sec-sub">Everything your school needs—administration, academics, AI, communication, finance, and more—working together on one intelligent platform.</p>
+  </div>
+  <div class="wrap grid g5" style="margin-top:44px">
+    <div class="card eco-card"><div class="eco-head"><div class="ic" style="background:var(--blue)"><svg class="ico"><use href="#school"/></svg></div><h4>School Administration</h4></div><p>Manage students, staff, attendance, timetables, leaves and daily operations seamlessly.</p></div>
+    <div class="card eco-card"><div class="eco-head"><div class="ic" style="background:var(--green)"><svg class="ico"><use href="#cap"/></svg></div><h4>Academic Management</h4></div><p>Homework, assignments, exams, report cards and academic workflows—simplified.</p></div>
+    <div class="card eco-card"><div class="eco-head"><div class="ic" style="background:var(--purple)"><svg class="ico"><use href="#edit"/></svg></div><h4>AI Assessment Generator</h4></div><p>Create worksheets, tests, question papers and quizzes in seconds with AI.</p></div>
+    <div class="card eco-card"><div class="eco-head"><div class="ic" style="background:var(--blue)"><svg class="ico"><use href="#ai"/></svg></div><h4>AI Academic Assistant</h4></div><p>24×7 AI tutor for explanations, summaries, doubt solving and learning recommendations.</p></div>
+    <div class="card eco-card"><div class="eco-head"><div class="ic" style="background:var(--orange)"><svg class="ico"><use href="#users"/></svg></div><h4>Parent Empowerment</h4></div><p>Real-time updates, AI test creation, homework alerts and complete visibility—all in one app.</p></div>
+    <div class="card eco-card"><div class="eco-head"><div class="ic" style="background:var(--teal)"><svg class="ico"><use href="#cap"/></svg></div><h4>Student Success Platform</h4></div><p>Personalized learning, improvement plans and goal tracking for every learner.</p></div>
+    <div class="card eco-card"><div class="eco-head"><div class="ic" style="background:var(--pink)"><svg class="ico"><use href="#line-chart"/></svg></div><h4>Predictive Performance Analytics</h4></div><p>AI predicts performance, identifies risks and recommends proactive interventions.</p></div>
+    <div class="card eco-card"><div class="eco-head"><div class="ic" style="background:var(--blue)"><svg class="ico"><use href="#message"/></svg></div><h4>Communication Suite</h4></div><p>Smart announcements, group messages, SMS, email and WhatsApp integration.</p></div>
+    <div class="card eco-card"><div class="eco-head"><div class="ic" style="background:var(--orange)"><svg class="ico"><use href="#cart"/></svg></div><h4>School Commerce</h4></div><p>Manage uniform, books, stationery, fees, events and other school purchases.</p></div>
+    <div class="card eco-card"><div class="eco-head"><div class="ic" style="background:var(--green)"><svg class="ico"><use href="#dollar"/></svg></div><h4>Finance &amp; Fee Management</h4></div><p>Fee collection, invoicing, discounts, dues, receipts and financial accounting.</p></div>
+    <div class="card eco-card"><div class="eco-head"><div class="ic" style="background:var(--purple)"><svg class="ico"><use href="#bus"/></svg></div><h4>Transport Management</h4></div><p>Real-time GPS tracking, route management, attendance on boarding and safety alerts.</p></div>
+    <div class="card eco-card"><div class="eco-head"><div class="ic" style="background:var(--teal)"><svg class="ico"><use href="#book"/></svg></div><h4>Library Management</h4></div><p>Cataloging, issue/return, digital library, member management and fines.</p></div>
+    <div class="card eco-card"><div class="eco-head"><div class="ic" style="background:var(--orange)"><svg class="ico"><use href="#bed"/></svg></div><h4>Hostel Management</h4></div><p>Room allocation, mess management, attendance, leave tracking and more.</p></div>
+    <div class="card eco-card"><div class="eco-head"><div class="ic" style="background:var(--blue)"><svg class="ico"><use href="#layers"/></svg></div><h4>Integrations &amp; APIs</h4></div><p>Seamless integration with third-party apps, devices and government platforms.</p></div>
+    <div class="card eco-card"><div class="eco-head"><div class="ic" style="background:var(--pink)"><svg class="ico"><use href="#bar-chart"/></svg></div><h4>Analytics &amp; Decision Intelligence</h4></div><p>Real-time dashboards, custom reports and data-driven insights for smarter decisions.</p></div>
+  </div>
+  <div class="wrap eco-cta"><button class="btn btn-primary" style="padding:16px 34px">Explore the Entire Ecosystem →</button></div>
+  <div class="wrap eco-foot"><svg class="ico"><use href="#shield"/></svg> One Platform. Every Feature. Unlimited Possibilities.</div>
+</section>
+
+<!-- ============================ STAKEHOLDERS (home-6) ============================ -->
+<section class="stake">
+  <div class="wrap center">
+    <span class="eyebrow">Built for Everyone Who Shapes Education</span>
+    <h2 class="sec-title" style="margin-top:12px">Empowering Every Stakeholder.<br><span class="blue">Strengthening Every Outcome.</span></h2>
+    <p class="sec-sub">EduAitor is designed for the entire school community—bringing everyone together to create a smarter, more connected and more successful learning environment.</p>
+  </div>
+  <div class="wrap grid g5" style="margin-top:44px">
+    <div class="card stake-card"><div class="photo" style="background:#e9f0ff;color:var(--blue)"><svg class="ico"><use href="#user"/></svg></div><div class="body"><h4>School Leadership</h4><p style="font-size:13px;margin-bottom:12px">Make smarter strategic decisions with real-time insights, automation and actionable analytics.</p><ul><li>Real-time dashboards</li><li>Data-driven decision making</li><li>Institution-wide visibility</li></ul></div></div>
+    <div class="card stake-card"><div class="photo" style="background:#e8f6ee;color:var(--green)"><svg class="ico"><use href="#briefcase"/></svg></div><div class="body"><h4>Administrators</h4><p style="font-size:13px;margin-bottom:12px">Simplify daily operations, automate workflows and manage the school efficiently.</p><ul><li>Automated processes</li><li>Centralized management</li><li>Time and cost savings</li></ul></div></div>
+    <div class="card stake-card"><div class="photo" style="background:#f0eaff;color:var(--purple)"><svg class="ico"><use href="#teacher"/></svg></div><div class="body"><h4>Teachers</h4><p style="font-size:13px;margin-bottom:12px">Reduce administrative workload and focus more on teaching, inspiring and mentoring.</p><ul><li>AI academic tools</li><li>Easy lesson &amp; assessment creation</li><li>More time for what matters</li></ul></div></div>
+    <div class="card stake-card"><div class="photo" style="background:#fff0e6;color:var(--orange)"><svg class="ico"><use href="#users"/></svg></div><div class="body"><h4>Parents</h4><p style="font-size:13px;margin-bottom:12px">Stay informed, engaged and empowered to support your child's learning journey.</p><ul><li>Real-time updates</li><li>AI test creation &amp; homework alerts</li><li>Complete visibility in one app</li></ul></div></div>
+    <div class="card stake-card"><div class="photo" style="background:#e6f6f5;color:var(--teal)"><svg class="ico"><use href="#cap"/></svg></div><div class="body"><h4>Students</h4><p style="font-size:13px;margin-bottom:12px">Learn better with personalized support, instant help and resources available anytime, anywhere.</p><ul><li>24×7 AI academic assistant</li><li>Personalized learning</li><li>Track progress &amp; improve</li></ul></div></div>
+  </div>
+  <div class="wrap"><div class="stake-banner"><div class="ic"><svg class="ico"><use href="#users"/></svg></div><div><h3>One Community. <span class="blue">One Goal.</span></h3><p style="font-family:'Poppins';font-weight:600;color:var(--ink);font-size:18px">When every stakeholder is empowered, every student achieves more.</p></div></div></div>
+  <div class="wrap center" style="margin-top:22px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:8px"><svg class="ico"><use href="#shield"/></svg> One Platform. Every Stakeholder. Infinite Impact.</div>
+</section>
+
+<!-- ============================ WHAT MAKES DIFFERENT (home-7) ============================ -->
+<section class="dots-bg">
+  <div class="wrap center">
+    <span class="eyebrow">What Makes Us Different</span>
+    <h2 class="sec-title" style="margin-top:12px">More Than Software.<br>A Complete <span class="blue">School Transformation</span> Platform.</h2>
+    <p class="sec-sub">EduAitor combines the power of AI with deep domain expertise to deliver more than automation—we deliver transformation that impacts every learner, educator and every outcome.</p>
+  </div>
+  <div class="wrap grid g6" style="margin-top:44px">
+    <div class="card d7-card"><div class="icon-badge" style="background:var(--blue)"><svg class="ico"><use href="#ai"/></svg></div><h4>AI-First</h4><p>AI is at the core of everything we build—empowering educators, supporting students and simplifying every workflow.</p></div>
+    <div class="card d7-card"><div class="icon-badge" style="background:var(--green)"><svg class="ico"><use href="#layers"/></svg></div><h4>One Platform</h4><p>All school operations, academics, finance, transport, commerce and analytics—unified on one intelligent platform.</p></div>
+    <div class="card d7-card"><div class="icon-badge" style="background:var(--purple)"><svg class="ico"><use href="#users"/></svg></div><h4>Parent Empowerment</h4><p>Transform parents from spectators to active learning partners with real-time visibility and AI-powered tools.</p></div>
+    <div class="card d7-card"><div class="icon-badge" style="background:var(--teal)"><svg class="ico"><use href="#cap"/></svg></div><h4>Student Success</h4><p>Personalized learning, AI academic assistant and predictive insights help every student learn better and achieve more.</p></div>
+    <div class="card d7-card"><div class="icon-badge" style="background:var(--orange)"><svg class="ico"><use href="#bar-chart"/></svg></div><h4>Predictive Intelligence</h4><p>AI-powered analytics predict risks, identify learning gaps and empower leadership with actionable insights.</p></div>
+    <div class="card d7-card"><div class="icon-badge" style="background:var(--blue)"><svg class="ico"><use href="#shield"/></svg></div><h4>Enterprise Ready</h4><p>Scalable, secure and future-ready architecture with multi-school support, advanced integrations and enterprise-grade security.</p></div>
+  </div>
+  <div class="wrap"><div class="d7-foot"><div><span style="font-family:'Poppins';font-weight:700;color:var(--ink);font-size:20px">We don't just digitize schools.</span><br><span class="blue" style="font-family:'Poppins';font-weight:700;font-size:20px">We transform the way schools operate, teach and inspire.</span></div><div class="mini"><div><i><svg class="ico"><use href="#clock"/></svg></i>Save Time</div><div><i><svg class="ico"><use href="#settings"/></svg></i>Increase Efficiency</div><div><i><svg class="ico"><use href="#line-chart"/></svg></i>Improve Outcomes</div><div><i><svg class="ico"><use href="#users"/></svg></i>Create Impact</div></div></div></div>
+  <div class="wrap center" style="margin-top:20px;color:var(--muted)">Better Operations. Better Teaching. Better Learning. <span class="blue">Stronger Outcomes.</span></div>
+</section>
+
+<!-- ============================ PURPOSE (home-8) ============================ -->
+<section class="purpose">
+  <div class="wrap pp-grid">
+    <div>
+      <span class="eyebrow">Our Purpose</span>
+      <h2 class="sec-title" style="margin-top:12px">Because Education <span class="blue">Changes Lives.</span></h2>
+      <p style="margin-top:18px">At EduAitor, we believe technology should empower people, not replace them. That's why we built more than a platform—we built a purpose.</p>
+      <ul class="pp-list" style="margin-top:24px">
+        <li><span class="ic" style="background:#e9f0ff;color:var(--blue)"><svg class="ico"><use href="#teacher"/></svg></span><div>We believe technology should <b class="blue">empower educators</b> to teach better, not just work faster.</div></li>
+        <li><span class="ic" style="background:#e8f6ee;color:var(--green)"><svg class="ico"><use href="#users"/></svg></span><div>We believe parents should become <b style="color:var(--green)">active learning partners</b>, every step of the way.</div></li>
+        <li><span class="ic" style="background:#f0eaff;color:var(--purple)"><svg class="ico"><use href="#cap"/></svg></span><div>We believe <b style="color:var(--purple)">every student</b> deserves personalized support to discover their potential and achieve their dreams.</div></li>
+        <li><span class="ic" style="background:#fff0e6;color:var(--orange)"><svg class="ico"><use href="#school"/></svg></span><div>We believe <b style="color:var(--orange)">schools</b> should spend more time educating and less time managing.</div></li>
+        <li><span class="ic" style="background:#e9f0ff;color:var(--blue)"><svg class="ico"><use href="#heart"/></svg></span><div>We believe in creating <b class="blue">meaningful impact</b> that builds smarter schools and a better future for generations to come.</div></li>
+      </ul>
+    </div>
+    <div class="pp-photo"><img class="pp-img" src="Eduaitor/public/home/purpose-classroom.png" alt="Teacher helping students" /><div class="pp-quote" style="right:auto;left:16px">Empower Educators.<br>Engage Parents.<br>Elevate Students.</div><div class="pp-quote" style="top:auto;bottom:16px;right:16px;font-size:15px;display:flex;gap:8px;align-items:center"><svg class="ico"><use href="#heart"/></svg> That is why EduAitor exists.</div></div>
+  </div>
+  <div class="wrap"><div class="pp-mission"><div class="logo-badge"><svg class="ico"><use href="#sparkles"/></svg></div><div><b style="color:var(--ink);font-family:'Poppins'">Our Mission in Every Action</b></div><div class="items"><div><i><svg class="ico"><use href="#users"/></svg></i>Simplify Operations</div><div><i><svg class="ico"><use href="#teacher"/></svg></i>Empower Educators</div><div><i><svg class="ico"><use href="#users"/></svg></i>Engage Parents</div><div><i><svg class="ico"><use href="#cap"/></svg></i>Support Students</div><div><i><svg class="ico"><use href="#line-chart"/></svg></i>Improve Outcomes</div></div><div style="margin-left:auto;text-align:right"><b style="color:var(--ink);font-family:'Poppins'">Stronger Schools.<br>Stronger Students.<br><span class="blue">Stronger Tomorrow.</span></b></div></div></div>
+  <div class="wrap pp-cite">“ Education is not just what we do. <span class="blue">It's why we exist.</span> ”</div>
+</section>
+
+<!-- ============================ EDUAITOR DIFFERENCE (home-9) ============================ -->
+<section class="diff9">
+  <img class="d9-hero-photo" src="Eduaitor/public/home/difference-woman.png" alt="Educator with tablet" />
+  <div class="wrap center">
+    <span class="pill grad">The EduAitor Difference</span>
+    <h2 class="sec-title" style="margin-top:16px">It's Not Just a School Software.<br>It's a <span class="blue">Smarter Way Forward.</span></h2>
+    <p class="sec-sub">EduAitor combines AI + Automation + Education Expertise to deliver <span class="blue">unmatched value</span> for every school.</p>
+  </div>
+  <div class="wrap d9-top" style="margin-top:40px">
+    <ul class="d9-side">
+      <li><span class="ic" style="background:var(--blue)"><svg class="ico"><use href="#ai"/></svg></span><div><b>AI at the Core</b><span>Built with AI to think, predict and personalize.</span></div></li>
+      <li><span class="ic" style="background:var(--green)"><svg class="ico"><use href="#check-circle"/></svg></span><div><b>All-in-One Platform</b><span>Everything schools need, unified and simplified.</span></div></li>
+      <li><span class="ic" style="background:var(--purple)"><svg class="ico"><use href="#lock"/></svg></span><div><b>Secure &amp; Reliable</b><span>Enterprise-grade security you can trust.</span></div></li>
+      <li><span class="ic" style="background:var(--orange)"><svg class="ico"><use href="#smartphone"/></svg></span><div><b>Mobile First</b><span>Powerful mobile apps for every stakeholder.</span></div></li>
+      <li><span class="ic" style="background:var(--blue)"><svg class="ico"><use href="#cloud"/></svg></span><div><b>Future Ready</b><span>Scalable, flexible and built to grow with you.</span></div></li>
+    </ul>
+    <div class="d9-cards">
+      <div class="card d9-card"><div class="icon-badge" style="color:var(--blue)"><svg class="ico"><use href="#target"/></svg></div><h4>Smarter</h4><p>AI-driven insights, automated workflows and intelligent recommendations that save time and improve decisions.</p></div>
+      <div class="card d9-card"><div class="icon-badge" style="color:var(--green)"><svg class="ico"><use href="#users"/></svg></div><h4>More Engaging</h4><p>Powerful tools that engage students, empower teachers and connect parents like never before.</p></div>
+      <div class="card d9-card"><div class="icon-badge" style="color:var(--purple)"><svg class="ico"><use href="#settings"/></svg></div><h4>More Complete</h4><p>From administration to academics, transport to communication—everything on one unified platform.</p></div>
+      <div class="card d9-card"><div class="icon-badge" style="color:var(--orange)"><svg class="ico"><use href="#bar-chart"/></svg></div><h4>More Impactful</h4><p>Personalized learning, predictive analytics and student success tools that drive better outcomes.</p></div>
+      <div class="card d9-card"><div class="icon-badge" style="color:var(--teal)"><svg class="ico"><use href="#shield"/></svg></div><h4>More Trusted</h4><p>Built with robust security, data privacy and compliance at the heart of everything we do.</p></div>
+      <div class="card d9-card"><div class="icon-badge" style="color:var(--pink)"><svg class="ico"><use href="#heart"/></svg></div><h4>More Human</h4><p>Technology that understands people—designed to support, not replace the human touch in education.</p></div>
+    </div>
+  </div>
+  <div class="wrap vs-row">
+    <div class="vs-box trad"><h4>Traditional School Software</h4><ul><li>Manual and time-consuming</li><li>Works in isolation</li><li>Limited insights and reporting</li><li>Difficult to use and adopt</li><li>One-size-fits-all approach</li></ul></div>
+    <div class="vs-mid">VS</div>
+    <div class="vs-box edu"><h4>EduAitor</h4><ul><li>Intelligent automation that saves hours every day</li><li>One platform, all functions—fully connected</li><li>AI-powered insights for smarter decisions</li><li>Easy to use, loved by all stakeholders</li><li>Designed for every school's unique needs</li></ul></div>
+  </div>
+  <div class="wrap" style="margin-top:24px"><div class="center" style="font-family:'Poppins';font-weight:700;font-size:22px;color:var(--ink);display:flex;align-items:center;justify-content:center;gap:10px"><svg class="ico" style="color:var(--orange)"><use href="#star"/></svg> We don't just manage schools. <span class="blue">We help schools excel.</span></div></div>
+  <div class="wrap"><div class="d9-strip"><div><b style="font-family:'Poppins';font-size:20px;display:flex;align-items:center;gap:10px"><svg class="ico"><use href="#award"/></svg> The EduAitor Difference</b><br><span style="color:#cfe0ff">Better Technology. Better Experiences. Better Outcomes.</span></div><div class="mini"><div><i><svg class="ico"><use href="#clock"/></svg></i>Save Time</div><div><i><svg class="ico"><use href="#teacher"/></svg></i>Empower Teachers</div><div><i><svg class="ico"><use href="#users"/></svg></i>Engage Parents</div><div><i><svg class="ico"><use href="#cap"/></svg></i>Support Students</div><div><i><svg class="ico"><use href="#line-chart"/></svg></i>Improve Outcomes</div></div></div></div>
+</section>
+
+<!-- ============================ PRICING (home-10) ============================ -->
+<section class="pricing" id="pricing">
+  <div class="wrap center">
+    <span class="pill grad">Simple. Transparent. Affordable.</span>
+    <h2 class="sec-title" style="margin-top:16px">Powerful. Complete. Affordable.<br>That's <span class="blue">EduAitor ONE.</span></h2>
+    <p class="sec-sub">All the features you need. One simple plan. Maximum value for every student.</p>
+  </div>
+  <div class="wrap pr-grid">
+    <div class="pr-side">
+      <h5>What You Get With EduAitor ONE</h5>
+      <ul>
+        <li><span class="ic"><svg class="ico"><use href="#monitor"/></svg></span><div><b>Complete School Management</b><span>Admin, academics, fees, transport &amp; more</span></div></li>
+        <li><span class="ic"><svg class="ico"><use href="#ai"/></svg></span><div><b>AI-Powered Learning</b><span>Assessments, assistant, personalized learning</span></div></li>
+        <li><span class="ic"><svg class="ico"><use href="#users"/></svg></span><div><b>Parent &amp; Student Engagement</b><span>Real-time updates, alerts &amp; dashboards</span></div></li>
+        <li><span class="ic"><svg class="ico"><use href="#bar-chart"/></svg></span><div><b>Smart Analytics &amp; Reports</b><span>Data-driven insights for better decisions</span></div></li>
+        <li><span class="ic"><svg class="ico"><use href="#shield"/></svg></span><div><b>Secure &amp; Reliable</b><span>Enterprise-grade security &amp; data protection</span></div></li>
+        <li><span class="ic"><svg class="ico"><use href="#cloud"/></svg></span><div><b>Always Accessible</b><span>Cloud-based. Anytime, anywhere.</span></div></li>
+      </ul>
+    </div>
+    <div>
+      <div class="center" style="margin-bottom:16px"><span class="pill">One Plan. Two Options.</span></div>
+      <div class="plans">
+        <div class="plan month"><div class="tag"><svg class="ico"><use href="#calendar"/></svg> MONTHLY PLAN</div><p style="font-size:12px;color:var(--muted);margin-bottom:14px">Flexible. Convenient. Hassle-free.</p><div class="price">₹1</div><div class="per">Per Student Per Day</div><div class="billed">Billed Monthly</div><ul><li>All features included</li><li>Pay only for active students</li><li>Cancel or adjust anytime</li></ul></div>
+        <div class="plan year"><div class="tag"><svg class="ico"><use href="#calendar"/></svg> YEARLY PLAN</div><p style="font-size:12px;color:var(--muted);margin-bottom:14px">Best Value. Maximum Savings.</p><div class="price">₹1</div><div class="per">Per Student Per Day</div><div class="billed">Billed Yearly</div><ul><li>All features included</li><li>25% discount vs. monthly plan</li><li>Best value for your school</li></ul></div>
+        <div class="save-badge"><div><b>SAVE 25%</b><span>WITH YEARLY PLAN</span></div></div>
+      </div>
+    </div>
+    <div class="pr-side">
+      <h5>Trusted by Schools. Built for Impact.</h5>
+      <ul>
+        <li><span class="ic"><svg class="ico"><use href="#school"/></svg></span><div><b>For Schools</b><span>Save time, reduce workload, improve outcomes.</span></div></li>
+        <li><span class="ic"><svg class="ico"><use href="#teacher"/></svg></span><div><b>For Teachers</b><span>Teach better, manage easily, inspire more.</span></div></li>
+        <li><span class="ic"><svg class="ico"><use href="#users"/></svg></span><div><b>For Parents</b><span>Stay connected, informed and empowered.</span></div></li>
+        <li><span class="ic"><svg class="ico"><use href="#cap"/></svg></span><div><b>For Students</b><span>Learn better, achieve more, dream bigger.</span></div></li>
+        <li><span class="ic"><svg class="ico"><use href="#lock"/></svg></span><div><b>100% Secure</b><span>Your data is safe with enterprise-grade security.</span></div></li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap"><div class="pr-foot"><div class="mini"><div><i><svg class="ico"><use href="#clock"/></svg></i>Save Time<br><span style="color:#9db4d8;font-weight:400">Automate tasks.</span></div><div><i class="cur">₹</i>Save Costs<br><span style="color:#9db4d8;font-weight:400">Affordable pricing.</span></div><div><i><svg class="ico"><use href="#line-chart"/></svg></i>Improve Outcomes<br><span style="color:#9db4d8;font-weight:400">Data-driven insights.</span></div><div><i><svg class="ico"><use href="#heart"/></svg></i>Stronger Community<br><span style="color:#9db4d8;font-weight:400">Connected schools.</span></div></div><div style="text-align:right"><b style="font-family:'Poppins';font-size:18px">One Plan. Every Feature.</b><br><span style="color:#37e08a;font-family:'Poppins';font-weight:700;font-size:20px">₹1 Per Student Per Day.</span><br><span style="color:#9db4d8;font-size:12px">That's the EduAitor Promise.</span></div></div></div>
+  <div class="wrap center" style="margin-top:20px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap"><svg class="ico"><use href="#shield"/></svg> Simple Pricing. Powerful Impact. That's EduAitor ONE. &nbsp;·&nbsp; NO COMPLEX PLANS · NO HIDDEN CHARGES · JUST REAL VALUE</div>
+</section>
+
+<!-- ============================ IMPACT LOOP (home-11) ============================ -->
+<section class="loop">
+  <div class="wrap center">
+    <span class="pill grad">The EduAitor Impact Loop</span>
+    <h2 class="sec-title" style="margin-top:16px">Better Operations. Better Teaching.<br><span class="blue">Better Learning. Better Future.</span></h2>
+    <p class="sec-sub">A continuous cycle of intelligence and action that creates lasting impact for every stakeholder in the education ecosystem.</p>
+  </div>
+  <div class="wrap loop-grid">
+    <div class="loop-side">
+      <h5><svg class="ico"><use href="#award"/></svg> The Impact We Create</h5>
+      <ul>
+        <li><span class="ic" style="background:var(--blue)"><svg class="ico"><use href="#school"/></svg></span><div><b>For Schools</b><span>Efficient operations, smarter decisions and stronger outcomes.</span></div></li>
+        <li><span class="ic" style="background:var(--green)"><svg class="ico"><use href="#teacher"/></svg></span><div><b>For Teachers</b><span>Less workload, more focus on what matters most—teaching and inspiring.</span></div></li>
+        <li><span class="ic" style="background:var(--purple)"><svg class="ico"><use href="#cap"/></svg></span><div><b>For Students</b><span>Personalized support, better performance and brighter futures.</span></div></li>
+        <li><span class="ic" style="background:var(--orange)"><svg class="ico"><use href="#users"/></svg></span><div><b>For Parents</b><span>Real-time visibility, meaningful engagement and peace of mind.</span></div></li>
+        <li><span class="ic" style="background:var(--pink)"><svg class="ico"><use href="#globe"/></svg></span><div><b>For Society</b><span>A smarter education ecosystem building a better tomorrow.</span></div></li>
+      </ul>
+    </div>
+    <div class="loop-center">
+      <div class="loop-ring"></div>
+      <div class="loop-node ln1"><svg class="ico"><use href="#settings"/></svg></div>
+      <div class="loop-node ln2"><svg class="ico"><use href="#teacher"/></svg></div>
+      <div class="loop-node ln3"><svg class="ico"><use href="#users"/></svg></div>
+      <div class="loop-node ln4"><svg class="ico"><use href="#users"/></svg></div>
+      <div class="loop-node ln5"><svg class="ico"><use href="#line-chart"/></svg></div>
+      <div class="loop-node ln6"><svg class="ico"><use href="#target"/></svg></div>
+      <div class="loop-core"><div><span class="lg">Edu<span class="blue">AI</span>tor</span><small>Smarter Insights.<br>Stronger Actions.<br>Brighter Outcomes.</small></div></div>
+    </div>
+    <div class="loop-side">
+      <h5><svg class="ico"><use href="#star"/></svg> Enabled by EduAitor</h5>
+      <ul>
+        <li><span class="ic" style="background:var(--blue)"><svg class="ico"><use href="#ai"/></svg></span><div><b>AI-Powered Intelligence</b><span>Smart automation, predictive insights and personalized recommendations.</span></div></li>
+        <li><span class="ic" style="background:var(--green)"><svg class="ico"><use href="#cloud"/></svg></span><div><b>Unified Platform</b><span>All modules, all users, one seamless and secure platform.</span></div></li>
+        <li><span class="ic" style="background:var(--purple)"><svg class="ico"><use href="#shield"/></svg></span><div><b>Secure &amp; Reliable</b><span>Enterprise-grade security, data privacy and 24x7 reliability.</span></div></li>
+        <li><span class="ic" style="background:var(--orange)"><svg class="ico"><use href="#smartphone"/></svg></span><div><b>Accessible Anywhere</b><span>Web and mobile access anytime, anywhere.</span></div></li>
+        <li><span class="ic" style="background:var(--teal)"><svg class="ico"><use href="#settings"/></svg></span><div><b>Future-Ready</b><span>Continuous innovation to keep schools ahead.</span></div></li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap"><div class="loop-strip"><div><span class="ic"><svg class="ico"><use href="#rocket"/></svg></span><div><b style="color:#fff;font-family:'Poppins'">The loop never stops.</b><br><span style="color:#cfe0ff">The impact never ends.</span></div></div><div><span class="ic"><svg class="ico"><use href="#users"/></svg></span><div><b style="color:#fff;font-family:'Poppins'">Join the EduAitor Movement</b><br><span style="color:#cfe0ff">Be part of a community transforming education—together.</span></div></div><div><span class="ic"><svg class="ico"><use href="#handshake"/></svg></span><div><b style="color:#fff;font-family:'Poppins'">Start Your Impact Loop Today</b><br><span style="color:#cfe0ff">One step today. Infinite impact for generations tomorrow.</span></div></div></div></div>
+</section>
+
+<!-- ============================ FUTURE CTA (home-12) ============================ -->
+<section class="future" id="contact">
+  <div class="wrap center">
+    <span class="eyebrow">— The Future of Education is Here —</span>
+    <h2 class="sec-title" style="margin-top:12px">Let's Build Smarter Schools.<br><span class="blue">Together.</span></h2>
+    <p class="sec-sub">EduAitor is more than a platform—it's a movement to transform education, empower every stakeholder and unlock the true potential of every student.</p>
+  </div>
+  <div class="wrap fu-grid" style="margin-top:44px">
+    <ul class="fu-list">
+      <li><span class="ic"><svg class="ico"><use href="#school"/></svg></span><div><b class="blue">Transform Your School</b><span>Streamline operations, enhance teaching and deliver better outcomes.</span></div></li>
+      <li><span class="ic"><svg class="ico"><use href="#users"/></svg></span><div><b style="color:var(--green)">Empower Every Stakeholder</b><span>Give school leaders, teachers, parents and students the tools they need to excel.</span></div></li>
+      <li><span class="ic"><svg class="ico"><use href="#line-chart"/></svg></span><div><b style="color:var(--purple)">Drive Real Impact</b><span>Make data-driven decisions, improve performance and shape brighter futures.</span></div></li>
+      <li><span class="ic"><svg class="ico"><use href="#star"/></svg></span><div><b style="color:var(--orange)">Be Future-Ready</b><span>Embrace AI, automation and innovation—stay ahead, always.</span></div></li>
+    </ul>
+    <div class="fu-center">
+      <div class="rocket"><svg class="ico"><use href="#rocket"/></svg></div>
+      <h3>The Best Time to Start is</h3>
+      <div class="now">NOW!</div>
+      <p>Join hundreds of forward-thinking schools already making the change.</p>
+      <p style="color:#37e08a;font-family:'Poppins';font-weight:600;margin-top:8px">Be the next success story!</p>
+    </div>
+    <div class="fu-photo"><img src="Eduaitor/public/home/future-family.png" alt="Family using EduAitor" /></div>
+  </div>
+  <div class="wrap"><div class="fu-strip"><h4>Let's take the next step—together.</h4><div class="row">
+    <div><span class="ic" style="background:var(--blue)"><svg class="ico"><use href="#calendar"/></svg></span><div><b>Book a Demo</b>See EduAitor in action. Experience the difference.</div></div>
+    <div><span class="ic" style="background:var(--green)"><svg class="ico"><use href="#phone"/></svg></span><div><b>Talk to Our Experts</b>Get personalized guidance for your school.</div></div>
+    <div><span class="ic" style="background:var(--purple)"><svg class="ico"><use href="#handshake"/></svg></span><div><b>Partner With Us</b>Join a growing community of future-ready schools.</div></div>
+    <div><span class="ic" style="background:var(--orange)"><svg class="ico"><use href="#rocket"/></svg></span><div><b>Start Your Journey</b>One simple step today. Infinite possibilities tomorrow.</div></div>
+  </div></div></div>
+  <div class="wrap fu-bottom">
+    <div class="logo">Edu<span class="blue">AI</span>tor</div>
+    <div style="font-size:12px;color:var(--muted)">Smarter Schools. Stronger Students.</div>
+    <div class="tagline">Smarter Schools. Stronger Students. Better Tomorrow.</div>
+    <div style="color:var(--green);font-family:'Poppins';font-weight:600;font-size:18px;margin-bottom:14px">Let's make it happen!</div>
+    <div class="contact"><span><svg class="ico"><use href="#globe"/></svg> www.eduaitor.com</span><span><svg class="ico"><use href="#mail"/></svg> hello@eduaitor.com</span><span><svg class="ico"><use href="#phone"/></svg> +91 89557 89557</span></div>
+  </div>
+</section>
+
+<!-- ============================ FOOTER (home-13) ============================ -->
+<footer class="footer" id="resources">
+  <div class="foot-main">
+    <div class="wrap foot-grid">
+      <div class="foot-about">
+        <div class="logo">Edu<span class="blue">AI</span>tor</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Smarter Schools. Stronger Students.</div>
+        <p>EduAitor is an AI-powered School Operating System that simplifies operations, empowers educators, engages parents and helps every student reach their full potential.</p>
+        <div class="foot-note"><svg class="ico"><use href="#heart"/></svg> One Ecosystem. Every Connection. Infinite Impact.</div>
+      </div>
+      <div><h5>Product</h5>
+        <a><svg class="ico lead-ic"><use href="#star"/></svg> Features <span class="chev">›</span></a><a><svg class="ico lead-ic"><use href="#cap"/></svg> Academics <span class="chev">›</span></a><a><svg class="ico lead-ic"><use href="#ai"/></svg> AI &amp; Learning <span class="chev">›</span></a><a><svg class="ico lead-ic"><use href="#users"/></svg> Parent Suite <span class="chev">›</span></a><a><svg class="ico lead-ic"><use href="#building"/></svg> Admin Suite <span class="chev">›</span></a><a><svg class="ico lead-ic"><use href="#shield"/></svg> Security <span class="chev">›</span></a><a><svg class="ico lead-ic"><use href="#smartphone"/></svg> Mobile Apps <span class="chev">›</span></a></div>
+      <div><h5>Solutions</h5>
+        <a><svg class="ico lead-ic"><use href="#school"/></svg> For Schools <span class="chev">›</span></a><a><svg class="ico lead-ic"><use href="#teacher"/></svg> For Teachers <span class="chev">›</span></a><a><svg class="ico lead-ic"><use href="#users"/></svg> For Parents <span class="chev">›</span></a><a><svg class="ico lead-ic"><use href="#cap"/></svg> For Students <span class="chev">›</span></a><a><svg class="ico lead-ic"><use href="#user"/></svg> By Role <span class="chev">›</span></a><a><svg class="ico lead-ic"><use href="#target"/></svg> By Need <span class="chev">›</span></a><a><svg class="ico lead-ic"><use href="#file-text"/></svg> By Board <span class="chev">›</span></a></div>
+      <div><h5>Resources</h5>
+        <a><svg class="ico lead-ic"><use href="#help"/></svg> Help Center <span class="chev">›</span></a><a><svg class="ico lead-ic"><use href="#book"/></svg> Knowledge Base <span class="chev">›</span></a><a><svg class="ico lead-ic"><use href="#edit"/></svg> Blogs <span class="chev">›</span></a><a><svg class="ico lead-ic"><use href="#line-chart"/></svg> Case Studies <span class="chev">›</span></a><a><svg class="ico lead-ic"><use href="#video"/></svg> Webinars <span class="chev">›</span></a><a><svg class="ico lead-ic"><use href="#download"/></svg> Downloads <span class="chev">›</span></a><a><svg class="ico lead-ic"><use href="#sparkles"/></svg> What's New <span class="chev">›</span></a></div>
+      <div><h5>Company</h5>
+        <a><svg class="ico lead-ic"><use href="#users"/></svg> About Us <span class="chev">›</span></a><a><svg class="ico lead-ic"><use href="#target"/></svg> Our Mission <span class="chev">›</span></a><a><svg class="ico lead-ic"><use href="#user"/></svg> Our Team <span class="chev">›</span></a><a><svg class="ico lead-ic"><use href="#briefcase"/></svg> Careers <span class="chev">›</span></a><a><svg class="ico lead-ic"><use href="#handshake"/></svg> Partners <span class="chev">›</span></a><a><svg class="ico lead-ic"><use href="#lock"/></svg> Privacy Policy <span class="chev">›</span></a><a><svg class="ico lead-ic"><use href="#file-text"/></svg> Terms of Service <span class="chev">›</span></a></div>
+      <div class="foot-cta">
+        <h5 style="font-family:'Poppins';font-size:18px;text-transform:none;letter-spacing:0">Let's Build <span class="blue">Smarter Schools. Together.</span></h5>
+        <p style="font-size:13px;margin-bottom:16px">Book a demo or connect with our team to see EduAitor in action.</p>
+        <button class="btn btn-primary"><svg class="ico"><use href="#calendar"/></svg> Book a Demo →</button>
+        <button class="btn btn-ghost"><svg class="ico"><use href="#phone"/></svg> Talk to Our Experts</button>
+        <div style="margin-top:16px;font-size:12px;color:var(--muted)">Download the EduAitor App</div>
+        <div style="display:flex;gap:10px;margin-top:8px"><span class="chip"><svg class="ico"><use href="#play"/></svg> Google Play</span><span class="chip"><svg class="ico"><use href="#apple"/></svg> App Store</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot-bar">
+    <div class="wrap foot-bar-inner">
+      <div><svg class="ico bic"><use href="#map-pin"/></svg><div><b style="color:#fff">EduAitor Technologies Pvt. Ltd.</b><br>B-28, Sector-63, Noida, Uttar Pradesh - 201301, India</div></div>
+      <div><svg class="ico bic"><use href="#mail"/></svg><div>hello@eduaitor.com<br>+91 89557 89557</div></div>
+      <div><svg class="ico bic"><use href="#globe"/></svg><div>www.eduaitor.com</div></div>
+      <div style="align-items:center">Follow Us <div class="social"><a><svg class="ico ico-fill"><use href="#facebook"/></svg></a><a><svg class="ico ico-fill"><use href="#linkedin"/></svg></a><a><svg class="ico ico-fill"><use href="#youtube"/></svg></a><a><svg class="ico ico-fill"><use href="#instagram"/></svg></a></div></div>
+    </div>
+    <div class="foot-copy">© 2026 EduAitor Technologies Pvt. Ltd. All rights reserved. &nbsp;|&nbsp; <span class="blue">Empowering Education. Enriching Futures.</span></div>
+  </div>
+</footer>
+
+</body>
+</html>

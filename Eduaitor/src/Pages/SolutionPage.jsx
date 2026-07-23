@@ -1,332 +1,401 @@
-import React, { useEffect, useRef } from "react";
-import { NavLink } from "react-router-dom";
+import React from "react";
+import { Link } from "react-router-dom";
 import "./SolutionPage.css";
-import SuccessStorySection from "../Components/SolutionPage-components/SuccessStorySection";
 
-const roles = [
+const pillars = [
   {
-    id: "schools",
-    emoji: null,
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-        <polyline points="9 22 9 12 15 12 15 22" />
+    num: "01",
+    title: "School Operations",
+    desc: "Run your school smoothly with end-to-end digital management.",
+    accent: "blue",
+    features: [
+      "Admissions",
+      "Administration",
+      "Finance & Fees",
+      "Transport",
+      "Hostel",
+      "Library",
+      "Communication",
+      "Daily Operations",
+    ],
+    link: "/ecosystem?module=school-administration",
+    illustration: (
+      <svg viewBox="0 0 160 100" className="sp-illu" aria-hidden="true">
+        <rect x="48" y="38" width="64" height="48" rx="4" fill="#dbeafe" />
+        <path d="M44 42 L80 18 L116 42" fill="#93c5fd" />
+        <rect x="72" y="62" width="16" height="24" rx="2" fill="#2563eb" />
+        <rect x="56" y="50" width="12" height="12" rx="1.5" fill="#fff" />
+        <rect x="92" y="50" width="12" height="12" rx="1.5" fill="#fff" />
+        <circle cx="36" cy="34" r="10" fill="#bfdbfe" />
+        <path d="M31 34h10M36 29v10" stroke="#2563eb" strokeWidth="1.6" />
+        <rect x="118" y="28" width="22" height="16" rx="3" fill="#eff6ff" stroke="#60a5fa" />
+        <path d="M122 36h14M122 40h10" stroke="#3b82f6" strokeWidth="1.4" />
+        <circle cx="128" cy="70" r="12" fill="#dbeafe" />
+        <path d="M122 70h12M128 64v12" stroke="#2563eb" strokeWidth="1.5" />
       </svg>
     ),
-    tag: "Institution",
-    title: "For Schools & Institutions",
-    description:
-      "Centralize every administrative function — fee collection, vendor coordination, staff oversight, and performance monitoring — in a single intelligent command centre.",
-    features: ["Automated billing & reconciliation", "Vendor marketplace", "Real-time dashboards", "Multi-campus support"],
-    accent: "#6C63FF",
-    bg: "linear-gradient(135deg, #0d0d1a 0%, #12102b 100%)",
   },
   {
-    id: "teachers",
+    num: "02",
+    title: "Teaching & Learning",
+    desc: "Empower teachers with AI tools and engage students in better learning.",
+    accent: "green",
+    features: [
+      "Lesson Planning",
+      "Homework & Assignments",
+      "AI Assessment Generator",
+      "Report Cards",
+      "AI Academic Assistant",
+      "Online Learning",
+      "Personalized Learning",
+    ],
+    link: "/ecosystem?module=ai-assistant",
+    illustration: (
+      <svg viewBox="0 0 160 100" className="sp-illu" aria-hidden="true">
+        <ellipse cx="80" cy="88" rx="48" ry="6" fill="#dcfce7" />
+        <circle cx="52" cy="42" r="14" fill="#86efac" />
+        <path d="M40 70c0-10 8-16 12-16s12 6 12 16v10H40V70z" fill="#22c55e" />
+        <rect x="78" y="28" width="52" height="36" rx="4" fill="#bbf7d0" />
+        <path d="M86 40h36M86 48h28M86 56h20" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" />
+        <circle cx="118" cy="68" r="10" fill="#86efac" />
+        <path d="M110 82c2-8 6-12 8-12s6 4 8 12" fill="#22c55e" />
+      </svg>
+    ),
+  },
+  {
+    num: "03",
+    title: "Student Success",
+    desc: "Identify learning gaps, track progress and help every student excel.",
+    accent: "purple",
+    features: [
+      "Learning Gap Detection",
+      "Personalized Recommendations",
+      "AI Tutor",
+      "Practice Generator",
+      "Progress Tracking",
+      "Goal Tracking",
+      "Predictive Analytics",
+    ],
+    link: "/ecosystem?module=student-success",
+    illustration: (
+      <svg viewBox="0 0 160 100" className="sp-illu" aria-hidden="true">
+        <rect x="70" y="48" width="54" height="34" rx="4" fill="#ede9fe" />
+        <rect x="76" y="54" width="42" height="22" rx="2" fill="#c4b5fd" />
+        <circle cx="52" cy="46" r="13" fill="#c4b5fd" />
+        <path d="M40 72c0-10 8-16 12-16s12 6 12 16v8H40v-8z" fill="#7c3aed" />
+        <path
+          d="M78 72 L90 60 L102 66 L116 48"
+          fill="none"
+          stroke="#7c3aed"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+        />
+        <circle cx="116" cy="48" r="4" fill="#7c3aed" />
+      </svg>
+    ),
+  },
+  {
+    num: "04",
+    title: "Parent Engagement",
+    desc: "Keep parents informed, involved, and empowered in their child's journey.",
+    accent: "orange",
+    features: [
+      "Attendance & Updates",
+      "Homework & Assignments",
+      "AI Test Generator",
+      "Fee Payments",
+      "School Updates",
+      "Communication",
+    ],
+    link: "/ecosystem?module=parent-suite",
+    illustration: (
+      <svg viewBox="0 0 160 100" className="sp-illu" aria-hidden="true">
+        <rect x="88" y="22" width="36" height="62" rx="6" fill="#ffedd5" stroke="#fb923c" strokeWidth="2" />
+        <rect x="94" y="30" width="24" height="40" rx="2" fill="#fff" />
+        <circle cx="106" cy="76" r="2.5" fill="#fb923c" />
+        <circle cx="52" cy="40" r="14" fill="#fdba74" />
+        <path d="M38 74c0-12 9-18 14-18s14 6 14 18v12H38V74z" fill="#ea580c" />
+        <path d="M96 38h20M96 46h16M96 54h12" stroke="#f97316" strokeWidth="1.6" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
+    num: "05",
+    title: "Leadership & Intelligence",
+    desc: "Make smarter decisions with real-time insights and actionable data.",
+    accent: "teal",
+    features: [
+      "Real-time Dashboards",
+      "Admissions Insights",
+      "Finance Overview",
+      "Attendance Insights",
+      "Academics Overview",
+      "Teacher Performance",
+      "Student Performance",
+      "Predictive Analytics",
+      "Custom Reports",
+    ],
+    link: "/ecosystem?module=analytics",
+    columns: 2,
+    illustration: (
+      <svg viewBox="0 0 160 100" className="sp-illu" aria-hidden="true">
+        <rect x="28" y="24" width="104" height="62" rx="6" fill="#ccfbf1" />
+        <rect x="36" y="32" width="28" height="18" rx="3" fill="#5eead4" />
+        <rect x="70" y="32" width="28" height="18" rx="3" fill="#99f6e4" />
+        <rect x="104" y="32" width="20" height="18" rx="3" fill="#2dd4bf" />
+        <path
+          d="M40 72 L56 58 L72 64 L90 46 L112 54"
+          fill="none"
+          stroke="#0d9488"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+        />
+        <circle cx="128" cy="48" r="14" fill="#99f6e4" />
+        <path d="M128 40v16M120 48h16" stroke="#0f766e" strokeWidth="1.6" />
+      </svg>
+    ),
+  },
+  {
+    num: "06",
+    title: "Platform & Technology",
+    desc: "Secure, scalable and future-ready technology for schools of all sizes.",
+    accent: "navy",
+    features: [
+      "Mobile App & Multi-Roles",
+      "Integrations",
+      "Security & Compliance",
+      "Multi-board Support",
+      "Cloud / On-premise",
+      "Scalable & Reliable",
+    ],
+    link: "/ecosystem?module=security",
+    columns: 2,
+    illustration: (
+      <svg viewBox="0 0 160 100" className="sp-illu" aria-hidden="true">
+        <path
+          d="M80 18 L108 30 V52 C108 68 96 80 80 88 C64 80 52 68 52 52 V30 Z"
+          fill="#dbeafe"
+          stroke="#1d4ed8"
+          strokeWidth="2"
+        />
+        <rect x="72" y="44" width="16" height="18" rx="2" fill="#1d4ed8" />
+        <circle cx="80" cy="40" r="6" fill="none" stroke="#1d4ed8" strokeWidth="2" />
+        <circle cx="36" cy="36" r="10" fill="#bfdbfe" />
+        <circle cx="124" cy="36" r="10" fill="#93c5fd" />
+        <circle cx="40" cy="72" r="9" fill="#dbeafe" />
+        <circle cx="120" cy="72" r="9" fill="#bfdbfe" />
+        <path d="M46 40 L70 34M114 40 L90 34M48 68 L66 58M112 68 L94 58" stroke="#60a5fa" strokeWidth="1.5" />
+      </svg>
+    ),
+  },
+];
+
+const highlights = [
+  {
+    title: "AI-Powered Intelligence",
+    desc: "Built-in AI across all solutions",
     icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <rect x="8" y="9" width="8" height="10" rx="2" />
+        <path d="M12 3v3M9 6h6M10 13h.01M14 13h.01M10 16h4" />
+      </svg>
+    ),
+  },
+  {
+    title: "Secure & Compliant",
+    desc: "End-to-end encryption and data protection standards",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        <path d="M9 12l2 2 4-4" />
+      </svg>
+    ),
+  },
+  {
+    title: "Access Anywhere",
+    desc: "Web & mobile access anytime, on any device",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <rect x="5" y="2" width="14" height="20" rx="2" />
+        <path d="M12 18h.01" />
+      </svg>
+    ),
+  },
+  {
+    title: "Dedicated Support",
+    desc: "Onboarding, training & 24x7 customer support",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
+        <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
+      </svg>
+    ),
+  },
+  {
+    title: "Scale Without Limits",
+    desc: "From single school to multi-campus institutions",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M3 17l6-6 4 4 8-8" />
+        <path d="M14 7h7v7" />
+      </svg>
+    ),
+  },
+];
+
+const stats = [
+  {
+    value: "50,000+",
+    label: "Schools Trust EduAitor",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M3 21h18M5 21V8l7-4 7 4v13M9 21v-6h6v6" />
+      </svg>
+    ),
+  },
+  {
+    value: "10 Million+",
+    label: "Students Impacted",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
         <circle cx="9" cy="7" r="4" />
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
       </svg>
     ),
-    tag: "Educator",
-    title: "For Teachers & Staff",
-    description:
-      "Spend less time on paperwork, more time teaching. Manage assessments, track student growth, and communicate with families — all from one streamlined workspace.",
-    features: ["AI-assisted grading", "Attendance automation", "Student progress heatmaps", "Parent messaging hub"],
-    accent: "#00C9A7",
-    bg: "linear-gradient(135deg, #071a16 0%, #0a1f1c 100%)",
   },
   {
-    id: "students",
+    value: "98%",
+    label: "Customer Satisfaction",
     icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-        <path d="M6 12v5c3 3 9 3 12 0v-5" />
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        <path d="M9 12l2 2 4-4" />
       </svg>
     ),
-    tag: "Learner",
-    title: "For Students",
-    description:
-      "A personalised learning portal that adapts to each student. Access resources, track achievements, and stay connected — anytime, on any device.",
-    features: ["Personalised learning paths", "Progress analytics", "Assignment submissions", "Digital certificates"],
-    accent: "#F7C948",
-    bg: "linear-gradient(135deg, #1a1500 0%, #1f1a04 100%)",
   },
-  {
-    id: "parents",
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-      </svg>
-    ),
-    tag: "Family",
-    title: "For Parents & Guardians",
-    description:
-      "Complete visibility into your child's school life. Pay fees securely, receive real-time alerts, and communicate directly with teachers — no app-switching required.",
-    features: ["One-tap fee payments", "Live attendance alerts", "Academic report cards", "Direct teacher chat"],
-    accent: "#FF6B6B",
-    bg: "linear-gradient(135deg, #1a0808 0%, #1f0d0d 100%)",
-  },
-];
-
-const capabilities = [
-  { icon: "📊", title: "Advanced Analytics", desc: "Predictive insights across every department", span: "wide" },
-  { icon: "💳", title: "Secure Payments", desc: "PCI-compliant, instant reconciliation" },
-  { icon: "🛒", title: "Education Marketplace", desc: "Vetted vendors, one procurement flow" },
-  { icon: "🔐", title: "Enterprise Security", desc: "SOC 2, role-based access, encrypted at rest" },
-  { icon: "📩", title: "Unified Comms", desc: "SMS, email, push — all in one inbox", span: "wide" },
-  { icon: "☁️", title: "Cloud Scalability", desc: "Autoscaling infrastructure for any school size" },
-];
-
-const problems = [
-  { problem: "Manual fee tracking & late payments", solution: "Automated billing with real-time reconciliation" },
-  { problem: "Zero vendor transparency or accountability", solution: "Integrated marketplace with verified partners" },
-  { problem: "Siloed, disconnected communication", solution: "Unified multi-channel messaging platform" },
-  { problem: "No data insights to guide growth", solution: "AI-powered analytics & forecasting dashboards" },
 ];
 
 export default function SolutionPage() {
-  const heroRef = useRef(null);
-
-  useEffect(() => {
-    const el = heroRef.current;
-    if (!el) return;
-    const onMove = (e) => {
-      const { clientX: x, clientY: y } = e;
-      const { width, height } = el.getBoundingClientRect();
-      const xP = ((x / width) * 100).toFixed(1);
-      const yP = ((y / height) * 100).toFixed(1);
-      el.style.setProperty("--mx", `${xP}%`);
-      el.style.setProperty("--my", `${yP}%`);
-    };
-    el.addEventListener("mousemove", onMove);
-    return () => el.removeEventListener("mousemove", onMove);
-  }, []);
-
   return (
-    <div className="sp-root">
-      {/* ───────────── HERO ───────────── */}
-      <section className="sp-hero" ref={heroRef}>
-        <div className="sp-hero__glow sp-hero__glow--a" />
-        <div className="sp-hero__glow sp-hero__glow--b" />
-        <div className="sp-hero__grid" aria-hidden="true" />
-
-        <div className="sp-hero__content">
-          <span className="sp-badge">School Management Platform</span>
-          <h1 className="sp-hero__h1">
-            One Platform.<br />
-            <span className="sp-hero__gradient-text">Every Stakeholder.</span><br />
-            Zero Complexity.
-          </h1>
-          <p className="sp-hero__sub">
-            Eduaitor unifies schools, educators, students, and parents under a single intelligent infrastructure —
-            automating operations so everyone can focus on what actually matters: education.
-          </p>
-          <div className="sp-hero__actions">
-            <NavLink to="/bookademo" className="sp-btn sp-btn--primary">
-              Schedule a Demo
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </NavLink>
-            <NavLink to="/features" className="sp-btn sp-btn--ghost">See all features</NavLink>
-          </div>
-          <div className="sp-hero__stats">
-            <div className="sp-stat"><strong>500+</strong><span>Schools onboarded</span></div>
-            <div className="sp-stat__divider" />
-            <div className="sp-stat"><strong>2M+</strong><span>Students managed</span></div>
-            <div className="sp-stat__divider" />
-            <div className="sp-stat"><strong>99.9%</strong><span>Uptime SLA</span></div>
-          </div>
-        </div>
-
-        <div className="sp-hero__visual" aria-hidden="true">
-          <div className="sp-dashboard-mock">
-            <div className="sp-mock__bar">
-              <span /><span /><span />
-            </div>
-            <div className="sp-mock__content">
-              <div className="sp-mock__row">
-                <div className="sp-mock__tile sp-mock__tile--wide">
-                  <div className="sp-mock__label">Fee Collection</div>
-                  <div className="sp-mock__value">₹ 42,80,000</div>
-                  <div className="sp-mock__tag sp-mock__tag--green">↑ 18% this month</div>
-                </div>
-                <div className="sp-mock__tile">
-                  <div className="sp-mock__label">Attendance</div>
-                  <div className="sp-mock__value">94.2%</div>
-                  <div className="sp-mock__tag sp-mock__tag--blue">Live</div>
-                </div>
-              </div>
-              <div className="sp-mock__row">
-                <div className="sp-mock__tile">
-                  <div className="sp-mock__label">Alerts</div>
-                  <div className="sp-mock__value">3 new</div>
-                </div>
-                <div className="sp-mock__tile">
-                  <div className="sp-mock__label">Avg. Score</div>
-                  <div className="sp-mock__value">78.5</div>
-                </div>
-                <div className="sp-mock__tile">
-                  <div className="sp-mock__label">Teachers</div>
-                  <div className="sp-mock__value">124</div>
-                </div>
-              </div>
-              <div className="sp-mock__chart">
-                {[40, 65, 50, 80, 60, 90, 75].map((h, i) => (
-                  <div key={i} className="sp-mock__bar-item" style={{ height: `${h}%`, animationDelay: `${i * 0.1}s` }} />
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ───────────── ROLES ───────────── */}
-      <section className="sp-section sp-roles">
-        <div className="sp-section__header">
-          <span className="sp-badge sp-badge--dark">Role-Based Solutions</span>
-          <h2 className="sp-section__h2">Built for Every Stakeholder</h2>
-          <p className="sp-section__sub">
-            Each experience is purpose-built — no feature bloat, no confusion. Everyone gets exactly what they need.
-          </p>
-        </div>
-
-        <div className="sp-roles__grid">
-          {roles.map((role) => (
-            <div className="sp-role-card" key={role.id} style={{ "--card-accent": role.accent, "--card-bg": role.bg }}>
-              <div className="sp-role-card__header">
-                <div className="sp-role-card__icon">{role.icon}</div>
-                <span className="sp-role-card__tag">{role.tag}</span>
-              </div>
-              <h3 className="sp-role-card__title">{role.title}</h3>
-              <p className="sp-role-card__desc">{role.description}</p>
-              <ul className="sp-role-card__features">
-                {role.features.map((f) => (
-                  <li key={f}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ───────────── PROBLEM / SOLUTION ───────────── */}
-      <section className="sp-section sp-compare">
-        <div className="sp-compare__inner">
-          <div className="sp-section__header sp-section__header--left">
-            <span className="sp-badge">Pain → Gain</span>
-            <h2 className="sp-section__h2">We Fix What's Broken</h2>
-          </div>
-
-          <div className="sp-compare__table">
-            <div className="sp-compare__col sp-compare__col--problem">
-              <div className="sp-compare__col-head">
-                <span className="sp-compare__icon sp-compare__icon--red">✕</span>
-                Without Eduaitor
-              </div>
-              {problems.map((p, i) => (
-                <div className="sp-compare__row" key={i}>
-                  <span>{p.problem}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="sp-compare__divider" aria-hidden="true">
-              <div className="sp-compare__arrow-track">
-                {problems.map((_, i) => (
-                  <svg key={i} width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6C63FF" strokeWidth="2">
-                    <path d="M5 12h14M12 5l7 7-7 7" />
-                  </svg>
-                ))}
-              </div>
-            </div>
-
-            <div className="sp-compare__col sp-compare__col--solution">
-              <div className="sp-compare__col-head">
-                <span className="sp-compare__icon sp-compare__icon--green">✓</span>
-                With Eduaitor
-              </div>
-              {problems.map((p, i) => (
-                <div className="sp-compare__row sp-compare__row--solution" key={i}>
-                  <span>{p.solution}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ───────────── SUCCESS STORY ───────────── */}
-      <SuccessStorySection />
-
-      {/* ───────────── CAPABILITIES ───────────── */}
-      <section className="sp-section sp-capabilities">
-        <div className="sp-section__header">
-          <span className="sp-badge sp-badge--dark">Platform Core</span>
-          <h2 className="sp-section__h2">Everything You Need, Nothing You Don't</h2>
-        </div>
-
-        <div className="sp-cap__bento">
-          {capabilities.map((c, i) => (
-            <div className={`sp-cap__card ${c.span === "wide" ? "sp-cap__card--wide" : ""}`} key={i}>
-              <div className="sp-cap__card-icon">{c.icon}</div>
-              <h3 className="sp-cap__card-title">{c.title}</h3>
-              <p className="sp-cap__card-desc">{c.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ───────────── SECURITY ───────────── */}
-      <section className="sp-security">
-        <div className="sp-security__inner">
-          <div className="sp-security__left">
-            <span className="sp-badge">Trust & Compliance</span>
-            <h2 className="sp-security__h2">Enterprise-Grade Security, Built In</h2>
-            <p className="sp-security__body">
-              Every byte of data is encrypted in transit and at rest. Role-based access controls, audit trails,
-              and compliance-ready architecture mean your institution is protected — always.
+    <div className="sp-page">
+      <section className="sp-hero">
+        <div className="sp-container sp-hero__grid">
+          <div className="sp-hero__copy">
+            <h1>
+              Solutions Built Around Schools.
+              <br />
+              Not Software.
+            </h1>
+            <p>
+              Every school is unique, but the challenges are remarkably similar. EduAitor
+              delivers intelligent solutions that simplify operations, empower educators,
+              engage parents, and help every student succeed.
             </p>
-            <div className="sp-security__badges">
-              {["256-bit Encryption", "Role-Based Access", "SOC 2 Ready", "GDPR Compliant"].map((b) => (
-                <span className="sp-security__badge" key={b}>{b}</span>
-              ))}
+            <div className="sp-hero__actions">
+              <a href="#pillars" className="sp-btn sp-btn--primary">
+                Explore Solutions <span aria-hidden="true">→</span>
+              </a>
+              <Link to="/bookademo" className="sp-btn sp-btn--outline">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" />
+                  <path d="M16 2v4M8 2v4M3 10h18" />
+                </svg>
+                Book a Demo
+              </Link>
             </div>
           </div>
-          <div className="sp-security__right" aria-hidden="true">
-            <div className="sp-shield">
-              <div className="sp-shield__ring sp-shield__ring--1" />
-              <div className="sp-shield__ring sp-shield__ring--2" />
-              <div className="sp-shield__ring sp-shield__ring--3" />
-              <div className="sp-shield__core">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6C63FF" strokeWidth="1.5">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                </svg>
-              </div>
+
+          <div className="sp-hero__visual">
+            <div className="sp-hero__photo-wrap">
+              <img
+                src="/solutions/solutions-hero.png"
+                alt="School leader and students using EduAitor"
+                className="sp-hero__photo"
+              />
+            </div>
+            <div className="sp-hero__stats">
+              {stats.map((s) => (
+                <div className="sp-stat-card" key={s.value}>
+                  <span className="sp-stat-card__icon">{s.icon}</span>
+                  <div>
+                    <strong>{s.value}</strong>
+                    <span>{s.label}</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* ───────────── CTA ───────────── */}
+      <section className="sp-pillars" id="pillars">
+        <div className="sp-container">
+          <div className="sp-pillars__head">
+            <h2>Six Solution Pillars for Every School</h2>
+            <p>Comprehensive solutions designed to address every challenge. Measurable impact that matters.</p>
+            <span className="sp-pillars__rule" aria-hidden="true" />
+          </div>
+
+          <div className="sp-pillars__grid">
+            {pillars.map((p) => (
+              <article className={`sp-card sp-card--${p.accent}`} key={p.num}>
+                <div className="sp-card__top">
+                  <span className="sp-card__num">{p.num}</span>
+                  <h3>{p.title}</h3>
+                </div>
+                <p className="sp-card__desc">{p.desc}</p>
+                <div className="sp-card__illu">{p.illustration}</div>
+                <ul className={`sp-card__list${p.columns === 2 ? " sp-card__list--2" : ""}`}>
+                  {p.features.map((f) => (
+                    <li key={f}>{f}</li>
+                  ))}
+                </ul>
+                <Link to={p.link} className="sp-card__more">
+                  Learn More <span aria-hidden="true">→</span>
+                </Link>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="sp-highlights">
+        <div className="sp-container sp-highlights__grid">
+          {highlights.map((h) => (
+            <div className="sp-highlight" key={h.title}>
+              <span className="sp-highlight__icon">{h.icon}</span>
+              <div>
+                <strong>{h.title}</strong>
+                <p>{h.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section className="sp-cta">
-        <div className="sp-cta__glow" />
-        <h2 className="sp-cta__h2">Ready to Transform Your School?</h2>
-        <p className="sp-cta__sub">Join 500+ institutions already running smarter with Eduaitor.</p>
-        <div className="sp-cta__actions">
-          <NavLink to="/bookademo" className="sp-btn sp-btn--primary sp-btn--lg">
-            Get Started Free
-          </NavLink>
-          <NavLink to="/plans" className="sp-btn sp-btn--ghost sp-btn--lg">View Pricing</NavLink>
+        <div className="sp-container sp-cta__inner">
+          <div className="sp-cta__school" aria-hidden="true">
+            <svg viewBox="0 0 120 90" className="sp-cta__school-svg">
+              <rect x="28" y="34" width="64" height="46" rx="3" fill="#93c5fd" />
+              <path d="M24 38 L60 12 L96 38" fill="#60a5fa" />
+              <rect x="52" y="54" width="16" height="26" rx="2" fill="#1e3a8a" />
+              <rect x="36" y="44" width="12" height="12" rx="1.5" fill="#dbeafe" />
+              <rect x="72" y="44" width="12" height="12" rx="1.5" fill="#dbeafe" />
+              <circle cx="60" cy="28" r="5" fill="#fbbf24" />
+            </svg>
+          </div>
+          <div className="sp-cta__copy">
+            <h2>Whatever Your School Needs, EduAitor Has a Solution.</h2>
+            <p>
+              From admissions to alumni, administration to analytics, and classrooms to
+              communication—EduAitor brings every solution together on one intelligent platform.
+            </p>
+          </div>
+          <Link to="/bookademo" className="sp-btn sp-btn--light">
+            Book a Demo <span aria-hidden="true">→</span>
+          </Link>
         </div>
       </section>
     </div>

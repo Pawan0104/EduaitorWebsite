@@ -1,77 +1,74 @@
 import React, { useState } from "react";
 import "./Navbar.css";
-import { NavLink } from "react-router-dom";
+import { NavLink, Link, useLocation } from "react-router-dom";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+  const isHome = location.pathname === "/";
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
-  const closeMenu = () => {
-    setIsMenuOpen(false);
-  };
+  const closeMenu = () => setIsMenuOpen(false);
 
   return (
-    <div className="navbar">
+    <header className="navbar">
       <nav>
-        {/* Logo */}
-        <div className="logo">
-          {
-            <a href="/">
-              <img src="/eduaitor.png" alt="" />
-            </a>
-          }
-        </div>
+        <Link to="/" className="nb-brand" onClick={closeMenu}>
+          <div className="nb-logo-row">
+            <span className="nb-logo">
+              Edu<span className="nb-logo-a">A</span>itor
+            </span>
+          </div>
+          <span className="nb-tagline">Smarter Schools. Stronger Students.</span>
+        </Link>
 
-        {/* Nav Links */}
         <ul className={isMenuOpen ? "nav-links active" : "nav-links"}>
           <li onClick={closeMenu}>
-            <NavLink to="/">Home</NavLink>
+            <NavLink to="/" end>
+              Home
+            </NavLink>
           </li>
-
           <li onClick={closeMenu}>
-            <NavLink to="/solution">Solution</NavLink>
+            <NavLink to="/ecosystem">Ecosystem</NavLink>
           </li>
-
-          {/* <li onClick={closeMenu}>
-      <NavLink to="/marketplace">MarketPlace</NavLink>
-    </li> */}
-
           <li onClick={closeMenu}>
-            <NavLink to="/plans">Plans</NavLink>
+            <NavLink to="/solution">Solutions</NavLink>
           </li>
-
           <li onClick={closeMenu}>
-            <NavLink to="/aboutus">About Us</NavLink>
+            <NavLink to="/why">Why EduAitor</NavLink>
           </li>
-
           <li onClick={closeMenu}>
-            <NavLink to="/contactus">Contact us</NavLink>
+            <NavLink to="/plans">Pricing</NavLink>
+          </li>
+          <li onClick={closeMenu}>
+            <a href={isHome ? "#resources" : "/#resources"}>Resources</a>
+          </li>
+          <li onClick={closeMenu}>
+            <NavLink to="/contactus">Contact</NavLink>
           </li>
         </ul>
 
-        {/* Right Buttons */}
         <div className="nav-btn">
-          <NavLink to="/login">
-            <button className="login-btn">Login</button>
+          <NavLink to="/login" onClick={closeMenu}>
+            <button type="button" className="login-btn">
+              Login
+            </button>
           </NavLink>
-
-          <NavLink to="/bookademo">
-            <button className="demo-btn">Book a Demo</button>
+          <NavLink to="/bookademo" onClick={closeMenu}>
+            <button type="button" className="demo-btn">
+              Book a Demo
+            </button>
           </NavLink>
-
-          <button className="hamburger-icon" onClick={toggleMenu}>
-            {isMenuOpen ? (
-              <i className="fas fa-times"></i>
-            ) : (
-              <i className="fas fa-bars"></i>
-            )}
+          <button
+            type="button"
+            className="hamburger-icon"
+            onClick={() => setIsMenuOpen((v) => !v)}
+            aria-label="Toggle menu"
+          >
+            {isMenuOpen ? "✕" : "☰"}
           </button>
         </div>
       </nav>
-    </div>
+    </header>
   );
 };
 
