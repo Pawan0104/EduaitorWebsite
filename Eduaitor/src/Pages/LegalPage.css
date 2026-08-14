@@ -185,6 +185,7 @@
   color: var(--text-2);
   line-height: 1.7;
   margin: 0;
+  white-space: pre-line;
 }
 
 /* ── Help & Support – channels grid ─────────────────── */

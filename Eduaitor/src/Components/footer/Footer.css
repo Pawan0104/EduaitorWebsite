@@ -188,6 +188,10 @@
   text-decoration: none;
   margin-bottom: 12px;
   transition: all 0.15s ease;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  box-sizing: border-box;
 }
 
 .ft-btn-icon,
@@ -355,6 +359,28 @@
   gap: 10px;
   font-size: 12px;
   color: #94a3b8;
+}
+
+.ft-legal {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+
+.ft-legal-link {
+  color: #94a3b8;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.ft-legal-link:hover {
+  color: #e2e8f0;
+}
+
+.ft-legal-sep {
+  opacity: 0.45;
+  user-select: none;
 }
 
 .ft-sep {

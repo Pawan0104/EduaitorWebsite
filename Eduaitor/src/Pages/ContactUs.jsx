@@ -1,6 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./ContactUs.css";
+
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV
+    ? "http://localhost:5000/api"
+    : "https://eduaitor-website.onrender.com/api");
+
+const defaultContact = {
+  phone: "+91 6366 180 333",
+  email: "hello@eduaitor.com",
+};
 
 const Icon = ({ children, size = 22 }) => (
   <svg
@@ -165,42 +176,6 @@ const I = {
     </Icon>
   ),
 };
-
-const designations = [
-  "Principal",
-  "Director",
-  "Administrator",
-  "IT Head",
-  "Teacher",
-  "Other",
-];
-
-const states = [
-  "Andhra Pradesh",
-  "Delhi",
-  "Gujarat",
-  "Haryana",
-  "Karnataka",
-  "Maharashtra",
-  "Rajasthan",
-  "Tamil Nadu",
-  "Telangana",
-  "Uttar Pradesh",
-  "Other",
-];
-
-const boards = ["CBSE", "ICSE", "State Board", "IB", "Cambridge", "Other"];
-const studentRanges = ["1–250", "251–500", "501–1000", "1001–2500", "2500+"];
-const campusRanges = ["1", "2–5", "6–10", "10+"];
-const times = [
-  "10:00 AM",
-  "11:00 AM",
-  "12:00 PM",
-  "2:00 PM",
-  "3:00 PM",
-  "4:00 PM",
-  "5:00 PM",
-];
 
 const connectOptions = [
   {
@@ -413,63 +388,88 @@ const faqs = [
   },
 ];
 
-const touchCards = [
+const defaultReachCards = [
   {
     accent: "blue",
-    icon: I.headset,
+    icon: "headset",
     title: "Sales",
     desc: "For product demos, pricing, and general inquiries.",
     email: "sales@eduaitor.com",
     phone: "+91 6366 180 333",
     cta: "Talk to Sales",
     href: "tel:+916366180333",
+    openInNewTab: false,
   },
   {
     accent: "green",
-    icon: I.school,
+    icon: "school",
     title: "Enterprise",
     desc: "For school groups, multi-campus institutions, and enterprise solutions.",
     email: "enterprise@eduaitor.com",
     phone: "+91 6366 180 334",
     cta: "Contact Enterprise Team",
     href: "mailto:enterprise@eduaitor.com",
+    openInNewTab: false,
   },
   {
     accent: "purple",
-    icon: I.headset,
+    icon: "headset",
     title: "Support",
     desc: "For technical support, training, or help with your account.",
     email: "support@eduaitor.com",
     phone: "+91 6366 180 335",
     cta: "Get Support",
     href: "mailto:support@eduaitor.com",
+    openInNewTab: false,
   },
   {
     accent: "orange",
-    icon: I.pin,
+    icon: "pin",
     title: "Office",
     desc: "Visit our head office or send us your correspondence.",
     address:
       "EduAitor Technologies Pvt. Ltd. 6th Floor, Shipra Path, Mansarovar, Jaipur, Rajasthan – 302020, India",
     cta: "View on Map",
     href: "https://maps.google.com/?q=Shipra+Path+Mansarovar+Jaipur",
+    openInNewTab: true,
   },
 ];
 
+const defaultReachUs = {
+  eyebrow: "—— GET IN TOUCH ——",
+  titleBefore: "Multiple Ways to",
+  titleHighlight: "Reach Us",
+  subtitle:
+    "We're here to help you at every step. Choose the most convenient way to connect with our team.",
+  cards: defaultReachCards,
+  workingHoursTitle: "Working Hours",
+  workingHoursDays: "Monday – Saturday",
+  workingHoursTime: "9:30 AM – 6:30 PM (IST)",
+  workingHoursNote: "(Closed on Sundays & Public Holidays)",
+  newsletterTitle: "Stay in the Loop",
+  newsletterDesc:
+    "Subscribe to our newsletter for the latest updates, features, and education insights.",
+  newsletterEmail: "marketing@eduaitor.com",
+  officeLabel: "EduAitor Office",
+  notePrimary:
+    "We value your time and trust. Expect a response within one business day.",
+  noteSecondary: "Thank you for considering EduAitor.",
+};
+
+const reachIconMap = {
+  headset: I.headset,
+  school: I.school,
+  pin: I.pin,
+  phone: I.phone,
+  user: I.user,
+};
+
 const initialForm = {
-  schoolName: "",
   name: "",
-  designation: "",
+  schoolName: "",
   phone: "",
   email: "",
   city: "",
-  state: "",
-  board: "",
-  students: "",
-  campuses: "",
-  interests: ["Demo"],
-  date: "",
-  time: "",
   message: "",
 };
 
@@ -479,6 +479,45 @@ export default function ContactUs() {
   const [status, setStatus] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [openFaq, setOpenFaq] = useState(0);
+  const [contact, setContact] = useState(defaultContact);
+  const [reachUs, setReachUs] = useState(defaultReachUs);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    fetch(`${API_URL}/settings`, { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error("Failed to fetch settings");
+        return response.json();
+      })
+      .then(({ general = {}, reachUs: remoteReachUs = {} } = {}) => {
+        const phone =
+          (general.phones || []).map((item) => String(item || "").trim()).find(Boolean) ||
+          defaultContact.phone;
+        const email =
+          (general.emails || []).map((item) => String(item || "").trim()).find(Boolean) ||
+          defaultContact.email;
+        setContact({ phone, email });
+
+        const cards =
+          Array.isArray(remoteReachUs.cards) && remoteReachUs.cards.length > 0
+            ? remoteReachUs.cards
+            : defaultReachCards;
+
+        setReachUs({
+          ...defaultReachUs,
+          ...remoteReachUs,
+          cards,
+        });
+      })
+      .catch((error) => {
+        if (error.name !== "AbortError") {
+          console.error("Unable to load contact settings:", error);
+        }
+      });
+
+    return () => controller.abort();
+  }, []);
 
   const onChange = (e) => {
     const { name, value } = e.target;
@@ -486,32 +525,16 @@ export default function ContactUs() {
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  const toggleInterest = (item) => {
-    setForm((prev) => {
-      const has = prev.interests.includes(item);
-      return {
-        ...prev,
-        interests: has
-          ? prev.interests.filter((i) => i !== item)
-          : [...prev.interests, item],
-      };
-    });
-  };
-
   const validate = () => {
     const next = {};
-    if (!form.schoolName.trim()) next.schoolName = "Required";
     if (!form.name.trim()) next.name = "Required";
-    if (!form.designation) next.designation = "Required";
+    if (!form.schoolName.trim()) next.schoolName = "Required";
     if (!form.phone.trim()) next.phone = "Required";
     else if (!/^\d{10}$/.test(form.phone.replace(/\D/g, "")))
       next.phone = "Enter 10 digits";
     if (!form.email.trim()) next.email = "Required";
     else if (!/\S+@\S+\.\S+/.test(form.email)) next.email = "Invalid email";
     if (!form.city.trim()) next.city = "Required";
-    if (!form.state) next.state = "Required";
-    if (!form.board) next.board = "Required";
-    if (!form.students) next.students = "Required";
     return next;
   };
 
@@ -525,11 +548,31 @@ export default function ContactUs() {
     setSubmitting(true);
     setStatus("");
     try {
-      await new Promise((r) => setTimeout(r, 1200));
+      const response = await fetch(`${API_URL}/demo/book`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contactName: form.name.trim(),
+          instName: form.schoolName.trim(),
+          instType: "school",
+          phone: form.phone.replace(/\D/g, ""),
+          email: form.email.trim(),
+          city: form.city.trim(),
+          message: form.message.trim(),
+          mode: "zoom",
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || data.success === false) {
+        throw new Error(data.message || "Unable to book demo");
+      }
+
       setStatus("Thank you! We'll confirm your demo shortly.");
       setForm(initialForm);
-    } catch {
-      setStatus("Something went wrong. Please try again.");
+      setErrors({});
+    } catch (err) {
+      setStatus(err.message || "Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -692,19 +735,11 @@ export default function ContactUs() {
 
           <div className="cu-demo__shell">
             <form className="cu-form" onSubmit={onSubmit} noValidate>
-              <div className="cu-form__row">
+              <div className="cu-form__row cu-form__row--2">
                 <label>
-                  School Name <em>*</em>
-                  <input
-                    name="schoolName"
-                    value={form.schoolName}
-                    onChange={onChange}
-                    placeholder="Enter school name"
-                  />
-                  {errors.schoolName && <span className="cu-err">{errors.schoolName}</span>}
-                </label>
-                <label>
-                  Your Name <em>*</em>
+                  <span className="cu-form__label">
+                    Name <em>*</em>
+                  </span>
                   <input
                     name="name"
                     value={form.name}
@@ -714,33 +749,39 @@ export default function ContactUs() {
                   {errors.name && <span className="cu-err">{errors.name}</span>}
                 </label>
                 <label>
-                  Designation <em>*</em>
-                  <select name="designation" value={form.designation} onChange={onChange}>
-                    <option value="">Select designation</option>
-                    {designations.map((d) => (
-                      <option key={d}>{d}</option>
-                    ))}
-                  </select>
-                  {errors.designation && <span className="cu-err">{errors.designation}</span>}
+                  <span className="cu-form__label">
+                    School Name <em>*</em>
+                  </span>
+                  <input
+                    name="schoolName"
+                    value={form.schoolName}
+                    onChange={onChange}
+                    placeholder="Enter school name"
+                  />
+                  {errors.schoolName && <span className="cu-err">{errors.schoolName}</span>}
                 </label>
               </div>
 
-              <div className="cu-form__row">
+              <div className="cu-form__row cu-form__row--2">
                 <label>
-                  Mobile Number <em>*</em>
+                  <span className="cu-form__label">
+                    Phone <em>*</em>
+                  </span>
                   <div className="cu-phone">
                     <span>+91</span>
                     <input
                       name="phone"
                       value={form.phone}
                       onChange={onChange}
-                      placeholder="Enter mobile number"
+                      placeholder="Enter phone number"
                     />
                   </div>
                   {errors.phone && <span className="cu-err">{errors.phone}</span>}
                 </label>
                 <label>
-                  Email Address <em>*</em>
+                  <span className="cu-form__label">
+                    Email <em>*</em>
+                  </span>
                   <input
                     type="email"
                     name="email"
@@ -750,8 +791,13 @@ export default function ContactUs() {
                   />
                   {errors.email && <span className="cu-err">{errors.email}</span>}
                 </label>
+              </div>
+
+              <div className="cu-form__row cu-form__row--2">
                 <label>
-                  City <em>*</em>
+                  <span className="cu-form__label">
+                    City <em>*</em>
+                  </span>
                   <input
                     name="city"
                     value={form.city}
@@ -762,90 +808,14 @@ export default function ContactUs() {
                 </label>
               </div>
 
-              <div className="cu-form__row">
-                <label>
-                  State <em>*</em>
-                  <select name="state" value={form.state} onChange={onChange}>
-                    <option value="">Select state</option>
-                    {states.map((s) => (
-                      <option key={s}>{s}</option>
-                    ))}
-                  </select>
-                  {errors.state && <span className="cu-err">{errors.state}</span>}
-                </label>
-                <label>
-                  Board <em>*</em>
-                  <select name="board" value={form.board} onChange={onChange}>
-                    <option value="">Select board</option>
-                    {boards.map((b) => (
-                      <option key={b}>{b}</option>
-                    ))}
-                  </select>
-                  {errors.board && <span className="cu-err">{errors.board}</span>}
-                </label>
-                <label>
-                  Number of Students <em>*</em>
-                  <select name="students" value={form.students} onChange={onChange}>
-                    <option value="">Select range</option>
-                    {studentRanges.map((r) => (
-                      <option key={r}>{r}</option>
-                    ))}
-                  </select>
-                  {errors.students && <span className="cu-err">{errors.students}</span>}
-                </label>
-              </div>
-
-              <div className="cu-form__row cu-form__row--mixed">
-                <label>
-                  Number of Campuses
-                  <select name="campuses" value={form.campuses} onChange={onChange}>
-                    <option value="">Select range</option>
-                    {campusRanges.map((r) => (
-                      <option key={r}>{r}</option>
-                    ))}
-                  </select>
-                </label>
-                <div className="cu-interests">
-                  <span className="cu-interests__label">Interested In</span>
-                  <div className="cu-interests__list">
-                    {["Demo", "Pricing", "Enterprise", "Partnership"].map((item) => (
-                      <label key={item} className="cu-check">
-                        <input
-                          type="checkbox"
-                          checked={form.interests.includes(item)}
-                          onChange={() => toggleInterest(item)}
-                        />
-                        <span>{item}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="cu-form__row cu-form__row--2">
-                <label>
-                  Preferred Date
-                  <input type="date" name="date" value={form.date} onChange={onChange} />
-                </label>
-                <label>
-                  Preferred Time
-                  <select name="time" value={form.time} onChange={onChange}>
-                    <option value="">Select time</option>
-                    {times.map((t) => (
-                      <option key={t}>{t}</option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-
               <label className="cu-form__message">
-                Anything specific you'd like us to know? (Optional)
+                <span className="cu-form__label">Message</span>
                 <textarea
                   name="message"
                   value={form.message}
                   onChange={onChange}
-                  rows={4}
-                  placeholder="Your message helps us prepare the right demo for you..."
+                  rows={3}
+                  placeholder="Anything specific you'd like us to know? (Optional)"
                 />
               </label>
 
@@ -857,14 +827,24 @@ export default function ContactUs() {
                   {submitting ? "Scheduling..." : "Schedule My Demo →"}
                 </button>
               </div>
-              {status && <p className="cu-status">{status}</p>}
+              {status && (
+                <p
+                  className={`cu-status${
+                    /thank you|confirm/i.test(status) ? "" : " cu-status--error"
+                  }`}
+                >
+                  {status}
+                </p>
+              )}
             </form>
 
             <aside className="cu-expect">
-              <div className="cu-expect__art" aria-hidden="true">
-                {I.calendar}
+              <div className="cu-expect__head">
+                <span className="cu-expect__art" aria-hidden="true">
+                  {I.calendar}
+                </span>
+                <h3>What to Expect in Your Demo</h3>
               </div>
-              <h3>What to Expect in Your Demo</h3>
               <ul>
                 {expectItems.map((item) => (
                   <li key={item.title}>
@@ -891,8 +871,9 @@ export default function ContactUs() {
           </div>
 
           <p className="cu-demo__call">
-            Prefer to talk first? Call us at <a href="tel:+916366180333">+91 6366 180 333</a> or
-            Email us at <a href="mailto:hello@eduaitor.com">hello@eduaitor.com</a>
+            Prefer to talk first? Call us at{" "}
+            <a href={`tel:${contact.phone.replace(/[^\d+]/g, "")}`}>{contact.phone}</a> or
+            Email us at <a href={`mailto:${contact.email}`}>{contact.email}</a>
           </p>
         </div>
       </section>
@@ -994,20 +975,20 @@ export default function ContactUs() {
       <section className="cu-touch" id="get-in-touch">
         <div className="cu-container">
           <div className="cu-section-head">
-            <p className="cu-eyebrow">—— GET IN TOUCH ——</p>
+            <p className="cu-eyebrow">{reachUs.eyebrow}</p>
             <h2>
-              Multiple Ways to <span>Reach Us</span>
+              {reachUs.titleBefore} <span>{reachUs.titleHighlight}</span>
             </h2>
-            <p>
-              We're here to help you at every step. Choose the most convenient way to connect with
-              our team.
-            </p>
+            <p>{reachUs.subtitle}</p>
           </div>
           <div className="cu-touch__grid">
-            {touchCards.map((card) => (
-              <article key={card.title} className={`cu-touch-card cu-touch-card--${card.accent}`}>
+            {(reachUs.cards || []).map((card, index) => (
+              <article
+                key={`${card.title || "card"}-${index}`}
+                className={`cu-touch-card cu-touch-card--${card.accent || "blue"}`}
+              >
                 <span className="cu-touch-card__icon" aria-hidden="true">
-                  {card.icon}
+                  {reachIconMap[card.icon] || I.headset}
                 </span>
                 <h3>{card.title}</h3>
                 <p>{card.desc}</p>
@@ -1017,36 +998,50 @@ export default function ContactUs() {
                   </a>
                 )}
                 {card.phone && (
-                  <a href={`tel:${card.phone.replace(/\s/g, "")}`} className="cu-touch-card__link">
+                  <a
+                    href={`tel:${String(card.phone).replace(/[^\d+]/g, "")}`}
+                    className="cu-touch-card__link"
+                  >
                     {card.phone}
                   </a>
                 )}
                 {card.address && <p className="cu-touch-card__addr">{card.address}</p>}
-                <a href={card.href} className="cu-btn cu-btn--solid" target={card.title === "Office" ? "_blank" : undefined} rel="noreferrer">
-                  {card.cta}
-                </a>
+                {card.cta && (
+                  <a
+                    href={card.href || "#"}
+                    className="cu-btn cu-btn--solid"
+                    target={card.openInNewTab ? "_blank" : undefined}
+                    rel={card.openInNewTab ? "noreferrer" : undefined}
+                  >
+                    {card.cta}
+                  </a>
+                )}
               </article>
             ))}
           </div>
           <div className="cu-touch__meta">
             <div>
-              <strong>Working Hours</strong>
-              <p>Monday – Saturday</p>
-              <em>9:30 AM – 6:30 PM (IST)</em>
-              <span>(Closed on Sundays & Public Holidays)</span>
+              <strong>{reachUs.workingHoursTitle}</strong>
+              <p>{reachUs.workingHoursDays}</p>
+              <em>{reachUs.workingHoursTime}</em>
+              <span>{reachUs.workingHoursNote}</span>
             </div>
             <div>
-              <strong>Stay in the Loop</strong>
-              <p>Subscribe to our newsletter for the latest updates, features, and education insights.</p>
-              <a href="mailto:marketing@eduaitor.com">marketing@eduaitor.com</a>
+              <strong>{reachUs.newsletterTitle}</strong>
+              <p>{reachUs.newsletterDesc}</p>
+              {reachUs.newsletterEmail && (
+                <a href={`mailto:${reachUs.newsletterEmail}`}>
+                  {reachUs.newsletterEmail}
+                </a>
+              )}
             </div>
             <div className="cu-touch__office-img" aria-hidden="true">
-              EduAitor Office
+              {reachUs.officeLabel}
             </div>
           </div>
           <div className="cu-touch__notes">
-            <p>We value your time and trust. Expect a response within one business day.</p>
-            <p>Thank you for considering EduAitor.</p>
+            <p>{reachUs.notePrimary}</p>
+            <p>{reachUs.noteSecondary}</p>
           </div>
         </div>
       </section>

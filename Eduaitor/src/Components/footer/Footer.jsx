@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink, Link } from "react-router-dom";
 import {
   FaStar,
@@ -23,8 +23,6 @@ import {
   FaFlag,
   FaBriefcase,
   FaHandshake,
-  FaLock,
-  FaFileContract,
   FaCalendarAlt,
   FaHeadset,
   FaMapMarkerAlt,
@@ -39,6 +37,7 @@ import {
   FaArrowRight,
 } from "react-icons/fa";
 import "./Footer.css";
+import { useContactPopup } from "../ContactPopup";
 
 const productItems = [
   { label: "Features", to: "/ecosystem", icon: FaStar },
@@ -61,24 +60,46 @@ const solutionItems = [
 ];
 
 const resourceItems = [
-  { label: "Help Center", to: "/contactus", icon: FaQuestionCircle },
-  { label: "Knowledge Base", to: "/aboutus", icon: FaBookOpen },
-  { label: "Blogs", to: "/aboutus", icon: FaFileAlt },
-  { label: "Case Studies", to: "/aboutus", icon: FaChartBar },
-  { label: "Webinars", to: "/contactus", icon: FaPlayCircle },
-  { label: "Downloads", to: "/contactus", icon: FaDownload },
-  { label: "What's New", to: "/aboutus", icon: FaMagic },
+  { label: "Help Center", to: "/help-center", icon: FaQuestionCircle },
+  { label: "Knowledge Base", to: "/knowledge-base", icon: FaBookOpen },
+  { label: "Blogs", to: "/blogs", icon: FaFileAlt },
+  { label: "Case Studies", to: "/case-studies", icon: FaChartBar },
+  { label: "Webinars", to: "/webinars", icon: FaPlayCircle },
+  { label: "Downloads", to: "/downloads", icon: FaDownload },
+  { label: "What's New", to: "/whats-new", icon: FaMagic },
 ];
 
 const companyItems = [
-  { label: "About Us", to: "/aboutus", icon: FaInfoCircle },
-  { label: "Our Mission", to: "/aboutus", icon: FaFlag },
-  { label: "Our Team", to: "/aboutus", icon: FaUsers },
-  { label: "Careers", to: "/contactus", icon: FaBriefcase },
-  { label: "Partners", to: "/contactus", icon: FaHandshake },
-  { label: "Privacy Policy", to: "/legal", icon: FaLock },
-  { label: "Terms of Service", to: "/legal", icon: FaFileContract },
+  { label: "About Us", to: "/about-us", icon: FaInfoCircle },
+  { label: "Our Mission", to: "/our-mission", icon: FaFlag },
+  { label: "Our Team", to: "/our-team", icon: FaUsers },
+  { label: "Careers", to: "/careers", icon: FaBriefcase },
+  { label: "Partners", to: "/partners", icon: FaHandshake },
 ];
+
+const legalItems = [
+  { label: "Privacy Policy", to: "/privacy-policy" },
+  { label: "Terms & Conditions", to: "/terms-and-conditions" },
+  { label: "Refund & Cancellation Policy", to: "/refund-policy" },
+];
+
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV
+    ? "http://localhost:5000/api"
+    : "https://eduaitor-website.onrender.com/api");
+
+const defaultSettings = {
+  siteName: "EduAitor",
+  tagline: "Smarter Schools. Stronger Students.",
+  description:
+    "EduAitor is an AI-powered School Operating System that simplifies operations, empowers educators, engages parents and helps every student reach their full potential.",
+  emails: ["hello@eduaitor.com"],
+  phones: ["+91 89557 89557"],
+  address:
+    "EduAitor Technologies Pvt. Ltd. B-28, Sector-63, Noida, Uttar Pradesh - 201301, India",
+  copyright: "© 2026 EduAitor Technologies Pvt. Ltd. All rights reserved.",
+};
 
 function FooterCol({ title, items }) {
   return (
@@ -116,20 +137,46 @@ function FooterCol({ title, items }) {
 }
 
 const Footer = () => {
+  const [settings, setSettings] = useState(defaultSettings);
+  const { openContactPopup } = useContactPopup();
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    fetch(`${API_URL}/settings`, { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error("Failed to fetch settings");
+        return response.json();
+      })
+      .then(({ general = {} }) => {
+        setSettings((current) => ({ ...current, ...general }));
+      })
+      .catch((error) => {
+        if (error.name !== "AbortError") {
+          console.error("Unable to load site settings:", error);
+        }
+      });
+
+    return () => controller.abort();
+  }, []);
+
+  const emails = settings.emails?.filter(Boolean) || [];
+  const phones = settings.phones?.filter(Boolean) || [];
+
   return (
     <footer className="footer">
       <div className="ft-top">
         <div className="ft-main">
           <div className="ft-brand">
             <div className="ft-logo">
-              Edu<span>Aitor</span>
+              {settings.siteName || defaultSettings.siteName}
             </div>
-            <p className="ft-tagline">Smarter Schools. Stronger Students.</p>
+            <p className="ft-tagline">
+              {settings.tagline || defaultSettings.tagline}
+            </p>
             <div className="ft-brand-rule" aria-hidden />
             <p className="ft-desc">
-              EduAitor is an AI-powered School Operating System that simplifies
-              operations, empowers educators, engages parents and helps every
-              student reach their full potential.
+              {settings.description || defaultSettings.description}
             </p>
             <div className="ft-highlight">
               <span className="ft-heart" aria-hidden>
@@ -157,25 +204,39 @@ const Footer = () => {
               <span>Book a Demo</span>
               <FaArrowRight className="ft-btn-arrow" aria-hidden />
             </Link>
-            <Link to="/contactus" className="ft-btn ft-btn-outline">
+            <button
+              type="button"
+              className="ft-btn ft-btn-outline"
+              onClick={() => openContactPopup("footer-talk-experts")}
+            >
               <FaHeadset className="ft-btn-icon" aria-hidden />
               <span>Talk to Our Experts</span>
-            </Link>
-            <p className="ft-app-label">Download the EduAitor App</p>
-            <div className="ft-badges">
-              <a href="#" aria-label="Google Play">
-                <img
-                  src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
-                  alt="Get it on Google Play"
-                />
-              </a>
-              <a href="#" aria-label="App Store">
-                <img
-                  src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg"
-                  alt="Download on the App Store"
-                />
-              </a>
-            </div>
+            </button>
+            {settings.showAppDownload !== false && (
+              <>
+                <p className="ft-app-label">Download the EduAitor App</p>
+                <div className="ft-badges">
+                  <a
+                    href={settings.googlePlayUrl || "#"}
+                    aria-label="Google Play"
+                  >
+                    <img
+                      src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+                      alt="Get it on Google Play"
+                    />
+                  </a>
+                  <a
+                    href={settings.appStoreUrl || "#"}
+                    aria-label="App Store"
+                  >
+                    <img
+                      src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg"
+                      alt="Download on the App Store"
+                    />
+                  </a>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -187,34 +248,35 @@ const Footer = () => {
               <span className="ft-bottom-icon" aria-hidden>
                 <FaMapMarkerAlt />
               </span>
-              <p>
-                EduAitor Technologies Pvt. Ltd. B-28, Sector-63, Noida, Uttar
-                Pradesh - 201301, India
-              </p>
+              <p>{settings.address || defaultSettings.address}</p>
             </div>
 
             <div className="ft-bottom-divider" aria-hidden />
 
             <div className="ft-contacts">
-              <a href="mailto:hello@eduaitor.com">
+              {emails.map((email) => (
+                <a key={email} href={`mailto:${email}`}>
                 <span className="ft-bottom-icon" aria-hidden>
                   <FaEnvelope />
                 </span>
-                hello@eduaitor.com
-              </a>
-              <a href="tel:+918955789557">
-                <span className="ft-bottom-icon" aria-hidden>
-                  <FaPhoneAlt />
-                </span>
-                +91 89557 89557
-              </a>
+                  {email}
+                </a>
+              ))}
+              {phones.map((phone) => (
+                <a key={phone} href={`tel:${phone.replace(/[^\d+]/g, "")}`}>
+                  <span className="ft-bottom-icon" aria-hidden>
+                    <FaPhoneAlt />
+                  </span>
+                  {phone}
+                </a>
+              ))}
             </div>
 
             <div className="ft-bottom-divider" aria-hidden />
 
             <a
               className="ft-website"
-              href="https://www.eduaitor.com"
+              href={settings.website || "https://www.eduaitor.com"}
               target="_blank"
               rel="noreferrer"
             >
@@ -228,23 +290,33 @@ const Footer = () => {
 
             <div className="ft-social">
               <span className="ft-social-label">Follow Us</span>
-              <a href="#" aria-label="Facebook">
+              <a href={settings.facebook || "#"} aria-label="Facebook">
                 <FaFacebookF />
               </a>
-              <a href="#" aria-label="LinkedIn">
+              <a href={settings.linkedin || "#"} aria-label="LinkedIn">
                 <FaLinkedinIn />
               </a>
               <a href="#" aria-label="YouTube">
                 <FaYoutube />
               </a>
-              <a href="#" aria-label="Instagram">
+              <a href={settings.instagram || "#"} aria-label="Instagram">
                 <FaInstagram />
               </a>
             </div>
           </div>
 
           <div className="ft-copy">
-            <span>© 2026 EduAitor Technologies Pvt. Ltd. All rights reserved.</span>
+            <span>{settings.copyright || defaultSettings.copyright}</span>
+            <nav className="ft-legal" aria-label="Legal">
+              {legalItems.map(({ label, to }, i) => (
+                <React.Fragment key={to}>
+                  {i > 0 && <span className="ft-legal-sep" aria-hidden>|</span>}
+                  <NavLink to={to} className="ft-legal-link">
+                    {label}
+                  </NavLink>
+                </React.Fragment>
+              ))}
+            </nav>
             <span className="ft-sep">|</span>
             <span className="ft-copy-right">
               Empowering Education. Enriching Futures.{" "}

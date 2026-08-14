@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
 import "../Pages/pricing.css";
+import { useContactPopup } from "../Components/ContactPopup";
 
 const fallbackPlansData = [
   {
@@ -53,6 +54,7 @@ export default function PricingSection() {
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { openContactPopup } = useContactPopup();
 
   const API = import.meta.env.VITE_API_URL;
 
@@ -253,8 +255,15 @@ export default function PricingSection() {
 
       <p className="pricing-footnote">
         Prices are per student per month. Taxes applicable as per government
-        norms. <NavLink to="/bookademo">Contact us</NavLink> for large
-        institutions or custom requirements.
+        norms.{" "}
+        <button
+          type="button"
+          className="pricing-contact-link"
+          onClick={() => openContactPopup("pricing-contact-us")}
+        >
+          Contact us
+        </button>{" "}
+        for large institutions or custom requirements.
       </p>
     </div>
   );

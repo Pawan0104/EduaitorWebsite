@@ -1,7 +1,8 @@
 // admin/pages/Plan.jsx
 import { useState, useEffect, useRef } from "react";
+import { API_URL, apiFetch } from "../lib/api";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API = API_URL;
 
 /* ══════════════════════════════════════════════════════════
    SHARED STYLES (CSS-variable-aware, matches index.css)
@@ -755,7 +756,7 @@ export default function Plan() {
   const fetchPlans = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${API}/plans`);
+      const res = await apiFetch(`${API}/plans`);
       if (!res.ok) throw new Error();
       const data = await res.json();
       setPlans(data);
@@ -779,7 +780,7 @@ export default function Plan() {
       const isEdit = modal && modal._id;
       const url = isEdit ? `${API}/plans/${modal._id}` : `${API}/plans`;
       const method = isEdit ? "PUT" : "POST";
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -798,7 +799,7 @@ export default function Plan() {
   const handleDelete = async () => {
     setDeleting(true);
     try {
-      const res = await fetch(`${API}/plans/${deleteTarget._id}`, {
+      const res = await apiFetch(`${API}/plans/${deleteTarget._id}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error();
@@ -814,7 +815,7 @@ export default function Plan() {
 
   const handleToggle = async (plan) => {
     try {
-      const res = await fetch(`${API}/plans/${plan._id}/toggle`, {
+      const res = await apiFetch(`${API}/plans/${plan._id}/toggle`, {
         method: "PATCH",
       });
       if (!res.ok) throw new Error();

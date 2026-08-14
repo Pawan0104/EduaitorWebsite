@@ -1,23 +1,141 @@
 import { useState, useEffect, useRef } from "react";
 import { useTheme } from "../context/ThemeContext";
+import { API_URL, apiFetch } from "../lib/api";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API = API_URL;
 
 /* ═══════════════════════════════════════════════════════════
    TABS CONFIG
 ══════════════════════════════════════════════════════════════ */
 const TABS = [
   { id: "general", label: "General", icon: "⚙️" },
+  { id: "reachUs", label: "Reach Us", icon: "📞" },
   { id: "policies", label: "Policies", icon: "📄" },
+  { id: "resources", label: "Resources", icon: "📚" },
+  { id: "company", label: "Company", icon: "🏢" },
 ];
 
 const POLICY_PAGES = [
-  { key: "termsOfUse", label: "Terms of Use" },
+  { key: "termsOfUse", label: "Terms & Conditions" },
   { key: "privacyPolicy", label: "Privacy Policy" },
-  { key: "helpSupport", label: "Help & Support" },
-  { key: "faqs", label: "FAQs" },
+  { key: "refundPolicy", label: "Refund & Cancellation Policy" },
 ];
 
+const RESOURCE_PAGES = [
+  { key: "helpCenter", label: "Help Center", path: "/help-center" },
+  { key: "knowledgeBase", label: "Knowledge Base", path: "/knowledge-base" },
+  { key: "blogs", label: "Blogs", path: "/blogs" },
+  { key: "caseStudies", label: "Case Studies", path: "/case-studies" },
+  { key: "webinars", label: "Webinars", path: "/webinars" },
+  { key: "downloads", label: "Downloads", path: "/downloads" },
+  { key: "whatsNew", label: "What's New", path: "/whats-new" },
+];
+
+const COMPANY_PAGES = [
+  { key: "aboutUs", label: "About Us", path: "/about-us" },
+  { key: "ourMission", label: "Our Mission", path: "/our-mission" },
+  { key: "ourTeam", label: "Our Team", path: "/our-team" },
+  { key: "careers", label: "Careers", path: "/careers" },
+  { key: "partners", label: "Partners", path: "/partners" },
+];
+
+const REACH_ACCENTS = ["blue", "green", "purple", "orange"];
+const REACH_ICONS = ["headset", "school", "pin", "phone", "user"];
+
+const DEFAULT_REACH_CARDS = [
+  {
+    accent: "blue",
+    icon: "headset",
+    title: "Sales",
+    desc: "For product demos, pricing, and general inquiries.",
+    email: "sales@eduaitor.com",
+    phone: "+91 6366 180 333",
+    address: "",
+    cta: "Talk to Sales",
+    href: "tel:+916366180333",
+    openInNewTab: false,
+  },
+  {
+    accent: "green",
+    icon: "school",
+    title: "Enterprise",
+    desc: "For school groups, multi-campus institutions, and enterprise solutions.",
+    email: "enterprise@eduaitor.com",
+    phone: "+91 6366 180 334",
+    address: "",
+    cta: "Contact Enterprise Team",
+    href: "mailto:enterprise@eduaitor.com",
+    openInNewTab: false,
+  },
+  {
+    accent: "purple",
+    icon: "headset",
+    title: "Support",
+    desc: "For technical support, training, or help with your account.",
+    email: "support@eduaitor.com",
+    phone: "+91 6366 180 335",
+    address: "",
+    cta: "Get Support",
+    href: "mailto:support@eduaitor.com",
+    openInNewTab: false,
+  },
+  {
+    accent: "orange",
+    icon: "pin",
+    title: "Office",
+    desc: "Visit our head office or send us your correspondence.",
+    email: "",
+    phone: "",
+    address:
+      "EduAitor Technologies Pvt. Ltd. 6th Floor, Shipra Path, Mansarovar, Jaipur, Rajasthan – 302020, India",
+    cta: "View on Map",
+    href: "https://maps.google.com/?q=Shipra+Path+Mansarovar+Jaipur",
+    openInNewTab: true,
+  },
+];
+
+const DEFAULT_REACH_US = {
+  eyebrow: "—— GET IN TOUCH ——",
+  titleBefore: "Multiple Ways to",
+  titleHighlight: "Reach Us",
+  subtitle:
+    "We're here to help you at every step. Choose the most convenient way to connect with our team.",
+  cards: DEFAULT_REACH_CARDS,
+  workingHoursTitle: "Working Hours",
+  workingHoursDays: "Monday – Saturday",
+  workingHoursTime: "9:30 AM – 6:30 PM (IST)",
+  workingHoursNote: "(Closed on Sundays & Public Holidays)",
+  newsletterTitle: "Stay in the Loop",
+  newsletterDesc:
+    "Subscribe to our newsletter for the latest updates, features, and education insights.",
+  newsletterEmail: "marketing@eduaitor.com",
+  officeLabel: "EduAitor Office",
+  notePrimary:
+    "We value your time and trust. Expect a response within one business day.",
+  noteSecondary: "Thank you for considering EduAitor.",
+};
+
+const emptyReachCard = () => ({
+  accent: "blue",
+  icon: "headset",
+  title: "",
+  desc: "",
+  email: "",
+  phone: "",
+  address: "",
+  cta: "",
+  href: "",
+  openInNewTab: false,
+});
+
+const normalizeReachUs = (data = {}) => ({
+  ...DEFAULT_REACH_US,
+  ...data,
+  cards:
+    Array.isArray(data.cards) && data.cards.length > 0
+      ? data.cards.map((card) => ({ ...emptyReachCard(), ...card }))
+      : DEFAULT_REACH_CARDS,
+});
 /* ═══════════════════════════════════════════════════════════
    SHARED UI ATOMS
 ══════════════════════════════════════════════════════════════ */
@@ -346,6 +464,249 @@ function GeneralPanel({ data, setData, onFile, previews }) {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   REACH US PANEL
+══════════════════════════════════════════════════════════════ */
+function ReachUsPanel({ data, setData }) {
+  const set = (k, v) => setData((p) => ({ ...p, [k]: v }));
+
+  const updateCard = (i, key, val) =>
+    set(
+      "cards",
+      (data.cards || []).map((card, idx) =>
+        idx === i ? { ...card, [key]: val } : card,
+      ),
+    );
+
+  const addCard = () => set("cards", [...(data.cards || []), emptyReachCard()]);
+  const removeCard = (i) =>
+    set(
+      "cards",
+      (data.cards || []).filter((_, idx) => idx !== i),
+    );
+
+  return (
+    <>
+      <SectionCard title="Section Header" icon="✏️">
+        <Input
+          label="Eyebrow"
+          value={data.eyebrow || ""}
+          onChange={(e) => set("eyebrow", e.target.value)}
+          placeholder="—— GET IN TOUCH ——"
+        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
+          <Input
+            label="Title (before highlight)"
+            value={data.titleBefore || ""}
+            onChange={(e) => set("titleBefore", e.target.value)}
+            placeholder="Multiple Ways to"
+          />
+          <Input
+            label="Title Highlight"
+            value={data.titleHighlight || ""}
+            onChange={(e) => set("titleHighlight", e.target.value)}
+            placeholder="Reach Us"
+          />
+        </div>
+        <Textarea
+          label="Subtitle"
+          value={data.subtitle || ""}
+          onChange={(e) => set("subtitle", e.target.value)}
+          rows={2}
+        />
+      </SectionCard>
+
+      <SectionCard title="Contact Cards" icon="🗂️">
+        <p className="text-xs text-[var(--text-muted)] mb-4">
+          Manage Sales, Enterprise, Support, Office and any extra contact cards.
+        </p>
+        <div className="flex flex-col gap-4">
+          {(data.cards || []).map((card, i) => (
+            <div
+              key={i}
+              className="border border-[var(--border)] rounded-xl p-4 bg-[var(--bg-base)]"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[10px] font-bold tracking-widest uppercase text-[var(--text-muted)]">
+                  Card {i + 1}
+                  {card.title ? ` · ${card.title}` : ""}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => removeCard(i)}
+                  className="text-xs font-bold px-3 py-1.5 rounded-lg border border-[var(--danger-border)] bg-[var(--danger-soft)] text-[var(--danger-text)] cursor-pointer"
+                >
+                  Remove
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
+                <Input
+                  label="Title"
+                  value={card.title || ""}
+                  onChange={(e) => updateCard(i, "title", e.target.value)}
+                  placeholder="Sales"
+                />
+                <Input
+                  label="CTA Button Text"
+                  value={card.cta || ""}
+                  onChange={(e) => updateCard(i, "cta", e.target.value)}
+                  placeholder="Talk to Sales"
+                />
+              </div>
+
+              <Textarea
+                label="Description"
+                value={card.desc || ""}
+                onChange={(e) => updateCard(i, "desc", e.target.value)}
+                rows={2}
+              />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
+                <Input
+                  label="Email"
+                  type="email"
+                  value={card.email || ""}
+                  onChange={(e) => updateCard(i, "email", e.target.value)}
+                  placeholder="sales@eduaitor.com"
+                />
+                <Input
+                  label="Phone"
+                  value={card.phone || ""}
+                  onChange={(e) => updateCard(i, "phone", e.target.value)}
+                  placeholder="+91 XXXXX XXXXX"
+                />
+              </div>
+
+              <Textarea
+                label="Address"
+                hint="Used for Office-style cards"
+                value={card.address || ""}
+                onChange={(e) => updateCard(i, "address", e.target.value)}
+                rows={2}
+              />
+
+              <Input
+                label="Button Link"
+                hint="Use tel:+91..., mailto:..., or a full URL"
+                value={card.href || ""}
+                onChange={(e) => updateCard(i, "href", e.target.value)}
+                placeholder="mailto:sales@eduaitor.com"
+              />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
+                <Field label="Accent Color">
+                  <select
+                    className={inputCls}
+                    value={card.accent || "blue"}
+                    onChange={(e) => updateCard(i, "accent", e.target.value)}
+                  >
+                    {REACH_ACCENTS.map((accent) => (
+                      <option key={accent} value={accent}>
+                        {accent}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+                <Field label="Icon">
+                  <select
+                    className={inputCls}
+                    value={card.icon || "headset"}
+                    onChange={(e) => updateCard(i, "icon", e.target.value)}
+                  >
+                    {REACH_ICONS.map((icon) => (
+                      <option key={icon} value={icon}>
+                        {icon}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+              </div>
+
+              <Toggle
+                label="Open link in new tab"
+                value={Boolean(card.openInNewTab)}
+                onChange={(v) => updateCard(i, "openInNewTab", v)}
+              />
+            </div>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={addCard}
+          className="mt-4 px-4 py-2 text-xs font-bold rounded-xl border border-[var(--accent-border)] bg-[var(--accent-soft)] text-[var(--accent-text)] cursor-pointer hover:opacity-80 transition-opacity"
+        >
+          + Add Contact Card
+        </button>
+      </SectionCard>
+
+      <SectionCard title="Working Hours & Newsletter" icon="🕐">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
+          <Input
+            label="Working Hours Title"
+            value={data.workingHoursTitle || ""}
+            onChange={(e) => set("workingHoursTitle", e.target.value)}
+          />
+          <Input
+            label="Working Days"
+            value={data.workingHoursDays || ""}
+            onChange={(e) => set("workingHoursDays", e.target.value)}
+          />
+          <Input
+            label="Working Time"
+            value={data.workingHoursTime || ""}
+            onChange={(e) => set("workingHoursTime", e.target.value)}
+          />
+          <Input
+            label="Working Hours Note"
+            value={data.workingHoursNote || ""}
+            onChange={(e) => set("workingHoursNote", e.target.value)}
+          />
+        </div>
+        <Divider label="Newsletter" />
+        <Input
+          label="Newsletter Title"
+          value={data.newsletterTitle || ""}
+          onChange={(e) => set("newsletterTitle", e.target.value)}
+        />
+        <Textarea
+          label="Newsletter Description"
+          value={data.newsletterDesc || ""}
+          onChange={(e) => set("newsletterDesc", e.target.value)}
+          rows={2}
+        />
+        <Input
+          label="Newsletter Email"
+          type="email"
+          value={data.newsletterEmail || ""}
+          onChange={(e) => set("newsletterEmail", e.target.value)}
+          placeholder="marketing@eduaitor.com"
+        />
+        <Input
+          label="Office Box Label"
+          value={data.officeLabel || ""}
+          onChange={(e) => set("officeLabel", e.target.value)}
+        />
+      </SectionCard>
+
+      <SectionCard title="Footer Notes" icon="📝">
+        <Textarea
+          label="Primary Note"
+          value={data.notePrimary || ""}
+          onChange={(e) => set("notePrimary", e.target.value)}
+          rows={2}
+        />
+        <Textarea
+          label="Secondary Note"
+          value={data.noteSecondary || ""}
+          onChange={(e) => set("noteSecondary", e.target.value)}
+          rows={2}
+        />
+      </SectionCard>
+    </>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
    POLICIES PANEL
 ══════════════════════════════════════════════════════════════ */
 function PolicySections({ sections, onChange }) {
@@ -409,8 +770,10 @@ function PolicySections({ sections, onChange }) {
   );
 }
 
-function PoliciesPanel({ data, setData }) {
-  const [activePolicyTab, setActivePolicyTab] = useState("termsOfUse");
+function PoliciesPanel({ data, setData, pages = POLICY_PAGES, defaultTab }) {
+  const [activePolicyTab, setActivePolicyTab] = useState(
+    defaultTab || pages[0]?.key || "termsOfUse"
+  );
 
   const set = (policyKey, field, val) =>
     setData((p) => ({
@@ -419,15 +782,14 @@ function PoliciesPanel({ data, setData }) {
     }));
 
   const activePolicy = data[activePolicyTab] || {};
-  const activeLabel = POLICY_PAGES.find(
-    (p) => p.key === activePolicyTab,
-  )?.label;
+  const activeMeta = pages.find((p) => p.key === activePolicyTab);
+  const activeLabel = activeMeta?.label;
 
   return (
     <>
       {/* Policy sub-tabs */}
       <div className="flex gap-2 flex-wrap mb-5">
-        {POLICY_PAGES.map((p) => (
+        {pages.map((p) => (
           <button
             key={p.key}
             onClick={() => setActivePolicyTab(p.key)}
@@ -460,10 +822,19 @@ function PoliciesPanel({ data, setData }) {
           />
           <Input
             label="URL Slug"
-            hint="Path shown in the browser e.g. /privacy-policy"
+            hint="Suggested path on the website"
             value={activePolicy.slug || ""}
             onChange={(e) => set(activePolicyTab, "slug", e.target.value)}
-            placeholder={`/${activePolicyTab.replace(/([A-Z])/g, "-$1").toLowerCase()}`}
+            placeholder={
+              activeMeta?.path ||
+              (activePolicyTab === "privacyPolicy"
+                ? "/privacy-policy"
+                : activePolicyTab === "refundPolicy"
+                  ? "/refund-policy"
+                  : activePolicyTab === "termsOfUse"
+                    ? "/terms-and-conditions"
+                    : `/${activePolicyTab.replace(/([A-Z])/g, "-$1").toLowerCase()}`)
+            }
           />
         </div>
 
@@ -520,6 +891,9 @@ export default function Setting() {
 
   const [general, setGeneral] = useState({});
   const [policies, setPolicies] = useState({});
+  const [resources, setResources] = useState({});
+  const [company, setCompany] = useState({});
+  const [reachUs, setReachUs] = useState(DEFAULT_REACH_US);
 
   const [files, setFiles] = useState({});
   const [previews, setPreviews] = useState({});
@@ -530,11 +904,14 @@ export default function Setting() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch(`${API}/settings`);
+        const res = await apiFetch(`${API}/settings`);
         if (!res.ok) throw new Error();
         const data = await res.json();
         setGeneral(data.general || {});
         setPolicies(data.policies || {});
+        setResources(data.resources || {});
+        setCompany(data.company || {});
+        setReachUs(normalizeReachUs(data.reachUs));
       } catch {
         showToast("Failed to load settings", "error");
       } finally {
@@ -554,15 +931,18 @@ export default function Setting() {
     setSaving(true);
     try {
       const fd = new FormData();
-      fd.append("data", JSON.stringify({ general, policies }));
+      fd.append("data", JSON.stringify({ general, policies, reachUs, resources, company }));
       Object.entries(files).forEach(([k, f]) => fd.append(k, f));
 
-      const res = await fetch(`${API}/settings`, { method: "PUT", body: fd });
+      const res = await apiFetch(`${API}/settings`, { method: "PUT", body: fd });
       if (!res.ok) throw new Error();
       const updated = await res.json();
 
       setGeneral(updated.general || {});
       setPolicies(updated.policies || {});
+      setResources(updated.resources || {});
+      setCompany(updated.company || {});
+      setReachUs(normalizeReachUs(updated.reachUs));
       setFiles({});
       setPreviews({});
       showToast("Settings saved!");
@@ -591,8 +971,28 @@ export default function Setting() {
             previews={previews}
           />
         );
+      case "reachUs":
+        return <ReachUsPanel data={reachUs} setData={setReachUs} />;
       case "policies":
         return <PoliciesPanel data={policies} setData={setPolicies} />;
+      case "resources":
+        return (
+          <PoliciesPanel
+            data={resources}
+            setData={setResources}
+            pages={RESOURCE_PAGES}
+            defaultTab="helpCenter"
+          />
+        );
+      case "company":
+        return (
+          <PoliciesPanel
+            data={company}
+            setData={setCompany}
+            pages={COMPANY_PAGES}
+            defaultTab="aboutUs"
+          />
+        );
       default:
         return null;
     }

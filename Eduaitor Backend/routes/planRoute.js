@@ -22,11 +22,12 @@ const router = express.Router();
   updatePlan,
   deletePlan,
   togglePlan,}   from "../controllers/planController.js";
+import { requireAdmin } from "../middlewares/auth.js";
 
    router.get("/",           getPlans);
    router.get("/:id",        getPlanById);
-   router.post("/",          createPlan);
-   router.put("/:id",        updatePlan);
-   router.delete("/:id",     deletePlan);
-   router.patch("/:id/toggle", togglePlan);
+   router.post("/",          requireAdmin, createPlan);
+   router.put("/:id",        requireAdmin, updatePlan);
+   router.delete("/:id",     requireAdmin, deletePlan);
+   router.patch("/:id/toggle", requireAdmin, togglePlan);
 export default router;

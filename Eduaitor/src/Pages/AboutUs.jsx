@@ -10,8 +10,11 @@ import {
 import "./AboutUs.css";
 import Counter from "../Components/Counter";
 import { NavLink } from "react-router-dom";
+import { useContactPopup } from "../Components/ContactPopup";
 
 const AboutUs = () => {
+  const { openContactPopup } = useContactPopup();
+
   return (
     <div className="about-page">
 
@@ -27,7 +30,13 @@ const AboutUs = () => {
           </p>
           <div className="hero-buttons">
            <NavLink to="/bookademo"> <button className="primary-btn">Request Demo</button></NavLink>
-           <NavLink to="/contactus"> <button className="secondary-btn">Contact Us</button></NavLink>
+           <button
+             type="button"
+             className="secondary-btn"
+             onClick={() => openContactPopup("about-contact-us")}
+           >
+             Contact Us
+           </button>
           </div>
         </div>
       </section>

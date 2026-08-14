@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Icons } from "../Components/icons";
+import { useContactPopup } from "../Components/ContactPopup";
 import "./Plans.css";
 
 /** Fresh clone so the same icon can appear multiple times on one page */
@@ -224,8 +225,17 @@ const heroBar = [
   { label: "Always Available Anywhere", icon: Icons.globe },
 ];
 
+const onePlanFeatures = [
+  { label: "All Features Included", icon: Icons.grid },
+  { label: "All Modules Included", icon: Icons.school },
+  { label: "All Future Updates", icon: Icons.refresh },
+  { label: "Mobile Apps Included", icon: Icons.phone },
+  { label: "Enterprise Security", icon: Icons.lock },
+  { label: "Dedicated Support", icon: Icons.headset },
+];
+
 const orbit = [
-  { label: "Smarter Administration", top: "6%", left: "50%", icon: Icons.school },
+  { label: "Smarter Administration", top: "6%", left: "30%", icon: Icons.school },
   { label: "Successful Students", top: "28%", left: "88%", icon: Icons.cap },
   { label: "Data-Driven Decisions", top: "72%", left: "82%", icon: Icons.chart },
   { label: "Empowered Teachers", top: "78%", left: "18%", icon: Icons.teach },
@@ -244,6 +254,7 @@ export default function Plans() {
   const [custom, setCustom] = useState(true);
   const [studentsInput, setStudentsInput] = useState("");
   const [billing, setBilling] = useState("monthly");
+  const { openContactPopup } = useContactPopup();
 
   const students = useMemo(() => {
     const n = parseInt(studentsInput, 10);
@@ -478,6 +489,17 @@ export default function Plans() {
                   <p>Billed Annually</p>
                 </div>
               </div>
+              <div className="pp-one__included">
+                <strong className="pp-one__included-title">Everything Included in One Plan</strong>
+                <div className="pp-one__included-grid">
+                  {onePlanFeatures.map((feature) => (
+                    <div key={feature.label} className="pp-one__included-item">
+                      <span aria-hidden="true">{ic(feature.icon)}</span>
+                      <strong>{feature.label}</strong>
+                    </div>
+                  ))}
+                </div>
+              </div>
               <div className="pp-one__foot">
                 Every Feature. Every Update. Every School. No hidden costs. No feature
                 restrictions. No complicated plans.
@@ -504,13 +526,17 @@ export default function Plans() {
                   </li>
                 ))}
               </ul>
-              <Link to="/contactus" className="pp-ent__cta">
+              <button
+                type="button"
+                className="pp-ent__cta"
+                onClick={() => openContactPopup("plans-enterprise")}
+              >
                 <span>
                   Let's Build the Right Solution for You
                   <small>Talk to our Enterprise Team</small>
                 </span>
                 <span aria-hidden="true">→</span>
-              </Link>
+              </button>
             </article>
           </div>
 
@@ -536,155 +562,169 @@ export default function Plans() {
 
       {/* 4 — Calculator */}
       <section className="pp-calc" id="calculator">
-        <div className="pp-container pp-calc__grid">
-          <div className="pp-calc__intro">
+        <div className="pp-container">
+          <div className="pp-calc__head">
             <p className="pp-eyebrow">— COST CALCULATOR —</p>
-            <h2>
-              Simple to Understand.
-              <br />
-              Easy to Plan.
-            </h2>
-            <p className="pp-calc__lead">See how affordable complete school management can be.</p>
-            <ul className="pp-calc__bullets">
-              <li>
+            <h2>Simple to Understand. Easy to Plan.</h2>
+            <p className="pp-calc__lead">
+              See how affordable complete school management can be.
+            </p>
+          </div>
+
+          <div className="pp-calc__highlights">
+            <div className="pp-calc__highlight">
+              <span className="pp-calc__bullet-icon" aria-hidden="true">
+                {ic(Icons.sparkles)}
+              </span>
+              <div>
                 <strong>Instant Calculation</strong>
                 <span>Get your monthly and annual cost in seconds.</span>
-              </li>
-              <li>
+              </div>
+            </div>
+            <div className="pp-calc__highlight">
+              <span className="pp-calc__bullet-icon" aria-hidden="true">
+                {ic(Icons.rupee)}
+              </span>
+              <div>
                 <strong>Transparent Pricing</strong>
                 <span>₹1 per student per day. Billed Monthly or Annually.</span>
-              </li>
-              <li>
+              </div>
+            </div>
+            <div className="pp-calc__highlight">
+              <span className="pp-calc__bullet-icon" aria-hidden="true">
+                {ic(Icons.trending)}
+              </span>
+              <div>
                 <strong>Maximum Savings</strong>
                 <span>Save 25% with Annual Billing.</span>
-              </li>
-            </ul>
+              </div>
+            </div>
           </div>
 
-          <div className="pp-calc__card">
-            <h3>Calculate Your School's Investment</h3>
-            <p className="pp-calc__tagline">One Simple Plan. One Affordable Price.</p>
+          <div className="pp-calc__grid">
+            <div className="pp-calc__card">
+              <h3>Calculate Your School's Investment</h3>
+              <p className="pp-calc__tagline">One Simple Plan. One Affordable Price.</p>
 
-            <div className="pp-calc__step">
-              <label>1. How many students are in your school?</label>
-              <div className="pp-calc__presets">
-                {PRESETS.map((n) => (
+              <div className="pp-calc__step">
+                <label>1. How many students are in your school?</label>
+                <div className="pp-calc__presets">
+                  {PRESETS.map((n) => (
+                    <button
+                      key={n}
+                      type="button"
+                      className={!custom && preset === n ? "is-active" : ""}
+                      onClick={() => pickPreset(n)}
+                    >
+                      {n}
+                    </button>
+                  ))}
                   <button
-                    key={n}
                     type="button"
-                    className={!custom && preset === n ? "is-active" : ""}
-                    onClick={() => pickPreset(n)}
+                    className={`pp-calc__custom-btn${custom ? " is-active" : ""}`}
+                    onClick={pickCustom}
                   >
-                    {n}
+                    Custom
                   </button>
+                </div>
+                <div className="pp-calc__input">
+                  <span aria-hidden="true">{ic(Icons.cap)}</span>
+                  <input
+                    type="number"
+                    min="1"
+                    placeholder="Enter number of students"
+                    value={studentsInput}
+                    onChange={(e) => {
+                      setCustom(true);
+                      setPreset(null);
+                      setStudentsInput(e.target.value);
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div className="pp-calc__step">
+                <label>2. Choose Your Billing Option</label>
+                <div className="pp-calc__billing">
+                  <button
+                    type="button"
+                    className={billing === "monthly" ? "is-active" : ""}
+                    onClick={() => setBilling("monthly")}
+                  >
+                    <span className="pp-calc__bill-icon" aria-hidden="true">
+                      {ic(Icons.calendar)}
+                    </span>
+                    <div>
+                      <strong>Monthly Billing</strong>
+                      <small>Pay Every Month</small>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    className={`pp-calc__annual${billing === "annual" ? " is-active" : ""}`}
+                    onClick={() => setBilling("annual")}
+                  >
+                    <span className="pp-calc__off">25% OFF</span>
+                    <span className="pp-calc__bill-icon" aria-hidden="true">
+                      {ic(Icons.calendar)}
+                    </span>
+                    <div>
+                      <strong>Annual Billing</strong>
+                      <small>Pay Once a Year</small>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              <div className="pp-calc__results">
+                <div>
+                  <span>Students</span>
+                  <strong>{students || "—"}</strong>
+                </div>
+                <div>
+                  <span>Monthly Investment</span>
+                  <strong>
+                    {formatINR(monthlyCost)}
+                    <small> per month</small>
+                  </strong>
+                </div>
+                <div>
+                  <span>Annual Investment</span>
+                  <strong>
+                    {formatINR(annualCost)}
+                    <small> per year</small>
+                  </strong>
+                </div>
+              </div>
+
+              <div className={`pp-calc__save${billing === "annual" && savings ? " is-on" : ""}`}>
+                {billing === "annual" && savings
+                  ? `You Save ${formatINR(savings)} with Annual Billing!`
+                  : "You Save 25% with Annual Billing!"}
+              </div>
+            </div>
+
+            <aside className="pp-love">
+              <h3>Why Schools Love EduAitor ONE</h3>
+              <ul>
+                {loveItems.map((item) => (
+                  <li key={item.title}>
+                    <span className="pp-love__icon" aria-hidden="true">
+                      {ic(item.icon)}
+                    </span>
+                    <div>
+                      <strong>{item.title}</strong>
+                      <p>{item.desc}</p>
+                    </div>
+                  </li>
                 ))}
-                <button
-                  type="button"
-                  className={`pp-calc__custom-btn${custom ? " is-active" : ""}`}
-                  onClick={pickCustom}
-                >
-                  Custom
-                </button>
+              </ul>
+              <div className="pp-love__promise">
+                ₹1 per day. Maximum Value. That's the EduAitor Promise!
               </div>
-              <div className="pp-calc__input">
-                <span aria-hidden="true">{ic(Icons.cap)}</span>
-                <input
-                  type="number"
-                  min="1"
-                  placeholder="Enter number of students"
-                  value={studentsInput}
-                  onChange={(e) => {
-                    setCustom(true);
-                    setPreset(null);
-                    setStudentsInput(e.target.value);
-                  }}
-                />
-              </div>
-            </div>
-
-            <div className="pp-calc__step">
-              <label>2. Choose Your Billing Option</label>
-              <div className="pp-calc__billing">
-                <button
-                  type="button"
-                  className={billing === "monthly" ? "is-active" : ""}
-                  onClick={() => setBilling("monthly")}
-                >
-                  <span className="pp-calc__bill-icon" aria-hidden="true">
-                    {ic(Icons.calendar)}
-                  </span>
-                  <div>
-                    <strong>Monthly Billing</strong>
-                    <small>Pay Every Month</small>
-                  </div>
-                </button>
-                <button
-                  type="button"
-                  className={`pp-calc__annual${billing === "annual" ? " is-active" : ""}`}
-                  onClick={() => setBilling("annual")}
-                >
-                  <span className="pp-calc__off">25% OFF</span>
-                  <span className="pp-calc__bill-icon" aria-hidden="true">
-                    {ic(Icons.calendar)}
-                  </span>
-                  <div>
-                    <strong>Annual Billing</strong>
-                    <small>Pay Once a Year</small>
-                  </div>
-                </button>
-              </div>
-            </div>
-
-            <div className="pp-calc__results">
-              <div>
-                <span>Students</span>
-                <strong>{students || "—"}</strong>
-              </div>
-              <div>
-                <span>Monthly Investment</span>
-                <strong>
-                  {formatINR(monthlyCost)}
-                  <small> per month</small>
-                </strong>
-              </div>
-              <div>
-                <span>Annual Investment</span>
-                <strong>
-                  {formatINR(annualCost)}
-                  <small> per year</small>
-                </strong>
-              </div>
-            </div>
-
-            <div className={`pp-calc__save${billing === "annual" && savings ? " is-on" : ""}`}>
-              {billing === "annual" && savings
-                ? `You Save ${formatINR(savings)} with Annual Billing!`
-                : "You Save 25% with Annual Billing!"}
-            </div>
+            </aside>
           </div>
 
-          <aside className="pp-love">
-            <h3>Why Schools Love EduAitor ONE</h3>
-            <ul>
-              {loveItems.map((item) => (
-                <li key={item.title}>
-                  <span className="pp-love__icon" aria-hidden="true">
-                    {ic(item.icon)}
-                  </span>
-                  <div>
-                    <strong>{item.title}</strong>
-                    <p>{item.desc}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <div className="pp-love__promise">
-              ₹1 per day. Maximum Value. That's the EduAitor Promise!
-            </div>
-          </aside>
-        </div>
-
-        <div className="pp-container">
           <div className="pp-calc-foot">
             <div className="pp-calc-foot__left">
               <span className="pp-calc-foot__icon" aria-hidden="true">
@@ -705,9 +745,13 @@ export default function Plans() {
               <p>
                 <strong>Need Help Calculating?</strong> Our team is ready to help you.
               </p>
-              <Link to="/contactus" className="pp-btn pp-btn--light">
+              <button
+                type="button"
+                className="pp-btn pp-btn--light"
+                onClick={() => openContactPopup("plans-talk-experts")}
+              >
                 Talk to Our Experts
-              </Link>
+              </button>
             </div>
           </div>
         </div>

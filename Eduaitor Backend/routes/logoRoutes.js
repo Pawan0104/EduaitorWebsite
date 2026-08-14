@@ -8,6 +8,7 @@ import {
   deleteLogo,
   reorderLogos,
 } from "../controllers/logocontroller.js";
+import { requireAdmin } from "../middlewares/auth.js";
 
 const router = express.Router();
 
@@ -37,9 +38,9 @@ const handleUpload = (req, res, next) => {
 
 /* ── routes ── */
 router.get   ("/"        , getAllLogos);
-router.post  ("/"        , handleUpload, createLogo);
-router.put   ("/:id"     , handleUpload, updateLogo);
-router.delete("/:id"     , deleteLogo);
-router.patch ("/reorder" , reorderLogos);
+router.post  ("/"        , requireAdmin, handleUpload, createLogo);
+router.put   ("/:id"     , requireAdmin, handleUpload, updateLogo);
+router.delete("/:id"     , requireAdmin, deleteLogo);
+router.patch ("/reorder" , requireAdmin, reorderLogos);
 
 export default router;

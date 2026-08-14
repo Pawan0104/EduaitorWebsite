@@ -156,7 +156,9 @@ export default function PricingOneSection() {
 
         <div className="hv-pricing__grid">
           <div className="hv-pricing__col hv-pricing__col--left">
-            <h3 className="hv-pricing__col-title">WHAT YOU GET WITH EDUAITOR ONE</h3>
+            <h3 className="hv-pricing__col-title hv-pricing__col-title--dark">
+              WHAT YOU GET WITH EDUAITOR ONE
+            </h3>
             <ul className="hv-pricing__features">
               {features.map((f, i) => (
                 <li className="hv-pricing__feature" key={i}>
@@ -169,7 +171,16 @@ export default function PricingOneSection() {
               ))}
             </ul>
             <div className="hv-pricing__left-bar">
-              Regular updates. New features. All included. No hidden costs.
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 2v6h-6" />
+                <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
+                <path d="M3 22v-6h6" />
+                <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+              </svg>
+              <div>
+                <strong>Regular Updates. New Features.</strong>
+                <p>All included. No hidden costs.</p>
+              </div>
             </div>
           </div>
 

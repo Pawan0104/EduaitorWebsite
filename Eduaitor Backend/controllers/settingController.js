@@ -36,7 +36,7 @@ export const updateSettings = async (req, res) => {
             return res.status(400).json({ message: "Invalid payload" });
         }
 
-        const { general = {}, policies = {} } = parsed;
+        const { general = {}, policies = {}, reachUs = {}, resources = {}, company = {} } = parsed;
         const files = req.files || {};
 
         /* LOGO */
@@ -64,12 +64,31 @@ export const updateSettings = async (req, res) => {
         delete general.logoUrl;
         delete general.faviconUrl;
 
+        const existingReachUs = setting.reachUs?.toObject
+            ? setting.reachUs.toObject()
+            : setting.reachUs || {};
+
+        const existingResources = setting.resources?.toObject
+            ? setting.resources.toObject()
+            : setting.resources || {};
+
+        const existingCompany = setting.company?.toObject
+            ? setting.company.toObject()
+            : setting.company || {};
+
+        const existingPolicies = setting.policies?.toObject
+            ? setting.policies.toObject()
+            : setting.policies || {};
+
         const updated = await Setting.findByIdAndUpdate(
             setting._id,
             {
                 $set: {
-                    general: { ...setting.general.toObject(), ...general },
-                    policies: { ...setting.policies.toObject(), ...policies },
+                    general: { ...(setting.general?.toObject?.() || setting.general || {}), ...general },
+                    policies: { ...existingPolicies, ...policies },
+                    reachUs: { ...existingReachUs, ...reachUs },
+                    resources: { ...existingResources, ...resources },
+                    company: { ...existingCompany, ...company },
                 },
             },
             { new: true, runValidators: true }

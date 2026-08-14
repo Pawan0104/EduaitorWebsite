@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-
-const ADMIN_EMAIL = "admin@gmail.com";
-const ADMIN_PASSWORD = "admin";
+import {
+  API_URL,
+  hasValidAdminToken,
+  setAdminToken,
+} from "../lib/api";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -13,7 +15,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (localStorage.getItem("adminAuth") === "true") {
+    if (hasValidAdminToken()) {
       navigate("/admin/dashboard", { replace: true });
     }
   }, [navigate]);
@@ -21,23 +23,30 @@ export default function Login() {
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    setTimeout(() => {
-      if (
-        formData.email === ADMIN_EMAIL &&
-        formData.password === ADMIN_PASSWORD
-      ) {
-        localStorage.setItem("adminAuth", "true");
-        navigate("/admin/dashboard");
-      } else {
-        setError("Invalid email or password!");
-        setLoading(false);
+    try {
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok || !data.token) {
+        throw new Error(data.message || "Unable to sign in");
       }
-    }, 600);
+
+      setAdminToken(data.token);
+      navigate("/admin/dashboard", { replace: true });
+    } catch (err) {
+      setError(err.message || "Unable to sign in");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -179,16 +188,9 @@ export default function Login() {
             </button>
           </form>
 
-          {/* Demo */}
-          <div className="mt-6 t-card rounded-xl px-4 py-4">
-            <p className="text-xs font-semibold uppercase tracking-widest mb-2 t-text-muted">
-              Demo Credentials
-            </p>
-            <p className="text-xs font-mono leading-relaxed t-text-sec">
-              Email: admin@gmail.com <br />
-              Password: admin
-            </p>
-          </div>
+          <p className="mt-6 text-xs text-center t-text-muted">
+            Authorized administrators only
+          </p>
         </div>
       </div>
     </div>

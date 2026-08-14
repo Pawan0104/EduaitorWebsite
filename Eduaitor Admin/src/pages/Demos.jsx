@@ -12,10 +12,8 @@ import {
   FaFilter,
   FaExclamationTriangle,
 } from "react-icons/fa";
-import axios from "axios";
 import { toast } from "react-toastify";
-
-const API = import.meta.env.VITE_API_URL;
+import { apiClient } from "../lib/api";
 
 // ── Status config ────────────────────────────────────────────
 const STATUS_STYLES = {
@@ -81,7 +79,7 @@ const DetailModal = ({ demo, onClose, onStatusChange }) => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await axios.patch(`${API}/demo/${demo._id}/status`, {
+      await apiClient.patch(`/demo/${demo._id}/status`, {
         status,
         adminNotes,
       });
@@ -268,10 +266,10 @@ export default function Demos() {
     setFetchError("");
     try {
       const [demosRes, statsRes] = await Promise.all([
-        axios.get(`${API}/demo`, {
+        apiClient.get("/demo", {
           params: { status: filterStatus || undefined },
         }),
-        axios.get(`${API}/demo/stats`),
+        apiClient.get("/demo/stats"),
       ]);
 
       setDemos(Array.isArray(demosRes.data.data) ? demosRes.data.data : []);
@@ -301,7 +299,7 @@ export default function Demos() {
     if (!window.confirm("Delete this demo booking?")) return;
     setDeleting(id);
     try {
-      await axios.delete(`${API}/demo/${id}`);
+      await apiClient.delete(`/demo/${id}`);
       setDemos((prev) => prev.filter((d) => d._id !== id));
       toast.success("Deleted");
     } catch (err) {

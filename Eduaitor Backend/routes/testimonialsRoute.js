@@ -7,6 +7,7 @@ import {
   updateTestimonial,
   deleteTestimonial,
 } from "../controllers/testimmmonialsController.js"; 
+import { requireAdmin } from "../middlewares/auth.js";
 
 const router = express.Router();
 
@@ -46,9 +47,9 @@ const handleUpload = (req, res, next) => {
 router.get("/", getTestimonials);
 
 // Admin-only mutations
-router.post(  "/",    handleUpload, createTestimonial);
-router.put(   "/:id", handleUpload, updateTestimonial);
-router.delete("/:id",               deleteTestimonial);
+router.post(  "/",    requireAdmin, handleUpload, createTestimonial);
+router.put(   "/:id", requireAdmin, handleUpload, updateTestimonial);
+router.delete("/:id", requireAdmin,               deleteTestimonial);
 
 export default router;
 

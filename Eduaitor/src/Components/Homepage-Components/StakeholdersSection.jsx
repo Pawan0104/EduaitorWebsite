@@ -77,7 +77,7 @@ const stakeholders = [
       "Personalized learning",
       "Track progress & improve",
     ],
-    image: "/home/stakeholder-student.png?v=2",
+    image: "/home/stakeholder-student-school.png",
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
         <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
@@ -147,7 +147,7 @@ export default function StakeholdersSection() {
             When every stakeholder is empowered, every student achieves more.
           </p>
           <img
-            src="/home/community-network.png?v=3"
+            src="/home/community-network-full.svg"
             alt=""
             className="hv-stakeholders__deco"
             aria-hidden="true"

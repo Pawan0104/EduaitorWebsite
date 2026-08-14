@@ -7,15 +7,15 @@ import {
     deleteDemo,
     getDemoStats,
 } from "../controllers/demoController.js";
+import { requireAdmin } from "../middlewares/auth.js";
 
 const router = express.Router();
 
 // ── Public ────────────────────────────────────────────────────
 router.post("/book", bookDemo);
 
-// ── Admin (add your auth middleware here when ready) ──────────
-// import { protect } from "../middlewares/auth.js";
-// router.use(protect);
+// ── Admin ──────────────────────────────────────────────────────
+router.use(requireAdmin);
 
 router.get("/stats", getDemoStats);
 router.get("/", getAllDemos);

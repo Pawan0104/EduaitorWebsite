@@ -312,11 +312,18 @@
   color: #9ca3af;
 }
 
-.pricing-page .pricing-footnote a {
+.pricing-page .pricing-footnote a,
+.pricing-page .pricing-contact-link {
   color: #7b4dc4;
   text-decoration: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
 }
 
-.pricing-page .pricing-footnote a:hover {
+.pricing-page .pricing-footnote a:hover,
+.pricing-page .pricing-contact-link:hover {
   text-decoration: underline;
 }

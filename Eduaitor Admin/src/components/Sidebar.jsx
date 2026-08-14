@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
+import { clearAdminSession } from "../lib/api";
 import {
   FaTachometerAlt,
   FaBook,
@@ -57,7 +58,7 @@ export default function Sidebar({ closeSidebar }) {
   const isDark = theme === "dark";
 
   const handleLogout = () => {
-    localStorage.removeItem("adminAuth");
+    clearAdminSession();
     navigate("/admin/login");
   };
 

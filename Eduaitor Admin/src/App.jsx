@@ -6,6 +6,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import Plan from "./pages/Plan";
 import Setting from "./pages/Setting";
 import Demos from "./pages/Demos";
+import Contacts from "./pages/Contacts";
 import Institute from "./pages/Institute";
 import Testimonials from "../src/pages/Testimonials";
 import Award from "./pages/Award";
@@ -58,9 +59,7 @@ export default function App() {
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="plan" element={<Plan />} />
         <Route path="demo" element={<Demos />} />
-        {/* <Route path="team" element={<ComingSoon name="Team" />} />
-        <Route path="visit" element={<ComingSoon name="Visits" />} /> */}
-        <Route path="contact" element={<ComingSoon name="Contacts" />} />
+        <Route path="contact" element={<Contacts />} />
         <Route path="institute" element={<Institute />} />
         <Route path="testimonial" element={<Testimonials />} />
         <Route path="award" element={<Award />} />

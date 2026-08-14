@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { API_URL, apiFetch } from "../lib/api";
 
 // --- PASTE ALL YOUR UTILITY COMPONENTS HERE (Spin, toast, Toasts, Badge, Toggle, IBtn, Fld, DropZone, IS, STYLES) ---
 // Note: I am omitting the repeating utility code to keep this concise, 
@@ -246,8 +247,8 @@ function AwardForm({ editTarget, onSuccess, clearEdit }) {
       fd.append("order", String(form.order));
       if (file) fd.append("image", file);
 
-      const url = editTarget ? `${import.meta.env.VITE_API_URL}/awards/${editTarget._id}` : `${import.meta.env.VITE_API_URL}/awards`;
-      const res = await fetch(url, { method: editTarget ? "PUT" : "POST", body: fd });
+      const url = editTarget ? `${API_URL}/awards/${editTarget._id}` : `${API_URL}/awards`;
+      const res = await apiFetch(url, { method: editTarget ? "PUT" : "POST", body: fd });
       if (!res.ok) throw new Error();
       
       toast(editTarget ? "Award updated!" : "Award added!");
@@ -438,7 +439,7 @@ export default function Award() {
   const load = useCallback(async () => {
     try {
       setLoading(true);
-      const r = await fetch(`${import.meta.env.VITE_API_URL}/awards`);
+      const r = await apiFetch(`${API_URL}/awards`);
       const d = await r.json();
       setAwards(d.awards || []);
     } catch { toast("Failed to load", "error"); }
@@ -449,7 +450,7 @@ export default function Award() {
 
   const doDelete = async () => {
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/awards/${delT._id}`, { method: "DELETE" });
+      await apiFetch(`${API_URL}/awards/${delT._id}`, { method: "DELETE" });
       toast("Deleted successfully"); setDelT(null); load();
     } catch { toast("Delete failed", "error"); }
   };

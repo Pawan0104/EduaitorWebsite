@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { API_URL, apiFetch } from "../lib/api";
 
 /* ─────────────────────────────────────────────────────────────────────────────
    STYLES
@@ -244,9 +245,9 @@ function LogoForm({ editTarget, onSuccess, clearEdit }) {
       fd.append("isActive", String(form.isActive));
       fd.append("order",    String(form.order));
       if (file) fd.append("image", file);
-      const url    = editTarget ? `${import.meta.env.VITE_API_URL}/logos/${editTarget._id}` : `${import.meta.env.VITE_API_URL}/logos`;
+      const url    = editTarget ? `${API_URL}/logos/${editTarget._id}` : `${API_URL}/logos`;
       const method = editTarget ? "PUT" : "POST";
-      const res    = await fetch(url, {method, body:fd});
+      const res    = await apiFetch(url, {method, body:fd});
       const data   = await res.json();
       if (!res.ok) throw new Error(data.message||"Failed");
       toast(editTarget ? "Logo updated! 🎉" : "Logo added! 🎉");
@@ -412,7 +413,7 @@ export default function Institute() {
   const [delT,   setDelT]   = useState(null);
 
   const load = useCallback(async () => {
-    try { setLoading(true); const r=await fetch(`${import.meta.env.VITE_API_URL}/logos`); const d=await r.json(); setLogos(d.logos||[]); }
+    try { setLoading(true); const r=await apiFetch(`${API_URL}/logos`); const d=await r.json(); setLogos(d.logos||[]); }
     catch { toast("Failed to load","error"); } finally { setLoading(false); }
   }, []);
 
@@ -421,13 +422,13 @@ export default function Institute() {
   const doToggle = async (logo) => {
     try {
       const fd=new FormData(); fd.append("isActive",String(!logo.isActive)); fd.append("label",logo.label); fd.append("altText",logo.altText); fd.append("order",String(logo.order));
-      await fetch(`${import.meta.env.VITE_API_URL}/logos/${logo._id}`,{method:"PUT",body:fd});
+      await apiFetch(`${API_URL}/logos/${logo._id}`,{method:"PUT",body:fd});
       toast(logo.isActive?"Logo hidden":"Logo is now active"); load();
     } catch { toast("Update failed","error"); }
   };
 
   const doDelete = async () => {
-    try { await fetch(`${import.meta.env.VITE_API_URL}/logos/${delT._id}`,{method:"DELETE"}); toast("Deleted"); setDelT(null); load(); }
+    try { await apiFetch(`${API_URL}/logos/${delT._id}`,{method:"DELETE"}); toast("Deleted"); setDelT(null); load(); }
     catch { toast("Delete failed","error"); }
   };
 

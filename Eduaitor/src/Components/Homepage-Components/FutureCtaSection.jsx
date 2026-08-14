@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./home-v2.css";
+import { useContactPopup } from "../ContactPopup";
 
 const features = [
   {
@@ -69,7 +70,9 @@ const actions = [
     color: "green",
     title: "TALK TO OUR EXPERTS",
     desc: "Get personalized guidance for your school.",
-    to: "/contactus",
+    to: "/contactus#get-in-touch",
+    action: "popup",
+    source: "home-talk-experts",
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
@@ -81,6 +84,8 @@ const actions = [
     title: "PARTNER WITH US",
     desc: "Join a growing community of future-ready schools.",
     to: "/contactus",
+    action: "popup",
+    source: "home-partner",
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -105,6 +110,8 @@ const actions = [
 ];
 
 export default function FutureCtaSection() {
+  const { openContactPopup } = useContactPopup();
+
   return (
     <section className="hv-section hv-future" id="resources">
       <div className="hv-container">
@@ -183,17 +190,30 @@ export default function FutureCtaSection() {
             Let's take the next step—<span className="hv-accent">together.</span>
           </p>
           <div className="hv-future__actions">
-            {actions.map((a, i) => (
-              <Link
-                to={a.to}
-                className={`hv-future__action hv-future__action--${a.color}`}
-                key={i}
-              >
-                <div className="hv-future__action-icon">{a.icon}</div>
-                <strong>{a.title}</strong>
-                <p>{a.desc}</p>
-              </Link>
-            ))}
+            {actions.map((a, i) =>
+              a.action === "popup" ? (
+                <button
+                  type="button"
+                  className={`hv-future__action hv-future__action--${a.color}`}
+                  key={i}
+                  onClick={() => openContactPopup(a.source || "home-cta")}
+                >
+                  <div className="hv-future__action-icon">{a.icon}</div>
+                  <strong>{a.title}</strong>
+                  <p>{a.desc}</p>
+                </button>
+              ) : (
+                <Link
+                  to={a.to}
+                  className={`hv-future__action hv-future__action--${a.color}`}
+                  key={i}
+                >
+                  <div className="hv-future__action-icon">{a.icon}</div>
+                  <strong>{a.title}</strong>
+                  <p>{a.desc}</p>
+                </Link>
+              )
+            )}
           </div>
         </div>
 

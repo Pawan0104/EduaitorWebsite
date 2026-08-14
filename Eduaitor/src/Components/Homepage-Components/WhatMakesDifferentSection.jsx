@@ -6,7 +6,7 @@ const cards = [
     color: "blue",
     title: "AI-First",
     desc: "AI is at the core of everything we build—empowering educators, supporting students and simplifying every workflow.",
-    image: "/home/diff-ai.png?v=4",
+    cropX: "-3.42%",
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
         <path d="M12 3c-2.8 0-5 2.4-5 5.4 0 1.7.7 3.2 1.9 4.2V15a2 2 0 0 0 2 2h2.2a2 2 0 0 0 2-2v-2.4c1.2-1 1.9-2.5 1.9-4.2C17 5.4 14.8 3 12 3z" />
@@ -21,7 +21,7 @@ const cards = [
     color: "green",
     title: "One Platform",
     desc: "All school operations, academics, communication, finance, transport, commerce and analytics—unified on one intelligent platform.",
-    image: "/home/diff-platform.png?v=4",
+    cropX: "-19.43%",
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
         <path d="M10 3.5 4.5 7v5.5L10 16l5.5-3.5V7L10 3.5z" />
@@ -35,7 +35,7 @@ const cards = [
     color: "purple",
     title: "Parent Empowerment",
     desc: "Transform parents from spectators to active learning partners with real-time visibility and AI-powered tools.",
-    image: "/home/diff-parent.png?v=4",
+    cropX: "-34.96%",
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
         <circle cx="8" cy="7" r="2.2" />
@@ -52,7 +52,7 @@ const cards = [
     color: "teal",
     title: "Student Success",
     desc: "Personalized learning, AI academic assistant and predictive insights help every student learn better and achieve more.",
-    image: "/home/diff-student.png?v=4",
+    cropX: "-50.39%",
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
         <path d="M2 10.5 12 5l10 5.5-10 5.5L2 10.5z" />
@@ -65,7 +65,7 @@ const cards = [
     color: "orange",
     title: "Predictive Intelligence",
     desc: "AI-powered analytics predict risks, identify learning gaps and empower leadership with actionable insights for better decisions.",
-    image: "/home/diff-analytics.png?v=4",
+    cropX: "-65.92%",
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
         <path d="M4 19V9" />
@@ -80,7 +80,7 @@ const cards = [
     color: "blue-dark",
     title: "Enterprise Ready",
     desc: "Scalable, secure and future-ready architecture with multi-school support, advanced integrations and enterprise-grade security.",
-    image: "/home/diff-enterprise.png?v=4",
+    cropX: "-81.45%",
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
         <path d="M12 3 5 6.5v5.2c0 4.3 2.9 7.4 7 8.8 4.1-1.4 7-4.5 7-8.8V6.5L12 3z" />
@@ -157,7 +157,12 @@ export default function WhatMakesDifferentSection() {
               <span className="hv-different__card-line" aria-hidden="true" />
               <p className="hv-different__card-desc">{card.desc}</p>
               <div className="hv-different__card-art">
-                <img src={card.image} alt="" aria-hidden="true" />
+                <img
+                  src="/home/home-7.png"
+                  alt=""
+                  aria-hidden="true"
+                  style={{ "--art-crop-x": card.cropX }}
+                />
               </div>
             </div>
           ))}

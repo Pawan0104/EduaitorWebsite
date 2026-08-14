@@ -2,6 +2,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { FaBars, FaSignOutAlt, FaBell, FaSun, FaMoon } from "react-icons/fa";
 import { useTheme } from "../context/ThemeContext";
 import { useState, useEffect } from "react";
+import { clearAdminSession } from "../lib/api";
 
 const PAGE_NAMES = {
   dashboard: "Dashboard",
@@ -35,7 +36,7 @@ export default function Topbar({ toggleSidebar }) {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("adminAuth");
+    clearAdminSession();
     navigate("/admin/login");
   };
 

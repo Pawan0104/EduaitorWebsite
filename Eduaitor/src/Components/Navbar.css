@@ -70,8 +70,24 @@
   transition: color 0.2s ease;
 }
 
+.nb-contact-link {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0 0 4px;
+  margin: 0;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: #334155;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
 .nav-links li a:hover,
-.nav-links a.active {
+.nav-links a.active,
+.nb-contact-link:hover {
   color: var(--primary);
 }
 

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { API_URL, apiFetch } from "../lib/api";
 
 /* ─────────────────────────────────────────────────────────────────────────────
    STYLES  — all classes used in JSX are defined here
@@ -445,11 +446,11 @@ function TestimonialForm({ editTarget, onSuccess, clearEdit }) {
       if (file) fd.append("image", file);
 
       const url    = editTarget
-        ? `${import.meta.env.VITE_API_URL}/testimonials/${editTarget._id}`
-        : `${import.meta.env.VITE_API_URL}/testimonials`;
+        ? `${API_URL}/testimonials/${editTarget._id}`
+        : `${API_URL}/testimonials`;
       const method = editTarget ? "PUT" : "POST";
 
-      const res  = await fetch(url, { method, body: fd });
+      const res  = await apiFetch(url, { method, body: fd });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Request failed");
 
@@ -722,7 +723,7 @@ export default function Testimonials() {
   const load = useCallback(async () => {
     try {
       setLoading(true);
-      const r = await fetch(`${import.meta.env.VITE_API_URL}/testimonials`);
+      const r = await apiFetch(`${API_URL}/testimonials`);
       const d = await r.json();
       setTestimonials(d.data || []);
     } catch {
@@ -743,7 +744,7 @@ export default function Testimonials() {
       fd.append("quote",    t.quote);
       fd.append("tag",      t.tag      || "");
       fd.append("rating",   String(t.rating));
-      await fetch(`${import.meta.env.VITE_API_URL}/testimonials/${t._id}`, { method: "PUT", body: fd });
+      await apiFetch(`${API_URL}/testimonials/${t._id}`, { method: "PUT", body: fd });
       toast(t.isActive ? "Testimonial hidden" : "Testimonial is now active");
       load();
     } catch {
@@ -753,7 +754,7 @@ export default function Testimonials() {
 
   const doDelete = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/testimonials/${delT._id}`, { method: "DELETE" });
+      const res = await apiFetch(`${API_URL}/testimonials/${delT._id}`, { method: "DELETE" });
       if (!res.ok) throw new Error();
       toast("Deleted successfully");
       setDelT(null);

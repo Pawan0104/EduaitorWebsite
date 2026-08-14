@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import "./Navbar.css";
-import { NavLink, Link, useLocation } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
+import { useContactPopup } from "./ContactPopup";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const location = useLocation();
-  const isHome = location.pathname === "/";
+  const { openContactPopup } = useContactPopup();
 
   const closeMenu = () => setIsMenuOpen(false);
 
@@ -39,11 +39,17 @@ const Navbar = () => {
           <li onClick={closeMenu}>
             <NavLink to="/plans">Pricing</NavLink>
           </li>
-          <li onClick={closeMenu}>
-            <a href={isHome ? "#resources" : "/#resources"}>Resources</a>
-          </li>
-          <li onClick={closeMenu}>
-            <NavLink to="/contactus">Contact</NavLink>
+          <li>
+            <button
+              type="button"
+              className="nb-contact-link"
+              onClick={() => {
+                closeMenu();
+                openContactPopup("navbar-contact");
+              }}
+            >
+              Contact
+            </button>
           </li>
         </ul>
 
