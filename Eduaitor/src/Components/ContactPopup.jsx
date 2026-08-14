@@ -1,11 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import "./ContactPopup.css";
-
-const API_URL =
-  import.meta.env.VITE_API_URL ||
-  (import.meta.env.DEV
-    ? "http://localhost:5000/api"
-    : "https://eduaitor-website.onrender.com/api");
+import { API_URL } from "../lib/api";
 
 const ContactPopupContext = createContext(null);
 

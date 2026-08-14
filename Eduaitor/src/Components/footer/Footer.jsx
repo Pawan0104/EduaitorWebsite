@@ -38,6 +38,7 @@ import {
 } from "react-icons/fa";
 import "./Footer.css";
 import { useContactPopup } from "../ContactPopup";
+import { API_URL } from "../../lib/api";
 
 const productItems = [
   { label: "Features", to: "/ecosystem", icon: FaStar },
@@ -82,12 +83,6 @@ const legalItems = [
   { label: "Terms & Conditions", to: "/terms-and-conditions" },
   { label: "Refund & Cancellation Policy", to: "/refund-policy" },
 ];
-
-const API_URL =
-  import.meta.env.VITE_API_URL ||
-  (import.meta.env.DEV
-    ? "http://localhost:5000/api"
-    : "https://eduaitor-website.onrender.com/api");
 
 const defaultSettings = {
   siteName: "EduAitor",

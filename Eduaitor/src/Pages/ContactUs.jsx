@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./ContactUs.css";
-
-const API_URL =
-  import.meta.env.VITE_API_URL ||
-  (import.meta.env.DEV
-    ? "http://localhost:5000/api"
-    : "https://eduaitor-website.onrender.com/api");
+import { API_URL } from "../lib/api";
 
 const defaultContact = {
   phone: "+91 6366 180 333",

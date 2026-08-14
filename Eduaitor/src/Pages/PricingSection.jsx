@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import axios from "axios";
 import "../Pages/pricing.css";
 import { useContactPopup } from "../Components/ContactPopup";
+import { API_URL } from "../lib/api";
 
 const fallbackPlansData = [
   {
@@ -56,7 +57,7 @@ export default function PricingSection() {
   const [error, setError] = useState(null);
   const { openContactPopup } = useContactPopup();
 
-  const API = import.meta.env.VITE_API_URL;
+  const API = API_URL;
 
   useEffect(() => {
     const fetchPlans = async () => {

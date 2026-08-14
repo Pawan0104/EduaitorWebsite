@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import "./TestimonialsSection.css";
+import { API_URL } from "../../lib/api";
 
 // const testimonials = [
 //   {
@@ -51,7 +52,7 @@ export default function TestimonialsSection() {
  const [testimonials, setTestimonials] = useState([]);
 
 useEffect(() => {
-  fetch(`${import.meta.env.VITE_API_URL}/testimonials?activeOnly=true`)
+  fetch(`${API_URL}/testimonials?activeOnly=true`)
     .then((res) => {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return res.json();

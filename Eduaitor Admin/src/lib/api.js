@@ -1,10 +1,15 @@
 import axios from "axios";
 
-export const API_URL =
-  import.meta.env.VITE_API_URL ||
-  (typeof window !== "undefined" && window.location.hostname !== "localhost"
-    ? `${window.location.origin}/api`
-    : "http://localhost:5000/api");
+const PRODUCTION_API = "https://eduaitor-website-backend.onrender.com/api";
+const LOCAL_API = "http://localhost:5000/api";
+
+const envUrl = (import.meta.env.VITE_API_URL || "").trim();
+
+export const API_URL = import.meta.env.DEV
+  ? envUrl || LOCAL_API
+  : envUrl && !/localhost|127\.0\.0\.1/i.test(envUrl)
+    ? envUrl
+    : PRODUCTION_API;
 
 const TOKEN_KEY = "adminToken";
 

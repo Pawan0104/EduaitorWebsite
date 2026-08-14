@@ -2,8 +2,7 @@ import React, { useState ,useRef,useEffect} from "react";
 import "./BookDemoPage.css";
 import Faqsection from "../Components/MarketPlace-components/Faqsection";
 import axios from "axios";
-
-const API = import.meta.env.VITE_API_URL || "https://eduaitor-website.onrender.com/api"; // e.g. http://localhost:5000/api
+import { API_URL as API } from "../lib/api";
 
 const BookDemoPage = () => {
   const [formData, setFormData] = useState({

@@ -1,68 +1,57 @@
 # EduAitor Admin
 
-## Basic settings (same host as backend)
+## Deploy on Render (Static Site)
 
-When the API is hosted on the **same domain as the admin dashboard**:
+1. Push this repo to GitHub.
+2. Render → **New** → **Static Site**
+3. Connect the repo and use:
 
-### 1) Admin — `Eduaitor Admin/.env`
+| Setting | Value |
+|---|---|
+| **Name** | `eduaitor-website-admin` (or any name) |
+| **Root Directory** | `Eduaitor Admin` |
+| **Build Command** | `npm install && npm run build` |
+| **Publish Directory** | `dist` |
+
+4. **Environment**
 
 ```env
-VITE_API_URL=https://YOUR-ADMIN-DOMAIN/api
+VITE_API_URL=https://eduaitor-website-backend.onrender.com/api
 ```
 
-Examples:
-- `VITE_API_URL=https://admin.eduaitor.com/api`
-- or same-origin relative: `VITE_API_URL=/api`
+5. Deploy. Login URL:
 
-Rebuild/redeploy admin after changing this.
+`https://YOUR-ADMIN-SITE.onrender.com/admin/login`
 
-### 2) Website — `Eduaitor/.env`
+6. On the **backend** Render service, add this admin URL to CORS (no trailing slash):
 
 ```env
-VITE_API_URL=https://YOUR-ADMIN-DOMAIN/api
+CLIENT_URL_2=https://YOUR-ADMIN-SITE.onrender.com
 ```
 
-(Use the same API URL the admin uses.)
+Then **Manual Deploy** the backend so CORS updates.
 
-### 3) Backend — `Eduaitor Backend/.env`
+## Local setup
+
+```bash
+cd "Eduaitor Admin"
+cp .env.example .env.development
+npm install
+npm run dev
+```
+
+Login: `/admin/login`
+
+## Backend auth env (on Render backend only)
 
 ```env
-PORT=5000
-
-MONGO_URI=mongodb+srv://...
-CLOUDINARY_CLOUD_NAME=...
-CLOUDINARY_API_KEY=...
-CLOUDINARY_API_SECRET=...
-
-CLIENT_URL_1=https://www.eduaitor.com
-CLIENT_URL_2=https://YOUR-ADMIN-DOMAIN
-CLIENT_URL_3=http://localhost:5173
-
 ADMIN_EMAIL=your-admin-email@example.com
 ADMIN_PASSWORD_HASH=your-bcrypt-password-hash
 JWT_SECRET=at-least-32-random-bytes
 ```
 
-`CLIENT_URL_*` must match the exact browser origins (no trailing slash).
-
-### 4) Generate admin password hash
-
-From `Eduaitor Backend`:
+Generate password hash from `Eduaitor Backend`:
 
 ```bash
 node -e "import('bcryptjs').then(async ({default:b}) => console.log(await b.hash(process.argv[1], 12)))" "YOUR-STRONG-PASSWORD"
 ```
-
-### 5) Generate JWT secret
-
-```bash
-node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
-```
-
-Login at `/admin/login` with `ADMIN_EMAIL` + the plain password you hashed.
-
-## Local setup
-
-1. Copy `.env.example` → `.env` in Admin, Backend, and Website.
-2. Set values above.
-3. `npm install` + `npm run dev` in each app.

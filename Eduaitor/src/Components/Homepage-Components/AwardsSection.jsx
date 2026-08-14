@@ -5,6 +5,7 @@ import awardLogo1 from "../../assets/awardLogo1.webp";
 import awardLogo2 from "../../assets/awardLogo2.webp";
 import awardLogo3 from "../../assets/awardLogo3.webp";
 import awardLogo4 from "../../assets/awardLogo4.webp";
+import { API_URL } from "../../lib/api";
 
 const awards = [
   { logo: awardLogo1, title: "Best EdTech Startup", org: "Startup India, 2023" },
@@ -35,7 +36,7 @@ export default function AwardsSection() {
   }, []);
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/awards`)
+    fetch(`${API_URL}/awards`)
     .then(res => res.json()).then(data => {
       console.log("Fetched awards:", data.awards);
       setAwards(data.awards);
