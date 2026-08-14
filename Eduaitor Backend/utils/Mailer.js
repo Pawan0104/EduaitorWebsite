@@ -1,25 +1,30 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getFrom() {
+  return (
+    process.env.RESEND_FROM ||
+    (process.env.EMAIL_USER
+      ? `EduAItor <${process.env.EMAIL_USER}>`
+      : "EduAItor <onboarding@resend.dev>")
+  );
+}
 
-const FROM =
-  process.env.RESEND_FROM ||
-  (process.env.EMAIL_USER
-    ? `EduAItor <${process.env.EMAIL_USER}>`
-    : "EduAItor <onboarding@resend.dev>");
-
-const ADMIN_TO = process.env.ADMIN_MAIL || "eeduaitor@gmail.com";
+function getAdminTo() {
+  return process.env.ADMIN_MAIL || "eeduaitor@gmail.com";
+}
 
 async function sendEmail({ to, subject, html }) {
-  if (!process.env.RESEND_API_KEY) {
-    throw new Error("RESEND_API_KEY is not set");
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new Error("RESEND_API_KEY is not set on the backend");
   }
   if (!to) {
     throw new Error("Email recipient is missing");
   }
 
+  const resend = new Resend(apiKey);
   const result = await resend.emails.send({
-    from: FROM,
+    from: getFrom(),
     to: Array.isArray(to) ? to : [to],
     subject,
     html,
@@ -29,7 +34,7 @@ async function sendEmail({ to, subject, html }) {
     throw new Error(result.error.message || "Resend failed to send email");
   }
 
-  console.log("Resend email sent:", result.data?.id, subject);
+  console.log("Resend email sent:", result.data?.id, "to:", to, subject);
   return result;
 }
 
@@ -109,7 +114,7 @@ export const sendAdminNotification = async (demo) => {
   `;
 
   return sendEmail({
-    to: ADMIN_TO,
+    to: getAdminTo(),
     subject: `Demo Request – ${demo.instName} (${demo.instType})`,
     html,
   });
@@ -137,7 +142,7 @@ export const sendContactLeadNotification = async (lead) => {
   `;
 
   return sendEmail({
-    to: ADMIN_TO,
+    to: getAdminTo(),
     subject: `Website enquiry – ${lead.name || "New lead"}`,
     html,
   });

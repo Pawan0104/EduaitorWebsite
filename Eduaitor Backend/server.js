@@ -1,6 +1,6 @@
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 
 import planRoute from "./routes/planRoute.js";
@@ -11,7 +11,6 @@ import testimonialRoute from "./routes/testimonialsRoute.js";
 import  awardRoute from "./routes/awardRoute.js";
 import authRoute from "./routes/authRoute.js";
 import contactLeadRoute from "./routes/contactLeadRoute.js";
-dotenv.config();
 
 const app = express();
 app.set("trust proxy", 1);

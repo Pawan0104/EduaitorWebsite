@@ -31,8 +31,9 @@ export const createContactLead = async (req, res) => {
       source,
     });
 
-    Promise.allSettled([
-      sendContactLeadNotification({
+    const mail = { admin: false, error: "" };
+    try {
+      await sendContactLeadNotification({
         name,
         phone,
         email,
@@ -40,19 +41,20 @@ export const createContactLead = async (req, res) => {
         city,
         message,
         source,
-      }),
-    ]).then((results) => {
-      results.forEach((r) => {
-        if (r.status === "rejected") {
-          console.error("Contact lead mail error:", r.reason?.message);
-        }
       });
-    });
+      mail.admin = true;
+    } catch (mailErr) {
+      mail.error = mailErr.message || "Admin email failed";
+      console.error("Contact lead mail error:", mail.error);
+    }
 
     return res.status(201).json({
       success: true,
-      message: "Thanks! Our team will contact you shortly.",
+      message: mail.admin
+        ? "Thanks! Our team will contact you shortly."
+        : "Request saved, but admin email failed.",
       data: lead,
+      mail,
     });
   } catch (err) {
     console.error(err);

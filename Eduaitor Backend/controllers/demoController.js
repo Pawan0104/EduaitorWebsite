@@ -24,21 +24,29 @@ export const bookDemo = async (req, res) => {
             date, time, mode, message,
         });
 
-        // Send emails (fire-and-forget — don't block response on email failure)
-        Promise.allSettled([
-            sendUserConfirmation(demo),
-            sendAdminNotification(demo),
-        ]).then((results) => {
-            results.forEach((r) => {
-                if (r.status === "rejected")
-                    console.error("Mail error:", r.reason?.message);
-            });
-        });
+        const mail = { admin: false, user: false, error: "" };
+        try {
+            await sendAdminNotification(demo);
+            mail.admin = true;
+        } catch (mailErr) {
+            mail.error = mailErr.message || "Admin email failed";
+            console.error("Admin mail error:", mail.error);
+        }
+        try {
+            await sendUserConfirmation(demo);
+            mail.user = true;
+        } catch (mailErr) {
+            console.error("User mail error:", mailErr.message);
+            if (!mail.error) mail.error = mailErr.message;
+        }
 
         return res.status(201).json({
             success: true,
-            message: "Demo booked successfully! Confirmation email sent.",
+            message: mail.admin
+                ? "Demo booked successfully! Confirmation email sent."
+                : "Demo booked, but admin email failed.",
             data: demo,
+            mail,
         });
     } catch (err) {
         console.error("bookDemo error:", err);
