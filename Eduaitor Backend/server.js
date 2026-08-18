@@ -26,19 +26,31 @@ const allowedOrigins = [
     "http://localhost:5173",
     "http://localhost:5174",
     "http://localhost:5175",
-].filter(Boolean); // .filter(Boolean) removes undefined if CLIENT_URL isn't set
+    "https://eduaitor.com",
+    "https://www.eduaitor.com",
+].filter(Boolean);
+
+function isAllowedOrigin(origin) {
+    if (!origin) return true;
+    if (allowedOrigins.includes(origin)) return true;
+    try {
+        const { hostname } = new URL(origin);
+        if (hostname === "eduaitor.com" || hostname.endsWith(".eduaitor.com")) {
+            return true;
+        }
+        if (hostname.endsWith(".onrender.com")) return true;
+    } catch {
+        return false;
+    }
+    return false;
+}
 
 app.use(
     cors({
         origin: function (origin, callback) {
-            // Allow requests with no origin (like mobile apps or curl requests)
-            if (!origin) return callback(null, true);
-
-            if (allowedOrigins.indexOf(origin) !== -1) {
-                callback(null, true);
-            } else {
-                callback(new Error("Not allowed by CORS"));
-            }
+            if (isAllowedOrigin(origin)) return callback(null, true);
+            console.warn("Blocked CORS origin:", origin);
+            return callback(null, false);
         },
         credentials: true,
     })
