@@ -1,6 +1,13 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./home-v2.css";
+import { getSettingsCached } from "../../lib/settingsCache";
+import {
+  DEFAULT_RATES,
+  formatRate,
+  ratesFromSettings,
+  savingsPercent,
+} from "../../lib/pricingRates";
 
 const features = [
   {
@@ -72,12 +79,6 @@ const monthlyChecks = [
   "Cancel or adjust anytime",
 ];
 
-const yearlyChecks = [
-  "All features included",
-  "25% discount vs. monthly plan",
-  "Best value for your school",
-];
-
 const trustGroups = [
   {
     color: "blue",
@@ -134,6 +135,25 @@ const impactBar = [
 ];
 
 export default function PricingOneSection() {
+  const [rates, setRates] = useState(DEFAULT_RATES);
+
+  useEffect(() => {
+    getSettingsCached()
+      .then((data) => setRates(ratesFromSettings(data)))
+      .catch(() => {});
+  }, []);
+
+  const savePct = savingsPercent(
+    rates.monthlyRatePerDay,
+    rates.yearlyRatePerDay
+  );
+
+  const yearlyChecks = [
+    "All features included",
+    ...(savePct > 0 ? [`${savePct}% discount vs. monthly plan`] : []),
+    "Best value for your school",
+  ];
+
   return (
     <section className="hv-section hv-pricing" id="pricing-one">
       <div className="hv-container">
@@ -190,7 +210,8 @@ export default function PricingOneSection() {
               <div className="hv-pricing__plan hv-pricing__plan--monthly">
                 <div className="hv-pricing__plan-label">MONTHLY PLAN</div>
                 <div className="hv-pricing__plan-price">
-                  <span className="hv-pricing__rupee">₹</span> 1
+                  <span className="hv-pricing__rupee">₹</span>{" "}
+                  {formatRate(rates.monthlyRatePerDay)}
                 </div>
                 <div className="hv-pricing__plan-unit">PER STUDENT PER DAY</div>
                 <span className="hv-pricing__plan-badge hv-pricing__plan-badge--blue">
@@ -211,12 +232,17 @@ export default function PricingOneSection() {
                 </Link>
               </div>
 
-              <div className="hv-pricing__save-badge">SAVE 25% WITH YEARLY PLAN</div>
+              <div className="hv-pricing__save-badge">
+                {savePct > 0
+                  ? `SAVE ${savePct}% WITH YEARLY PLAN`
+                  : "YEARLY PLAN"}
+              </div>
 
               <div className="hv-pricing__plan hv-pricing__plan--yearly">
                 <div className="hv-pricing__plan-label">YEARLY PLAN</div>
                 <div className="hv-pricing__plan-price hv-pricing__plan-price--green">
-                  <span className="hv-pricing__rupee">₹</span> 1
+                  <span className="hv-pricing__rupee">₹</span>{" "}
+                  {formatRate(rates.yearlyRatePerDay)}
                 </div>
                 <div className="hv-pricing__plan-unit">PER STUDENT PER DAY</div>
                 <span className="hv-pricing__plan-badge hv-pricing__plan-badge--green">
@@ -275,8 +301,11 @@ export default function PricingOneSection() {
             </div>
           ))}
           <div className="hv-pricing__impact-promise">
-            One Plan. Every Feature. <strong>₹1 Per Student Per Day.</strong> That's the EduAitor
-            Promise.
+            One Plan. Every Feature.{" "}
+            <strong>
+              ₹{formatRate(rates.monthlyRatePerDay)} Per Student Per Day.
+            </strong>{" "}
+            That's the EduAitor Promise.
           </div>
         </div>
 

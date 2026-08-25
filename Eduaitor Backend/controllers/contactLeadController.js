@@ -1,12 +1,17 @@
 import ContactLead from "../models/contactLead.js";
-import { sendContactLeadNotification } from "../utils/Mailer.js";
+import {
+  sendContactLeadAcknowledgment,
+  sendContactLeadNotification,
+} from "../utils/Mailer.js";
 
 export const createContactLead = async (req, res) => {
   try {
     const name = String(req.body.name || "").trim();
     const phone = String(req.body.phone || "").replace(/\D/g, "");
     const source = String(req.body.source || "contact-popup").trim();
-    const email = String(req.body.email || "").trim();
+    const email = String(req.body.email || "")
+      .trim()
+      .toLowerCase();
     const schoolName = String(req.body.schoolName || "").trim();
     const city = String(req.body.city || "").trim();
     const message = String(req.body.message || "").trim();
@@ -25,34 +30,59 @@ export const createContactLead = async (req, res) => {
       });
     }
 
+    if (email && !/\S+@\S+\.\S+/.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid email address.",
+      });
+    }
+
     const lead = await ContactLead.create({
       name,
       phone,
+      email: email || undefined,
+      schoolName: schoolName || undefined,
+      city: city || undefined,
+      message: message || undefined,
       source,
     });
 
-    const mail = { admin: false, error: "" };
+    const payload = {
+      name,
+      phone,
+      email,
+      schoolName,
+      city,
+      message,
+      source,
+    };
+
+    const mail = { admin: false, user: false, error: "" };
     try {
-      await sendContactLeadNotification({
-        name,
-        phone,
-        email,
-        schoolName,
-        city,
-        message,
-        source,
-      });
+      await sendContactLeadNotification(payload);
       mail.admin = true;
     } catch (mailErr) {
-      mail.error = mailErr.message || "Admin email failed";
-      console.error("Contact lead mail error:", mail.error);
+      mail.error = mailErr.message || "Support email failed";
+      console.error("Contact lead support mail error:", mail.error);
+    }
+
+    if (email) {
+      try {
+        await sendContactLeadAcknowledgment(payload);
+        mail.user = true;
+      } catch (mailErr) {
+        console.error("Contact lead user mail error:", mailErr.message);
+        if (!mail.error) mail.error = mailErr.message;
+      }
     }
 
     return res.status(201).json({
       success: true,
       message: mail.admin
-        ? "Thanks! Our team will contact you shortly."
-        : "Request saved, but admin email failed.",
+        ? email
+          ? "Thanks! Confirmation sent — our team will contact you shortly."
+          : "Thanks! Our team will contact you shortly."
+        : "Request saved, but email notification failed.",
       data: lead,
       mail,
     });
@@ -75,6 +105,7 @@ export const getContactLeads = async (req, res) => {
       filter.$or = [
         { name: { $regex: q, $options: "i" } },
         { phone: { $regex: q, $options: "i" } },
+        { email: { $regex: q, $options: "i" } },
       ];
     }
 

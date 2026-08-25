@@ -8,7 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { ThemeProvider } from "./context/ThemeContext.jsx";
 
 createRoot(document.getElementById("root")).render(
-  <BrowserRouter>
+  <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, "") || "/"}>
     <StrictMode>
       <ThemeProvider>
         <App />

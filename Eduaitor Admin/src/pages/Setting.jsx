@@ -381,6 +381,43 @@ function GeneralPanel({ data, setData, onFile, previews }) {
         </div>
       </SectionCard>
 
+      <SectionCard title="EduAitor ONE Pricing" icon="₹">
+        <p className="text-xs text-[var(--text-muted)] -mt-1 mb-3">
+          Per student per day rates shown on the website (home + plans). Yearly
+          default is ₹0.75.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
+          <Input
+            label="Monthly rate (₹ / student / day)"
+            type="number"
+            min="0"
+            step="0.01"
+            value={data.monthlyRatePerDay ?? 1}
+            onChange={(e) =>
+              set(
+                "monthlyRatePerDay",
+                e.target.value === "" ? "" : Number(e.target.value)
+              )
+            }
+            placeholder="1"
+          />
+          <Input
+            label="Yearly rate (₹ / student / day)"
+            type="number"
+            min="0"
+            step="0.01"
+            value={data.yearlyRatePerDay ?? 0.75}
+            onChange={(e) =>
+              set(
+                "yearlyRatePerDay",
+                e.target.value === "" ? "" : Number(e.target.value)
+              )
+            }
+            placeholder="0.75"
+          />
+        </div>
+      </SectionCard>
+
       {/* Contact Info */}
       <SectionCard title="Contact Info" icon="📞">
         <RepeatableSimple

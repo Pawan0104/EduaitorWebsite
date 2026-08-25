@@ -139,6 +139,7 @@ export default function Contacts() {
               <tr className="text-left border-b border-[var(--border)] t-text-sec">
                 <th className="px-4 py-3 font-bold">Name</th>
                 <th className="px-4 py-3 font-bold">Phone</th>
+                <th className="px-4 py-3 font-bold">Email</th>
                 <th className="px-4 py-3 font-bold">Source</th>
                 <th className="px-4 py-3 font-bold">Status</th>
                 <th className="px-4 py-3 font-bold">Received</th>
@@ -156,6 +157,18 @@ export default function Contacts() {
                     >
                       <FaPhone size={11} /> {lead.phone}
                     </a>
+                  </td>
+                  <td className="px-4 py-3">
+                    {lead.email ? (
+                      <a
+                        href={`mailto:${lead.email}`}
+                        className="text-[var(--accent-text)] font-medium"
+                      >
+                        {lead.email}
+                      </a>
+                    ) : (
+                      <span className="t-text-sec">—</span>
+                    )}
                   </td>
                   <td className="px-4 py-3 t-text-sec">{lead.source || "—"}</td>
                   <td className="px-4 py-3">

@@ -1,7 +1,14 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Icons } from "../Components/icons";
 import { useContactPopup } from "../Components/ContactPopup";
+import { getSettingsCached } from "../lib/settingsCache";
+import {
+  DEFAULT_RATES,
+  formatRate,
+  ratesFromSettings,
+  savingsPercent,
+} from "../lib/pricingRates";
 import "./Plans.css";
 
 /** Fresh clone so the same icon can appear multiple times on one page */
@@ -254,7 +261,19 @@ export default function Plans() {
   const [custom, setCustom] = useState(true);
   const [studentsInput, setStudentsInput] = useState("");
   const [billing, setBilling] = useState("monthly");
+  const [rates, setRates] = useState(DEFAULT_RATES);
   const { openContactPopup } = useContactPopup();
+
+  useEffect(() => {
+    getSettingsCached()
+      .then((data) => setRates(ratesFromSettings(data)))
+      .catch(() => {});
+  }, []);
+
+  const savePct = savingsPercent(
+    rates.monthlyRatePerDay,
+    rates.yearlyRatePerDay
+  );
 
   const students = useMemo(() => {
     const n = parseInt(studentsInput, 10);
@@ -267,25 +286,26 @@ export default function Plans() {
     if (students <= 0) {
       return { monthlyCost: null, annualCost: null, savings: null };
     }
-    // ₹1 per student per day → monthly base = students × 30
-    const monthlyBase = students * 30;
+    const days = 30;
+    const monthlyBase = students * days * rates.monthlyRatePerDay;
+    const yearlyBase = students * days * rates.yearlyRatePerDay;
     const annualFull = monthlyBase * 12;
-    const annualDiscounted = Math.round(annualFull * 0.75);
+    const annualDiscounted = yearlyBase * 12;
 
     if (billing === "annual") {
       return {
-        monthlyCost: Math.round(monthlyBase * 0.75),
-        annualCost: annualDiscounted,
-        savings: annualFull - annualDiscounted,
+        monthlyCost: Math.round(yearlyBase),
+        annualCost: Math.round(annualDiscounted),
+        savings: Math.round(annualFull - annualDiscounted),
       };
     }
 
     return {
-      monthlyCost: monthlyBase,
-      annualCost: annualFull,
+      monthlyCost: Math.round(monthlyBase),
+      annualCost: Math.round(annualFull),
       savings: 0,
     };
-  }, [students, billing]);
+  }, [students, billing, rates]);
 
   const pickPreset = (n) => {
     setCustom(false);
@@ -476,15 +496,19 @@ export default function Plans() {
                 <div className="pp-one__rate">
                   <span className="pp-one__tag">BILLED MONTHLY</span>
                   <strong>
-                    ₹1 <small>per day per student</small>
+                    ₹{formatRate(rates.monthlyRatePerDay)}{" "}
+                    <small>per day per student</small>
                   </strong>
                   <p>Billed Monthly</p>
                 </div>
                 <div className="pp-one__rate pp-one__rate--annual">
-                  <span className="pp-one__save">25% SAVINGS</span>
+                  {savePct > 0 ? (
+                    <span className="pp-one__save">{savePct}% SAVINGS</span>
+                  ) : null}
                   <span className="pp-one__tag pp-one__tag--green">BILLED ANNUALLY</span>
                   <strong>
-                    ₹0.75 <small>per day per student</small>
+                    ₹{formatRate(rates.yearlyRatePerDay)}{" "}
+                    <small>per day per student</small>
                   </strong>
                   <p>Billed Annually</p>
                 </div>
@@ -587,7 +611,11 @@ export default function Plans() {
               </span>
               <div>
                 <strong>Transparent Pricing</strong>
-                <span>₹1 per student per day. Billed Monthly or Annually.</span>
+                <span>
+                  ₹{formatRate(rates.monthlyRatePerDay)} monthly or ₹
+                  {formatRate(rates.yearlyRatePerDay)} annually per student per
+                  day.
+                </span>
               </div>
             </div>
             <div className="pp-calc__highlight">
@@ -596,7 +624,11 @@ export default function Plans() {
               </span>
               <div>
                 <strong>Maximum Savings</strong>
-                <span>Save 25% with Annual Billing.</span>
+                <span>
+                  {savePct > 0
+                    ? `Save ${savePct}% with Annual Billing.`
+                    : "Choose Annual Billing for the best yearly rate."}
+                </span>
               </div>
             </div>
           </div>
@@ -664,7 +696,9 @@ export default function Plans() {
                     className={`pp-calc__annual${billing === "annual" ? " is-active" : ""}`}
                     onClick={() => setBilling("annual")}
                   >
-                    <span className="pp-calc__off">25% OFF</span>
+                    {savePct > 0 ? (
+                      <span className="pp-calc__off">{savePct}% OFF</span>
+                    ) : null}
                     <span className="pp-calc__bill-icon" aria-hidden="true">
                       {ic(Icons.calendar)}
                     </span>
@@ -700,7 +734,9 @@ export default function Plans() {
               <div className={`pp-calc__save${billing === "annual" && savings ? " is-on" : ""}`}>
                 {billing === "annual" && savings
                   ? `You Save ${formatINR(savings)} with Annual Billing!`
-                  : "You Save 25% with Annual Billing!"}
+                  : savePct > 0
+                    ? `You Save ${savePct}% with Annual Billing!`
+                    : "Choose Annual Billing for the best yearly rate."}
               </div>
             </div>
 
@@ -720,7 +756,9 @@ export default function Plans() {
                 ))}
               </ul>
               <div className="pp-love__promise">
-                ₹1 per day. Maximum Value. That's the EduAitor Promise!
+                ₹{formatRate(rates.monthlyRatePerDay)} per day monthly, ₹
+                {formatRate(rates.yearlyRatePerDay)} yearly. Maximum Value.
+                That's the EduAitor Promise!
               </div>
             </aside>
           </div>

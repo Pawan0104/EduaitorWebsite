@@ -31,15 +31,19 @@
 }
 
 .ft-logo {
-  font-size: 30px;
-  font-weight: 800;
-  color: #0b1f3a;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  line-height: 0;
 }
 
-.ft-logo span {
-  color: #2563eb;
+.ft-logo-img {
+  height: 64px;
+  width: auto;
+  max-width: 240px;
+  object-fit: contain;
+  display: block;
+  filter: brightness(0.85) saturate(1.2);
 }
 
 .ft-tagline {

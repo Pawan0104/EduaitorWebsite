@@ -1,27 +1,145 @@
+import nodemailer from "nodemailer";
 import { Resend } from "resend";
+
+const LOGO_URL =
+  process.env.EMAIL_LOGO_URL ||
+  "https://www.eduaitor.com/admin/eduaitor.png";
+
+const BRAND = {
+  name: "Eduaitor",
+  teal: "#0d9488",
+  violet: "#6d28d9",
+  ink: "#0f172a",
+  muted: "#64748b",
+  line: "#e2e8f0",
+  soft: "#f0fdfa",
+  white: "#ffffff",
+};
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
 
 function getFrom() {
   return (
+    process.env.EMAIL_FROM ||
     process.env.RESEND_FROM ||
     (process.env.EMAIL_USER
-      ? `EduAItor <${process.env.EMAIL_USER}>`
-      : "EduAItor <onboarding@resend.dev>")
+      ? `Eduaitor <${process.env.EMAIL_USER}>`
+      : "Eduaitor <support@eduaitor.com>")
   );
 }
 
-function getAdminTo() {
-  return process.env.ADMIN_MAIL || "eeduaitor@gmail.com";
+function getSupportTo() {
+  return (
+    process.env.SUPPORT_MAIL ||
+    process.env.ADMIN_MAIL ||
+    "support@eduaitor.com"
+  );
 }
 
-async function sendEmail({ to, subject, html }) {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    throw new Error("RESEND_API_KEY is not set on the backend");
-  }
-  if (!to) {
-    throw new Error("Email recipient is missing");
-  }
+function isSmtpConfigured() {
+  return Boolean(
+    process.env.EMAIL_HOST &&
+      process.env.EMAIL_USER &&
+      process.env.EMAIL_PASS,
+  );
+}
 
+let smtpTransporter = null;
+
+function getSmtpTransporter() {
+  if (!isSmtpConfigured()) return null;
+  if (smtpTransporter) return smtpTransporter;
+
+  const port = Number(process.env.EMAIL_PORT || 587);
+  const secure =
+    String(process.env.EMAIL_SECURE || "").toLowerCase() === "true" ||
+    port === 465;
+  const rejectUnauthorized =
+    String(process.env.EMAIL_TLS_REJECT_UNAUTHORIZED || "true").toLowerCase() !==
+    "false";
+
+  smtpTransporter = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST,
+    port,
+    secure,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+    tls: { rejectUnauthorized },
+    requireTLS: !secure && port === 587,
+  });
+  return smtpTransporter;
+}
+
+function wrapBrandedEmail({ title, preheader = "", bodyHtml }) {
+  const safeTitle = escapeHtml(title || BRAND.name);
+  const year = new Date().getFullYear();
+  return `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>${safeTitle}</title></head>
+<body style="margin:0;padding:0;background:#eef2f7;font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:${BRAND.ink}">
+  ${preheader ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0">${escapeHtml(preheader)}</div>` : ""}
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f7;padding:24px 12px">
+    <tr><td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:${BRAND.white};border-radius:16px;overflow:hidden;border:1px solid ${BRAND.line}">
+        <tr>
+          <td style="padding:22px 28px 16px;text-align:center;border-bottom:1px solid ${BRAND.line};background:linear-gradient(180deg,#f8fffd 0%,#fff 100%)">
+            <img src="${escapeHtml(LOGO_URL)}" alt="Eduaitor" width="148" style="display:block;margin:0 auto 10px;max-width:148px;height:auto;border:0" />
+            <p style="margin:0;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:${BRAND.violet}">School ERP</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:28px">
+            <h1 style="margin:0 0 16px;font-size:22px;line-height:1.3;color:${BRAND.ink}">${safeTitle}</h1>
+            ${bodyHtml || ""}
+            <p style="margin:24px 0 0;font-size:12px;color:${BRAND.muted}">© ${year} Eduaitor. Track · Assess · Improve</p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
+
+function detailTable(rows) {
+  return `<table style="width:100%;border-collapse:collapse;font-size:14px;color:${BRAND.ink};margin:16px 0;background:${BRAND.soft};border:1px solid ${BRAND.line};border-radius:12px">
+    ${rows
+      .map(
+        ([label, value]) =>
+          `<tr>
+            <td style="padding:10px 14px;color:${BRAND.muted};width:38%;border-bottom:1px solid ${BRAND.line}">${escapeHtml(label)}</td>
+            <td style="padding:10px 14px;border-bottom:1px solid ${BRAND.line}"><strong>${escapeHtml(value || "—")}</strong></td>
+          </tr>`,
+      )
+      .join("")}
+  </table>`;
+}
+
+async function sendViaSmtp({ to, subject, html, text }) {
+  const transporter = getSmtpTransporter();
+  if (!transporter) throw new Error("SMTP not configured");
+  const info = await transporter.sendMail({
+    from: getFrom(),
+    to: Array.isArray(to) ? to.join(", ") : to,
+    subject,
+    html,
+    text,
+  });
+  console.log("[mail] SMTP sent:", info.messageId, "to:", to, subject);
+  return { id: info.messageId, provider: "smtp" };
+}
+
+async function sendViaResend({ to, subject, html }) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) throw new Error("RESEND_API_KEY is not set");
   const resend = new Resend(apiKey);
   const result = await resend.emails.send({
     from: getFrom(),
@@ -29,121 +147,154 @@ async function sendEmail({ to, subject, html }) {
     subject,
     html,
   });
-
   if (result.error) {
     throw new Error(result.error.message || "Resend failed to send email");
   }
-
-  console.log("Resend email sent:", result.data?.id, "to:", to, subject);
-  return result;
+  console.log("[mail] Resend sent:", result.data?.id, "to:", to, subject);
+  return { id: result.data?.id, provider: "resend" };
 }
 
+/**
+ * Prefer eduaitor.com SMTP; fall back to Resend if SMTP unset.
+ */
+async function sendEmail({ to, subject, html, text }) {
+  if (!to) throw new Error("Email recipient is missing");
+
+  if (isSmtpConfigured()) {
+    return sendViaSmtp({ to, subject, html, text });
+  }
+  if (process.env.RESEND_API_KEY) {
+    return sendViaResend({ to, subject, html });
+  }
+  throw new Error(
+    "Mail not configured. Set EMAIL_HOST/EMAIL_USER/EMAIL_PASS (or RESEND_API_KEY).",
+  );
+}
+
+/** User ack after demo / Contact Us (demo book) */
 export const sendUserConfirmation = async (demo) => {
-  const html = `
-    <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
-      <div style="background:linear-gradient(135deg,#4f46e5,#6366f1);padding:32px 24px;text-align:center;">
-        <h1 style="color:#fff;margin:0;font-size:24px;">Demo Booking Confirmed!</h1>
-        <p style="color:#c7d2fe;margin:8px 0 0;">EduAItor Platform</p>
-      </div>
-      <div style="padding:32px 24px;background:#fff;">
-        <p style="color:#374151;font-size:16px;">Hi <strong>${demo.contactName}</strong>,</p>
-        <p style="color:#6b7280;">
-          Thank you for booking a demo with EduAItor. We've received your request
-          and will confirm your slot within <strong>24 hours</strong>.
-        </p>
-        <div style="background:#f0f4ff;border-radius:8px;padding:20px;margin:24px 0;">
-          <h3 style="color:#4f46e5;margin:0 0 12px;">Your Demo Details</h3>
-          <table style="width:100%;border-collapse:collapse;font-size:14px;color:#374151;">
-            <tr><td style="padding:4px 0;color:#6b7280;width:40%;">Institution</td><td><strong>${demo.instName}</strong></td></tr>
-            <tr><td style="padding:4px 0;color:#6b7280;">Type</td><td>${demo.instType}</td></tr>
-            <tr><td style="padding:4px 0;color:#6b7280;">Preferred Date</td><td>${demo.date || "Flexible"}</td></tr>
-            <tr><td style="padding:4px 0;color:#6b7280;">Time Slot</td><td>${demo.time || "To be confirmed"}</td></tr>
-            <tr><td style="padding:4px 0;color:#6b7280;">Mode</td><td>${demo.mode}</td></tr>
-          </table>
-        </div>
-        <p style="color:#6b7280;font-size:14px;">If you have any urgent queries, contact us directly.</p>
-        <p style="color:#374151;font-size:14px;margin-top:24px;">Best regards,<br/><strong>EduAItor Team</strong></p>
-      </div>
-      <div style="background:#f9fafb;padding:16px 24px;text-align:center;border-top:1px solid #e5e7eb;">
-        <p style="color:#9ca3af;font-size:12px;margin:0;">© 2026 EduAItor. All rights reserved.</p>
-      </div>
-    </div>
-  `;
+  const name = demo.contactName || "there";
+  const html = wrapBrandedEmail({
+    title: "We received your demo request",
+    preheader: "Thanks for booking a demo with Eduaitor",
+    bodyHtml: `
+      <p style="margin:0 0 12px;font-size:15px;line-height:1.6">Hi <strong>${escapeHtml(name)}</strong>,</p>
+      <p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:${BRAND.ink}">
+        Thank you for booking a demo with Eduaitor. Our team will confirm your slot within <strong>24 hours</strong>.
+      </p>
+      ${detailTable([
+        ["Institution", demo.instName],
+        ["Type", demo.instType],
+        ["Preferred date", demo.date || "Flexible"],
+        ["Time slot", demo.time || "To be confirmed"],
+        ["Mode", demo.mode || "—"],
+        ["City", demo.city || "—"],
+      ])}
+      <p style="margin:0;font-size:14px;color:${BRAND.muted}">
+        Questions? Reply to this email or write to <a href="mailto:support@eduaitor.com" style="color:${BRAND.teal}">support@eduaitor.com</a>.
+      </p>
+    `,
+  });
 
   return sendEmail({
     to: demo.email,
-    subject: "Your EduAItor Demo is Booked",
+    subject: "Your Eduaitor demo request — confirmation",
     html,
+    text: `Hi ${name},\n\nThanks for booking a demo with Eduaitor. We'll confirm within 24 hours.\nInstitution: ${demo.instName}\n\n— Eduaitor`,
   });
 };
 
+/** Support inbox: new demo booking */
 export const sendAdminNotification = async (demo) => {
-  const html = `
-    <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
-      <div style="background:#0f172a;padding:24px;text-align:center;">
-        <h2 style="color:#6366f1;margin:0;">New Demo Request</h2>
-      </div>
-      <div style="padding:24px;background:#fff;">
-        <h3 style="color:#374151;margin:0 0 16px;">Booking Details</h3>
-        <table style="width:100%;border-collapse:collapse;font-size:14px;color:#374151;">
-          <tr style="background:#f0f4ff;">
-            <td colspan="2" style="padding:8px 12px;font-weight:600;color:#4f46e5;">Institution</td>
-          </tr>
-          <tr><td style="padding:6px 12px;color:#6b7280;width:40%;">Name</td><td>${demo.instName}</td></tr>
-          <tr><td style="padding:6px 12px;color:#6b7280;">Type</td><td>${demo.instType}</td></tr>
-          <tr><td style="padding:6px 12px;color:#6b7280;">Students</td><td>${demo.students || "—"}</td></tr>
-          <tr><td style="padding:6px 12px;color:#6b7280;">Branches</td><td>${demo.branches || "—"}</td></tr>
-          <tr style="background:#f0f4ff;">
-            <td colspan="2" style="padding:8px 12px;font-weight:600;color:#4f46e5;">Contact</td>
-          </tr>
-          <tr><td style="padding:6px 12px;color:#6b7280;">Name</td><td>${demo.contactName}</td></tr>
-          <tr><td style="padding:6px 12px;color:#6b7280;">Designation</td><td>${demo.designation || "—"}</td></tr>
-          <tr><td style="padding:6px 12px;color:#6b7280;">Email</td><td><a href="mailto:${demo.email}">${demo.email}</a></td></tr>
-          <tr><td style="padding:6px 12px;color:#6b7280;">Phone</td><td>${demo.phone}</td></tr>
-          <tr><td style="padding:6px 12px;color:#6b7280;">City</td><td>${demo.city || "—"}</td></tr>
-          <tr style="background:#f0f4ff;">
-            <td colspan="2" style="padding:8px 12px;font-weight:600;color:#4f46e5;">Demo Preferences</td>
-          </tr>
-          <tr><td style="padding:6px 12px;color:#6b7280;">Date</td><td>${demo.date || "Flexible"}</td></tr>
-          <tr><td style="padding:6px 12px;color:#6b7280;">Time</td><td>${demo.time || "—"}</td></tr>
-          <tr><td style="padding:6px 12px;color:#6b7280;">Mode</td><td>${demo.mode}</td></tr>
-          <tr><td style="padding:6px 12px;color:#6b7280;">Message</td><td>${demo.message || "—"}</td></tr>
-        </table>
-      </div>
-    </div>
-  `;
+  const html = wrapBrandedEmail({
+    title: "New demo booking",
+    preheader: `${demo.instName} — ${demo.contactName}`,
+    bodyHtml: `
+      <p style="margin:0 0 12px;font-size:15px;line-height:1.6">A new demo was booked on eduaitor.com.</p>
+      ${detailTable([
+        ["Institution", demo.instName],
+        ["Type", demo.instType],
+        ["Students", demo.students],
+        ["Branches", demo.branches],
+        ["Contact", demo.contactName],
+        ["Designation", demo.designation],
+        ["Email", demo.email],
+        ["Phone", demo.phone],
+        ["City", demo.city],
+        ["Date", demo.date || "Flexible"],
+        ["Time", demo.time],
+        ["Mode", demo.mode],
+        ["Message", demo.message],
+      ])}
+    `,
+  });
 
   return sendEmail({
-    to: getAdminTo(),
-    subject: `Demo Request – ${demo.instName} (${demo.instType})`,
+    to: getSupportTo(),
+    subject: `Demo request — ${demo.instName || "New lead"} (${demo.contactName || ""})`,
     html,
+    text: `New demo: ${demo.instName}\nContact: ${demo.contactName}\nEmail: ${demo.email}\nPhone: ${demo.phone}`,
   });
 };
 
+/** Support inbox: contact popup / enquiry */
 export const sendContactLeadNotification = async (lead) => {
-  const html = `
-    <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
-      <div style="background:#0f172a;padding:24px;text-align:center;">
-        <h2 style="color:#60a5fa;margin:0;">New website enquiry</h2>
-      </div>
-      <div style="padding:24px;background:#fff;">
-        <p style="color:#374151;font-size:15px;">Someone submitted a form on the EduAitor website.</p>
-        <table style="width:100%;border-collapse:collapse;font-size:14px;color:#374151;">
-          <tr><td style="padding:8px 0;color:#6b7280;width:36%;">Name</td><td><strong>${lead.name || "—"}</strong></td></tr>
-          <tr><td style="padding:8px 0;color:#6b7280;">Phone</td><td>${lead.phone || "—"}</td></tr>
-          <tr><td style="padding:8px 0;color:#6b7280;">Email</td><td>${lead.email || "—"}</td></tr>
-          <tr><td style="padding:8px 0;color:#6b7280;">School</td><td>${lead.schoolName || "—"}</td></tr>
-          <tr><td style="padding:8px 0;color:#6b7280;">City</td><td>${lead.city || "—"}</td></tr>
-          <tr><td style="padding:8px 0;color:#6b7280;">Source</td><td>${lead.source || "website"}</td></tr>
-          <tr><td style="padding:8px 0;color:#6b7280;">Message</td><td>${lead.message || "—"}</td></tr>
-        </table>
-      </div>
-    </div>
-  `;
+  const html = wrapBrandedEmail({
+    title: "New website enquiry",
+    preheader: lead.name || "New contact",
+    bodyHtml: `
+      <p style="margin:0 0 12px;font-size:15px;line-height:1.6">Someone submitted a form on eduaitor.com.</p>
+      ${detailTable([
+        ["Name", lead.name],
+        ["Phone", lead.phone],
+        ["Email", lead.email],
+        ["School", lead.schoolName],
+        ["City", lead.city],
+        ["Source", lead.source || "website"],
+        ["Message", lead.message],
+      ])}
+    `,
+  });
 
   return sendEmail({
-    to: getAdminTo(),
-    subject: `Website enquiry – ${lead.name || "New lead"}`,
+    to: getSupportTo(),
+    subject: `Website enquiry — ${lead.name || "New lead"}`,
     html,
+    text: `Enquiry from ${lead.name}\nPhone: ${lead.phone}\nEmail: ${lead.email || "—"}\nSource: ${lead.source}`,
+  });
+};
+
+/** User ack for contact enquiry (when email provided) */
+export const sendContactLeadAcknowledgment = async (lead) => {
+  if (!lead?.email) {
+    return { skipped: true, reason: "No user email" };
+  }
+
+  const name = lead.name || "there";
+  const html = wrapBrandedEmail({
+    title: "Thanks for contacting Eduaitor",
+    preheader: "We received your message",
+    bodyHtml: `
+      <p style="margin:0 0 12px;font-size:15px;line-height:1.6">Hi <strong>${escapeHtml(name)}</strong>,</p>
+      <p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:${BRAND.ink}">
+        Thanks for reaching out. Our team has received your message and will get back to you shortly.
+      </p>
+      ${detailTable([
+        ["Phone", lead.phone],
+        ["School", lead.schoolName],
+        ["City", lead.city],
+        ["Message", lead.message],
+      ])}
+      <p style="margin:0;font-size:14px;color:${BRAND.muted}">
+        Prefer to talk now? Email <a href="mailto:support@eduaitor.com" style="color:${BRAND.teal}">support@eduaitor.com</a>.
+      </p>
+    `,
+  });
+
+  return sendEmail({
+    to: lead.email,
+    subject: "We received your Eduaitor enquiry",
+    html,
+    text: `Hi ${name},\n\nThanks for contacting Eduaitor. We'll get back to you shortly.\n\n— Eduaitor`,
   });
 };

@@ -75,7 +75,11 @@ const LoginSignup = () => {
         {/* Left Side - Branding & Toggle */}
         <div className="login-left">
           <div className="brand-section">
-            <h1 className="logo-title">EduAitor</h1>
+            <img
+              src="/logo1-Photoroom.png"
+              alt="EduAItor"
+              className="logo-title-img"
+            />
             <p className="brand-subtitle">
               {isLogin 
                 ? 'Welcome back! Please sign in to your account.' 

@@ -42,9 +42,11 @@ export const bookDemo = async (req, res) => {
 
         return res.status(201).json({
             success: true,
-            message: mail.admin
-                ? "Demo booked successfully! Confirmation email sent."
-                : "Demo booked, but admin email failed.",
+            message: mail.admin && mail.user
+                ? "Demo booked successfully! Confirmation emails sent."
+                : mail.admin
+                ? "Demo booked. Support notified; user confirmation email failed."
+                : "Demo booked, but support email failed.",
             data: demo,
             mail,
         });

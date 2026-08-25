@@ -44,8 +44,10 @@ export const hasValidAdminToken = () => {
 
 const redirectToLogin = () => {
   clearAdminSession();
-  if (window.location.pathname !== "/admin/login") {
-    window.location.replace("/admin/login");
+  const base = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
+  const loginPath = `${base}/admin/login` || "/admin/login";
+  if (window.location.pathname !== loginPath) {
+    window.location.replace(loginPath);
   }
 };
 

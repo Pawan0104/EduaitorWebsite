@@ -69,6 +69,9 @@ const settingSchema = new mongoose.Schema(
             appStoreUrl: String,
 
             copyright: String,
+
+            monthlyRatePerDay: { type: Number, default: 1 },
+            yearlyRatePerDay: { type: Number, default: 0.75 },
         },
 
         /* REACH US (Contact page) */

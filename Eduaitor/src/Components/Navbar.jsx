@@ -12,11 +12,18 @@ const Navbar = () => {
   return (
     <header className="navbar">
       <nav>
-        <Link to="/" className="nb-brand" onClick={closeMenu}>
+        <Link
+          to="/"
+          className="nb-brand"
+          onClick={closeMenu}
+          aria-label="EduAItor home"
+        >
           <div className="nb-logo-row">
-            <span className="nb-logo">
-              Edu<span className="nb-logo-a">A</span>itor
-            </span>
+            <img
+              src="/logo1-Photoroom.png"
+              alt="EduAItor"
+              className="nb-logo-img"
+            />
           </div>
           <span className="nb-tagline">Smarter Schools. Stronger Students.</span>
         </Link>

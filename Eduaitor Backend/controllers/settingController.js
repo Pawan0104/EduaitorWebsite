@@ -14,6 +14,14 @@ export const getSettings = async (req, res) => {
     try {
         const setting = await getSetting();
         const obj = setting.toObject();
+        obj.general = obj.general || {};
+
+        if (obj.general.monthlyRatePerDay == null) {
+            obj.general.monthlyRatePerDay = 1;
+        }
+        if (obj.general.yearlyRatePerDay == null) {
+            obj.general.yearlyRatePerDay = 0.75;
+        }
 
         obj.general.logoUrl = obj.general.logo?.url || "";
         obj.general.faviconUrl = obj.general.favicon?.url || "";
@@ -63,6 +71,15 @@ export const updateSettings = async (req, res) => {
 
         delete general.logoUrl;
         delete general.faviconUrl;
+
+        if ("monthlyRatePerDay" in general) {
+            const n = Number(general.monthlyRatePerDay);
+            general.monthlyRatePerDay = Number.isFinite(n) && n >= 0 ? n : 1;
+        }
+        if ("yearlyRatePerDay" in general) {
+            const n = Number(general.yearlyRatePerDay);
+            general.yearlyRatePerDay = Number.isFinite(n) && n >= 0 ? n : 0.75;
+        }
 
         const existingReachUs = setting.reachUs?.toObject
             ? setting.reachUs.toObject()

@@ -163,9 +163,13 @@ const Footer = () => {
       <div className="ft-top">
         <div className="ft-main">
           <div className="ft-brand">
-            <div className="ft-logo">
-              {settings.siteName || defaultSettings.siteName}
-            </div>
+            <Link to="/" className="ft-logo" aria-label="EduAItor home">
+              <img
+                src="/logo1-Photoroom.png"
+                alt={settings.siteName || "EduAItor"}
+                className="ft-logo-img"
+              />
+            </Link>
             <p className="ft-tagline">
               {settings.tagline || defaultSettings.tagline}
             </p>

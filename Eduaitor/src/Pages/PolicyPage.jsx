@@ -174,6 +174,9 @@ const COMPANY_META = {
     accent: "blue",
     fallbackTitle: "About Us",
     fallbackUpdated: "January 15, 2025",
+    sectionTitle: "Our story",
+    sectionDesc:
+      "Who we are, what we believe, and how we work with schools.",
     fallbackSections: [
       {
         heading: "Who We Are",
@@ -304,6 +307,23 @@ const COMPANY_META = {
     ],
   },
 };
+
+function sectionHeading(meta, title) {
+  if (meta.sectionTitle) return meta.sectionTitle;
+  const t = String(title || "").trim();
+  if (/^about\b/i.test(t)) return "Our story";
+  return t ? `About ${t}` : "Overview";
+}
+
+function sectionDescription(meta, title) {
+  if (meta.sectionDesc) return meta.sectionDesc;
+  const t = String(title || "")
+    .trim()
+    .replace(/^about\s+/i, "");
+  return t
+    ? `Everything you need to know about ${t}.`
+    : "Everything you need to know.";
+}
 
 function formatDate(value) {
   if (!value) return "";
@@ -441,11 +461,10 @@ export default function PolicyPage({
           <>
             <div className="cms-section-head">
               <h2 className="cms-section-head__title">
-                {meta.sectionTitle || `About ${policy.title}`}
+                {sectionHeading(meta, policy.title)}
               </h2>
               <p className="cms-section-head__desc">
-                {meta.sectionDesc ||
-                  `Everything you need to know about ${policy.title}.`}
+                {sectionDescription(meta, policy.title)}
               </p>
             </div>
             <div className="cms-grid">

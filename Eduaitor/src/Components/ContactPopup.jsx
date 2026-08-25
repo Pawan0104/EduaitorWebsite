@@ -9,6 +9,7 @@ export function ContactPopupProvider({ children }) {
   const [source, setSource] = useState("contact-popup");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState("");
@@ -48,6 +49,12 @@ export function ContactPopupProvider({ children }) {
     if (digits.length < 10) {
       next.phone = "Enter a valid 10-digit phone number";
     }
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      next.email = "Please enter your email";
+    } else if (!/\S+@\S+\.\S+/.test(trimmedEmail)) {
+      next.email = "Enter a valid email address";
+    }
     setErrors(next);
     return Object.keys(next).length === 0;
   };
@@ -65,6 +72,7 @@ export function ContactPopupProvider({ children }) {
         body: JSON.stringify({
           name: name.trim(),
           phone: phone.replace(/\D/g, ""),
+          email: email.trim().toLowerCase(),
           source,
         }),
       });
@@ -76,6 +84,7 @@ export function ContactPopupProvider({ children }) {
       setStatus(data.message || "Thanks! Our team will contact you shortly.");
       setName("");
       setPhone("");
+      setEmail("");
       setErrors({});
       window.setTimeout(() => {
         setOpen(false);
@@ -111,7 +120,7 @@ export function ContactPopupProvider({ children }) {
             <p className="cu-popup__eyebrow">GET IN TOUCH</p>
             <h2 id="cu-popup-title">Talk to EduAitor</h2>
             <p className="cu-popup__sub">
-              Share your name and phone number. Our team will call you back shortly.
+              Share your details. Our team will reach out shortly — you'll also get an email confirmation.
             </p>
 
             <form className="cu-popup__form" onSubmit={onSubmit} noValidate>
@@ -126,6 +135,19 @@ export function ContactPopupProvider({ children }) {
                   onChange={(e) => setName(e.target.value)}
                 />
                 {errors.name && <em className="cu-popup__error">{errors.name}</em>}
+              </label>
+
+              <label>
+                <span>Email *</span>
+                <input
+                  type="email"
+                  name="email"
+                  autoComplete="email"
+                  placeholder="you@school.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+                {errors.email && <em className="cu-popup__error">{errors.email}</em>}
               </label>
 
               <label>

@@ -30,17 +30,18 @@
   flex-shrink: 0;
 }
 
-.nb-logo {
-  font-size: 26px;
-  font-weight: 700;
-  color: #0b1f3a;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+.nb-logo-row {
+  display: flex;
+  align-items: center;
 }
 
-.nb-logo-a {
-  color: var(--primary);
-  position: relative;
+.nb-logo-img {
+  height: 56px;
+  width: auto;
+  max-width: 220px;
+  object-fit: contain;
+  display: block;
+  filter: brightness(0.85) saturate(1.2);
 }
 
 .nb-tagline {
@@ -200,8 +201,9 @@
   .navbar nav {
     padding: 0 16px;
   }
-  .nb-logo {
-    font-size: 22px;
+  .nb-logo-img {
+    height: 44px;
+    max-width: 170px;
   }
   .nb-tagline {
     font-size: 9px;
