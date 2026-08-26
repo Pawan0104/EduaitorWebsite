@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import "./EcosystemSection.css";
+import { useContactPopup } from "../ContactPopup";
 
 const features = [
   {
@@ -93,6 +94,7 @@ const features = [
 ];
 
 export default function EcosystemSection() {
+  const { openContactPopup } = useContactPopup();
   const [visible, setVisible] = useState(false);
   const ref = useRef(null);
   useEffect(() => {
@@ -143,12 +145,16 @@ export default function EcosystemSection() {
             <div className="eco__cta-content">
               <h3>Ready to see it live?</h3>
               <p>Get a personalised 30-min walkthrough with our team.</p>
-              <a href="/bookademo" className="eco__cta-btn">
+              <button
+                type="button"
+                className="eco__cta-btn"
+                onClick={() => openContactPopup("home-ecosystem-book-demo")}
+              >
                 Book a Demo
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
-              </a>
+              </button>
             </div>
           </div>
         </div>

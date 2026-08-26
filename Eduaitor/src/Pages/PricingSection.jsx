@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
 import axios from "axios";
 import "../Pages/pricing.css";
 import { useContactPopup } from "../Components/ContactPopup";
@@ -208,15 +207,15 @@ export default function PricingSection() {
                   </p>
                 </div>
 
-                <NavLink to="/bookademo">
-                  <button
-                    className={`demo-btn ${
+                <button
+                  type="button"
+                  className={`demo-btn ${
                       plan.highlight ? "demo-btn-primary" : ""
                     }`}
-                  >
+                  onClick={() => openContactPopup("pricing-request-demo")}
+                >
                     {plan.CTA || "Request Demo"}
                   </button>
-                </NavLink>
 
                 <div className="feature-box">
                   <h4>What's included</h4>

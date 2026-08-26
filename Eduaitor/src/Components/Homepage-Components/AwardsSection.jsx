@@ -6,6 +6,7 @@ import awardLogo2 from "../../assets/awardLogo2.webp";
 import awardLogo3 from "../../assets/awardLogo3.webp";
 import awardLogo4 from "../../assets/awardLogo4.webp";
 import { API_URL } from "../../lib/api";
+import { useContactPopup } from "../ContactPopup";
 
 const awards = [
   { logo: awardLogo1, title: "Best EdTech Startup", org: "Startup India, 2023" },
@@ -22,6 +23,7 @@ const pressLogos = [
 ];
 
 export default function AwardsSection() {
+  const { openContactPopup } = useContactPopup();
   const [visible, setVisible] = useState(false);
   const [awards,setAwards] =useState([]);
   const ref = useRef(null);
@@ -103,13 +105,17 @@ export default function AwardsSection() {
             <p>Start free. No credit card. Cancel anytime.</p>
           </div>
           <div className="aw__cta-right">
-            <a href="/bookademo" className="aw__cta-btn aw__cta-btn--primary">
+            <button
+              type="button"
+              className="aw__cta-btn aw__cta-btn--primary"
+              onClick={() => openContactPopup("home-awards-get-started")}
+            >
               Get Started Free
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
-            </a>
-            <a link="/palns" className="aw__cta-btn aw__cta-btn--ghost">View Pricing</a>
+            </button>
+            <Link to="/plans" className="aw__cta-btn aw__cta-btn--ghost">View Pricing</Link>
           </div>
         </div>
 

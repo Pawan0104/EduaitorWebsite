@@ -72,6 +72,7 @@ const resourceItems = [
 
 const companyItems = [
   { label: "About Us", to: "/about-us", icon: FaInfoCircle },
+  { label: "IgniteX", to: "/ignitex", icon: FaMagic },
   { label: "Our Mission", to: "/our-mission", icon: FaFlag },
   { label: "Our Team", to: "/our-team", icon: FaUsers },
   { label: "Careers", to: "/careers", icon: FaBriefcase },
@@ -198,11 +199,15 @@ const Footer = () => {
             <p className="ft-cta-sub">
               Book a demo or connect with our team to see EduAitor in action.
             </p>
-            <Link to="/bookademo" className="ft-btn ft-btn-primary">
+            <button
+              type="button"
+              className="ft-btn ft-btn-primary"
+              onClick={() => openContactPopup("footer-book-demo")}
+            >
               <FaCalendarAlt className="ft-btn-icon" aria-hidden />
               <span>Book a Demo</span>
               <FaArrowRight className="ft-btn-arrow" aria-hidden />
-            </Link>
+            </button>
             <button
               type="button"
               className="ft-btn ft-btn-outline"

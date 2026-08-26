@@ -26,6 +26,11 @@ const allowedOrigins = [
     "http://localhost:5173",
     "http://localhost:5174",
     "http://localhost:5175",
+    "http://localhost:4173",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+    "http://127.0.0.1:5175",
+    "http://127.0.0.1:4173",
     "https://eduaitor.com",
     "https://www.eduaitor.com",
 ].filter(Boolean);
@@ -34,11 +39,18 @@ function isAllowedOrigin(origin) {
     if (!origin) return true;
     if (allowedOrigins.includes(origin)) return true;
     try {
-        const { hostname } = new URL(origin);
+        const { hostname, port } = new URL(origin);
         if (hostname === "eduaitor.com" || hostname.endsWith(".eduaitor.com")) {
             return true;
         }
         if (hostname.endsWith(".onrender.com")) return true;
+        // Local Vite / preview ports
+        if (
+            (hostname === "localhost" || hostname === "127.0.0.1") &&
+            (!port || Number(port) >= 3000)
+        ) {
+            return true;
+        }
     } catch {
         return false;
     }

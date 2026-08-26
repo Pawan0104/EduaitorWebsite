@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import "./home-v2.css";
 import { getSettingsCached } from "../../lib/settingsCache";
 import {
@@ -8,6 +7,7 @@ import {
   ratesFromSettings,
   savingsPercent,
 } from "../../lib/pricingRates";
+import { useContactPopup } from "../ContactPopup";
 
 const features = [
   {
@@ -135,6 +135,7 @@ const impactBar = [
 ];
 
 export default function PricingOneSection() {
+  const { openContactPopup } = useContactPopup();
   const [rates, setRates] = useState(DEFAULT_RATES);
 
   useEffect(() => {
@@ -227,9 +228,13 @@ export default function PricingOneSection() {
                     </li>
                   ))}
                 </ul>
-                <Link to="/bookademo" className="hv-btn hv-btn--primary hv-btn--block">
+                <button
+                  type="button"
+                  className="hv-btn hv-btn--primary hv-btn--block"
+                  onClick={() => openContactPopup("home-pricing-monthly")}
+                >
                   Get Started
-                </Link>
+                </button>
               </div>
 
               <div className="hv-pricing__save-badge">
@@ -258,9 +263,13 @@ export default function PricingOneSection() {
                     </li>
                   ))}
                 </ul>
-                <Link to="/bookademo" className="hv-btn hv-btn--green hv-btn--block">
+                <button
+                  type="button"
+                  className="hv-btn hv-btn--green hv-btn--block"
+                  onClick={() => openContactPopup("home-pricing-yearly")}
+                >
                   Get Started
-                </Link>
+                </button>
               </div>
             </div>
           </div>

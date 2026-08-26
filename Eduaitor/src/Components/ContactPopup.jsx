@@ -4,9 +4,67 @@ import { API_URL } from "../lib/api";
 
 const ContactPopupContext = createContext(null);
 
+const PRESETS = {
+  demo: {
+    eyebrow: "BOOK A DEMO",
+    title: "Request a Free Demo",
+    sub: "Share your name, email, and phone. Our support team will connect with you shortly.",
+    submit: "Request Demo",
+  },
+  ignitex: {
+    eyebrow: "IGNITEX FUTURE LAB™",
+    title: "Book a FREE Future Lab",
+    sub: "Share your details. We'll schedule a FREE 2-hour hands-on IgniteX experience for your students.",
+    submit: "Book Future Lab™",
+  },
+  contact: {
+    eyebrow: "GET IN TOUCH",
+    title: "Talk to EduAitor",
+    sub: "Share your details. Our team will reach out shortly — you'll also get an email confirmation.",
+    submit: "Request a Callback",
+  },
+  experts: {
+    eyebrow: "TALK TO EXPERTS",
+    title: "Talk to Our Experts",
+    sub: "Tell us how to reach you. Our specialists will call or email you soon.",
+    submit: "Talk to Experts",
+  },
+  sales: {
+    eyebrow: "TALK TO SALES",
+    title: "Talk to Our Sales Team",
+    sub: "Leave your details and our sales team will get in touch.",
+    submit: "Talk to Sales",
+  },
+};
+
+function resolveCopy(input) {
+  if (!input || typeof input === "string") {
+    const source = input || "contact-popup";
+    const key = /ignite|future.?lab/i.test(source)
+      ? "ignitex"
+      : /demo|book/i.test(source)
+      ? "demo"
+      : /expert/i.test(source)
+        ? "experts"
+        : /sales/i.test(source)
+          ? "sales"
+          : "contact";
+    return { source, ...PRESETS[key] };
+  }
+  const source = input.source || "contact-popup";
+  const preset = PRESETS[input.preset] || PRESETS.contact;
+  return {
+    source,
+    eyebrow: input.eyebrow || preset.eyebrow,
+    title: input.title || preset.title,
+    sub: input.sub || preset.sub,
+    submit: input.submit || preset.submit,
+  };
+}
+
 export function ContactPopupProvider({ children }) {
   const [open, setOpen] = useState(false);
-  const [source, setSource] = useState("contact-popup");
+  const [copy, setCopy] = useState(resolveCopy("contact-popup"));
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -14,8 +72,8 @@ export function ContactPopupProvider({ children }) {
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState("");
 
-  const openContactPopup = useCallback((nextSource = "contact-popup") => {
-    setSource(nextSource);
+  const openContactPopup = useCallback((next = "contact-popup") => {
+    setCopy(resolveCopy(next));
     setOpen(true);
     setStatus("");
     setErrors({});
@@ -65,6 +123,10 @@ export function ContactPopupProvider({ children }) {
 
     setSubmitting(true);
     setStatus("");
+
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 25000);
+
     try {
       const response = await fetch(`${API_URL}/contact-leads`, {
         method: "POST",
@@ -73,8 +135,9 @@ export function ContactPopupProvider({ children }) {
           name: name.trim(),
           phone: phone.replace(/\D/g, ""),
           email: email.trim().toLowerCase(),
-          source,
+          source: copy.source,
         }),
+        signal: controller.signal,
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok || data.success === false) {
@@ -89,10 +152,20 @@ export function ContactPopupProvider({ children }) {
       window.setTimeout(() => {
         setOpen(false);
         setStatus("");
-      }, 1600);
+      }, 1800);
     } catch (err) {
-      setStatus(err.message || "Something went wrong. Please try again.");
+      const msg = String(err?.message || "");
+      if (err?.name === "AbortError") {
+        setStatus("Taking too long — please try again in a moment.");
+      } else if (/failed to fetch|networkerror|load failed/i.test(msg)) {
+        setStatus(
+          "Could not reach the server. Check your internet connection and try again."
+        );
+      } else {
+        setStatus(msg || "Something went wrong. Please try again.");
+      }
     } finally {
+      window.clearTimeout(timeoutId);
       setSubmitting(false);
     }
   };
@@ -117,11 +190,9 @@ export function ContactPopupProvider({ children }) {
             >
               ×
             </button>
-            <p className="cu-popup__eyebrow">GET IN TOUCH</p>
-            <h2 id="cu-popup-title">Talk to EduAitor</h2>
-            <p className="cu-popup__sub">
-              Share your details. Our team will reach out shortly — you'll also get an email confirmation.
-            </p>
+            <p className="cu-popup__eyebrow">{copy.eyebrow}</p>
+            <h2 id="cu-popup-title">{copy.title}</h2>
+            <p className="cu-popup__sub">{copy.sub}</p>
 
             <form className="cu-popup__form" onSubmit={onSubmit} noValidate>
               <label>
@@ -179,7 +250,7 @@ export function ContactPopupProvider({ children }) {
               )}
 
               <button type="submit" className="cu-popup__submit" disabled={submitting}>
-                {submitting ? "Submitting…" : "Request a Callback"}
+                {submitting ? "Submitting…" : copy.submit}
               </button>
             </form>
           </div>

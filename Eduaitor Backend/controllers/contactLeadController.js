@@ -57,35 +57,36 @@ export const createContactLead = async (req, res) => {
       source,
     };
 
-    const mail = { admin: false, user: false, error: "" };
-    try {
-      await sendContactLeadNotification(payload);
-      mail.admin = true;
-    } catch (mailErr) {
-      mail.error = mailErr.message || "Support email failed";
-      console.error("Contact lead support mail error:", mail.error);
-    }
-
-    if (email) {
-      try {
-        await sendContactLeadAcknowledgment(payload);
-        mail.user = true;
-      } catch (mailErr) {
-        console.error("Contact lead user mail error:", mailErr.message);
-        if (!mail.error) mail.error = mailErr.message;
-      }
-    }
-
-    return res.status(201).json({
+    // Respond immediately — SMTP can hang and should not block the form.
+    res.status(201).json({
       success: true,
-      message: mail.admin
-        ? email
-          ? "Thanks! Confirmation sent — our team will contact you shortly."
-          : "Thanks! Our team will contact you shortly."
-        : "Request saved, but email notification failed.",
+      message: email
+        ? "Thanks! Our team will contact you shortly."
+        : "Thanks! Our team will contact you shortly.",
       data: lead,
-      mail,
     });
+
+    Promise.resolve()
+      .then(async () => {
+        try {
+          await sendContactLeadNotification(payload);
+        } catch (mailErr) {
+          console.error(
+            "Contact lead support mail error:",
+            mailErr.message || mailErr
+          );
+        }
+        if (!email) return;
+        try {
+          await sendContactLeadAcknowledgment(payload);
+        } catch (mailErr) {
+          console.error(
+            "Contact lead user mail error:",
+            mailErr.message || mailErr
+          );
+        }
+      })
+      .catch((err) => console.error("Contact lead mail queue error:", err));
   } catch (err) {
     console.error(err);
     return res.status(500).json({

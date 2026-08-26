@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Icons } from "../Components/icons";
 import "./WhyEduAitorPage.css";
+import { useContactPopup } from "../Components/ContactPopup";
 
 /* Local stroke-icon helper + extra icons not present in the shared set */
 const Icon = ({ children, size = 22 }) => (
@@ -350,6 +351,7 @@ const ctaTrust = [
 ];
 
 export default function WhyEduAitorPage() {
+  const { openContactPopup } = useContactPopup();
   return (
     <div className="wy">
       {/* 01 — Hero */}
@@ -377,9 +379,13 @@ export default function WhyEduAitorPage() {
               education.
             </p>
             <div className="wy-hero__actions">
-              <Link to="/bookademo" className="wy-btn wy-btn--primary">
+              <button
+                type="button"
+                className="wy-btn wy-btn--primary"
+                onClick={() => openContactPopup("why-book-demo")}
+              >
                 <span aria-hidden="true">{Icons.calendar}</span> Book a Demo
-              </Link>
+              </button>
               <Link to="/ecosystem" className="wy-btn wy-btn--outline">
                 <span aria-hidden="true">{I.compass}</span> Explore the
                 Ecosystem
@@ -791,9 +797,13 @@ export default function WhyEduAitorPage() {
               operations, empower educators, strengthen parent partnerships,
               and help every student succeed.
             </p>
-            <Link to="/bookademo" className="wy-btn wy-btn--primary">
+            <button
+              type="button"
+              className="wy-btn wy-btn--primary"
+              onClick={() => openContactPopup("why-cta-book-demo")}
+            >
               <span aria-hidden="true">{Icons.calendar}</span> Book a Demo
-            </Link>
+            </button>
           </div>
           <div className="wy-cta__visual">
             <img src="/why/cta-photo.png" alt="Mother and daughter exploring EduAitor together" />

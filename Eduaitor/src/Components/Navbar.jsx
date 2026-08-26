@@ -43,6 +43,14 @@ const Navbar = () => {
           <li onClick={closeMenu}>
             <NavLink to="/why">Why EduAitor</NavLink>
           </li>
+          <li className="nb-ignitex-item" onClick={closeMenu}>
+            <NavLink to="/ignitex" className="nb-ignitex">
+              <span className="nb-ignitex__cord" aria-hidden="true" />
+              <span className="nb-ignitex__board">
+                <span className="nb-ignitex__label">IgniteX</span>
+              </span>
+            </NavLink>
+          </li>
           <li onClick={closeMenu}>
             <NavLink to="/plans">Pricing</NavLink>
           </li>
@@ -66,11 +74,16 @@ const Navbar = () => {
               Login
             </button>
           </NavLink>
-          <NavLink to="/bookademo" onClick={closeMenu}>
-            <button type="button" className="demo-btn">
-              Book a Demo
-            </button>
-          </NavLink>
+          <button
+            type="button"
+            className="demo-btn"
+            onClick={() => {
+              closeMenu();
+              openContactPopup("navbar-book-demo");
+            }}
+          >
+            Book a Demo
+          </button>
           <button
             type="button"
             className="hamburger-icon"

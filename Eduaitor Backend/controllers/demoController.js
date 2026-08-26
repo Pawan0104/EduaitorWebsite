@@ -5,51 +5,65 @@ import { sendUserConfirmation, sendAdminNotification } from "../utils/Mailer.js"
 export const bookDemo = async (req, res) => {
     try {
         const {
-            instName, instType, students, branches,
-            contactName, designation, email, phone, city,
-            date, time, mode, message,
+            instName = "",
+            instType = "",
+            students = "",
+            branches = "",
+            contactName,
+            designation = "",
+            email,
+            phone,
+            city = "",
+            date = "",
+            time = "",
+            mode = "zoom",
+            message = "",
         } = req.body;
 
-        // Basic validation
-        if (!instName || !instType || !contactName || !email || !phone) {
+        if (!contactName || !email || !phone) {
             return res.status(400).json({
                 success: false,
-                message: "instName, instType, contactName, email, and phone are required.",
+                message: "Name, email, and phone are required.",
             });
         }
 
         const demo = await Demo.create({
-            instName, instType, students, branches,
-            contactName, designation, email, phone, city,
-            date, time, mode, message,
+            instName,
+            instType,
+            students,
+            branches,
+            contactName,
+            designation,
+            email,
+            phone,
+            city,
+            date,
+            time,
+            mode,
+            message,
         });
 
-        const mail = { admin: false, user: false, error: "" };
-        try {
-            await sendAdminNotification(demo);
-            mail.admin = true;
-        } catch (mailErr) {
-            mail.error = mailErr.message || "Admin email failed";
-            console.error("Admin mail error:", mail.error);
-        }
-        try {
-            await sendUserConfirmation(demo);
-            mail.user = true;
-        } catch (mailErr) {
-            console.error("User mail error:", mailErr.message);
-            if (!mail.error) mail.error = mailErr.message;
-        }
-
-        return res.status(201).json({
+        // Respond immediately — do not wait on SMTP.
+        res.status(201).json({
             success: true,
-            message: mail.admin && mail.user
-                ? "Demo booked successfully! Confirmation emails sent."
-                : mail.admin
-                ? "Demo booked. Support notified; user confirmation email failed."
-                : "Demo booked, but support email failed.",
+            message: "Thanks! Our team will contact you shortly.",
             data: demo,
-            mail,
         });
+
+        Promise.resolve()
+            .then(async () => {
+                try {
+                    await sendAdminNotification(demo);
+                } catch (mailErr) {
+                    console.error("Admin mail error:", mailErr.message || mailErr);
+                }
+                try {
+                    await sendUserConfirmation(demo);
+                } catch (mailErr) {
+                    console.error("User mail error:", mailErr.message || mailErr);
+                }
+            })
+            .catch((err) => console.error("Demo mail queue error:", err));
     } catch (err) {
         console.error("bookDemo error:", err);
         return res.status(500).json({ success: false, message: "Server error." });

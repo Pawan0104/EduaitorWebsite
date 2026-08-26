@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./SolutionPage.css";
+import { useContactPopup } from "../Components/ContactPopup";
 
 const pillars = [
   {
@@ -277,6 +278,7 @@ const stats = [
 ];
 
 export default function SolutionPage() {
+  const { openContactPopup } = useContactPopup();
   return (
     <div className="sp-page">
       <section className="sp-hero">
@@ -296,13 +298,17 @@ export default function SolutionPage() {
               <a href="#pillars" className="sp-btn sp-btn--primary">
                 Explore Solutions <span aria-hidden="true">→</span>
               </a>
-              <Link to="/bookademo" className="sp-btn sp-btn--outline">
+              <button
+                type="button"
+                className="sp-btn sp-btn--outline"
+                onClick={() => openContactPopup("solutions-book-demo")}
+              >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <rect x="3" y="4" width="18" height="18" rx="2" />
                   <path d="M16 2v4M8 2v4M3 10h18" />
                 </svg>
                 Book a Demo
-              </Link>
+              </button>
             </div>
           </div>
 
@@ -393,9 +399,13 @@ export default function SolutionPage() {
               communication—EduAitor brings every solution together on one intelligent platform.
             </p>
           </div>
-          <Link to="/bookademo" className="sp-btn sp-btn--light">
+          <button
+            type="button"
+            className="sp-btn sp-btn--light"
+            onClick={() => openContactPopup("solutions-cta-book-demo")}
+          >
             Book a Demo <span aria-hidden="true">→</span>
-          </Link>
+          </button>
         </div>
       </section>
     </div>

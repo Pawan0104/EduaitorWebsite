@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { Icons } from "../Components/icons";
 import { ecosystemModules } from "../data/ecosystemModules";
 import "./EcosystemPage.css";
+import { useContactPopup } from "../Components/ContactPopup";
 
 function ModuleIcon({ accent }) {
   return (
@@ -13,6 +14,7 @@ function ModuleIcon({ accent }) {
 }
 
 export default function EcosystemPage() {
+  const { openContactPopup } = useContactPopup();
   const [params, setParams] = useSearchParams();
   const initialId = params.get("module") || ecosystemModules[0].id;
   const [activeId, setActiveId] = useState(initialId);
@@ -124,9 +126,13 @@ export default function EcosystemPage() {
                 <p>{active.ctaText}</p>
               </div>
               <div className="eco-cta__actions">
-                <Link to="/bookademo" className="eco-btn eco-btn--primary">
+                <button
+                  type="button"
+                  className="eco-btn eco-btn--primary"
+                  onClick={() => openContactPopup("ecosystem-book-demo")}
+                >
                   Book a Demo
-                </Link>
+                </button>
                 <Link to="/plans" className="eco-btn eco-btn--outline">
                   Explore EduAitor ONE
                 </Link>

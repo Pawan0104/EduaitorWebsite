@@ -15,6 +15,7 @@ import {
 } from "react-icons/fa";
 import "./home-v2.css";
 import "./HeroSection.css";
+import { useContactPopup } from "../ContactPopup";
 
 const featureBar = [
   { label: "AI-Powered School OS", icon: FaMicrochip },
@@ -92,6 +93,7 @@ function OrbitRings() {
 }
 
 export default function HeroSection() {
+  const { openContactPopup } = useContactPopup();
   return (
     <section className="hv-section hv-hero">
       <div className="hv-container">
@@ -113,12 +115,16 @@ export default function HeroSection() {
               stronger educational outcomes.
             </p>
             <div className="hv-hero__actions">
-              <Link to="/bookademo" className="hv-btn hv-btn--primary">
+              <button
+                type="button"
+                className="hv-btn hv-btn--primary"
+                onClick={() => openContactPopup("home-hero-book-demo")}
+              >
                 Book a Demo
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
-              </Link>
+              </button>
               <Link to="/ecosystem" className="hv-btn hv-btn--outline">
                 Explore the Ecosystem
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">

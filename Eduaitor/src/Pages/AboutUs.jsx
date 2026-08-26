@@ -9,7 +9,6 @@ import {
 } from "react-icons/fa";
 import "./AboutUs.css";
 import Counter from "../Components/Counter";
-import { NavLink } from "react-router-dom";
 import { useContactPopup } from "../Components/ContactPopup";
 
 const AboutUs = () => {
@@ -29,7 +28,13 @@ const AboutUs = () => {
             scalable and intelligent technology.
           </p>
           <div className="hero-buttons">
-           <NavLink to="/bookademo"> <button className="primary-btn">Request Demo</button></NavLink>
+           <button
+             type="button"
+             className="primary-btn"
+             onClick={() => openContactPopup("about-request-demo")}
+           >
+             Request Demo
+           </button>
            <button
              type="button"
              className="secondary-btn"
@@ -158,7 +163,9 @@ const AboutUs = () => {
       {/* CTA */}
       <section className="about-cta">
         <h2>Join 1000+ Institutions Transforming Education</h2>
-           <NavLink to="/bookademo"> <button>Request Demo</button></NavLink>
+           <button type="button" onClick={() => openContactPopup("about-cta-request-demo")}>
+             Request Demo
+           </button>
 
       </section>
 

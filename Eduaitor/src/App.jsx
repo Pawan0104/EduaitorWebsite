@@ -15,6 +15,7 @@ import Marketplace from "./Pages/MarketPlace";
 import LegalPage from "./Pages/LegalPage";
 import PolicyPage from "./Pages/PolicyPage";
 import WhyEduAitorPage from "./Pages/WhyEduAitorPage";
+import IgniteXPage from "./Pages/IgniteXPage";
 import { ContactPopupProvider } from "./Components/ContactPopup";
 import { getSettingsCached } from "./lib/settingsCache";
 
@@ -108,6 +109,7 @@ const App = () => {
             element={<PolicyPage policyKey="partners" section="company" />}
           />
           <Route path="/why" element={<WhyEduAitorPage />} />
+          <Route path="/ignitex" element={<IgniteXPage />} />
         </Routes>
       </div>
       <Footer />

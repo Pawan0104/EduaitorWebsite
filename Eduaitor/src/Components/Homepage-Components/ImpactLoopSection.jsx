@@ -1,6 +1,6 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import "./home-v2.css";
+import { useContactPopup } from "../ContactPopup";
 
 const impactGroups = [
   {
@@ -156,6 +156,7 @@ const enabledBy = [
 ];
 
 export default function ImpactLoopSection() {
+  const { openContactPopup } = useContactPopup();
   return (
     <section className="hv-section hv-impact-loop">
       <div className="hv-container">
@@ -271,9 +272,13 @@ export default function ImpactLoopSection() {
               <p>One step today. Infinite impact for generations tomorrow.</p>
             </div>
           </div>
-          <Link to="/bookademo" className="hv-btn hv-btn--light hv-btn--sm">
+          <button
+            type="button"
+            className="hv-btn hv-btn--light hv-btn--sm"
+            onClick={() => openContactPopup("home-impact-book-demo")}
+          >
             Book a Demo
-          </Link>
+          </button>
         </div>
       </div>
     </section>

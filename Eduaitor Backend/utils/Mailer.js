@@ -74,6 +74,9 @@ function getSmtpTransporter() {
     },
     tls: { rejectUnauthorized },
     requireTLS: !secure && port === 587,
+    connectionTimeout: 12_000,
+    greetingTimeout: 12_000,
+    socketTimeout: 20_000,
   });
   return smtpTransporter;
 }
@@ -110,17 +113,50 @@ function wrapBrandedEmail({ title, preheader = "", bodyHtml }) {
 }
 
 function detailTable(rows) {
+  const filled = rows.filter(([, value]) => {
+    const v = String(value ?? "").trim();
+    return v && v !== "—";
+  });
+  if (!filled.length) return "";
   return `<table style="width:100%;border-collapse:collapse;font-size:14px;color:${BRAND.ink};margin:16px 0;background:${BRAND.soft};border:1px solid ${BRAND.line};border-radius:12px">
-    ${rows
+    ${filled
       .map(
         ([label, value]) =>
           `<tr>
             <td style="padding:10px 14px;color:${BRAND.muted};width:38%;border-bottom:1px solid ${BRAND.line}">${escapeHtml(label)}</td>
-            <td style="padding:10px 14px;border-bottom:1px solid ${BRAND.line}"><strong>${escapeHtml(value || "—")}</strong></td>
+            <td style="padding:10px 14px;border-bottom:1px solid ${BRAND.line}"><strong>${escapeHtml(value)}</strong></td>
           </tr>`,
       )
       .join("")}
   </table>`;
+}
+
+function getPublicContact() {
+  const email =
+    process.env.SUPPORT_MAIL ||
+    process.env.ADMIN_MAIL ||
+    "support@eduaitor.com";
+  const phone = process.env.SUPPORT_PHONE || "+91 89557 89557";
+  const website = process.env.PUBLIC_SITE_URL || "https://www.eduaitor.com";
+  return { email, phone, website };
+}
+
+function contactDetailsBlock() {
+  const { email, phone, website } = getPublicContact();
+  return `
+    <div style="margin:20px 0 0;padding:16px 18px;background:${BRAND.soft};border:1px solid ${BRAND.line};border-radius:12px">
+      <p style="margin:0 0 8px;font-size:13px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:${BRAND.violet}">Need to reach us directly?</p>
+      <p style="margin:0 0 6px;font-size:14px;line-height:1.6;color:${BRAND.ink}">
+        Email: <a href="mailto:${escapeHtml(email)}" style="color:${BRAND.teal};font-weight:600">${escapeHtml(email)}</a>
+      </p>
+      <p style="margin:0 0 6px;font-size:14px;line-height:1.6;color:${BRAND.ink}">
+        Phone: <a href="tel:${escapeHtml(phone.replace(/[^\d+]/g, ""))}" style="color:${BRAND.teal};font-weight:600">${escapeHtml(phone)}</a>
+      </p>
+      <p style="margin:0;font-size:14px;line-height:1.6;color:${BRAND.ink}">
+        Website: <a href="${escapeHtml(website)}" style="color:${BRAND.teal};font-weight:600">${escapeHtml(website.replace(/^https?:\/\//, ""))}</a>
+      </p>
+    </div>
+  `;
 }
 
 async function sendViaSmtp({ to, subject, html, text }) {
@@ -180,27 +216,18 @@ export const sendUserConfirmation = async (demo) => {
     bodyHtml: `
       <p style="margin:0 0 12px;font-size:15px;line-height:1.6">Hi <strong>${escapeHtml(name)}</strong>,</p>
       <p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:${BRAND.ink}">
-        Thank you for booking a demo with Eduaitor. Our team will confirm your slot within <strong>24 hours</strong>.
+        Thank you for requesting a demo with Eduaitor. Our support team will connect with you shortly.
       </p>
-      ${detailTable([
-        ["Institution", demo.instName],
-        ["Type", demo.instType],
-        ["Preferred date", demo.date || "Flexible"],
-        ["Time slot", demo.time || "To be confirmed"],
-        ["Mode", demo.mode || "—"],
-        ["City", demo.city || "—"],
-      ])}
-      <p style="margin:0;font-size:14px;color:${BRAND.muted}">
-        Questions? Reply to this email or write to <a href="mailto:support@eduaitor.com" style="color:${BRAND.teal}">support@eduaitor.com</a>.
-      </p>
+      ${contactDetailsBlock()}
     `,
   });
 
+  const { email, phone, website } = getPublicContact();
   return sendEmail({
     to: demo.email,
     subject: "Your Eduaitor demo request — confirmation",
     html,
-    text: `Hi ${name},\n\nThanks for booking a demo with Eduaitor. We'll confirm within 24 hours.\nInstitution: ${demo.instName}\n\n— Eduaitor`,
+    text: `Hi ${name},\n\nThanks for requesting a demo with Eduaitor. Our support team will connect with you shortly.\n\nContact us:\nEmail: ${email}\nPhone: ${phone}\nWebsite: ${website}\n\n— Eduaitor`,
   });
 };
 
@@ -208,32 +235,25 @@ export const sendUserConfirmation = async (demo) => {
 export const sendAdminNotification = async (demo) => {
   const html = wrapBrandedEmail({
     title: "New demo booking",
-    preheader: `${demo.instName} — ${demo.contactName}`,
+    preheader: `${demo.contactName || "New lead"} — ${demo.phone || ""}`,
     bodyHtml: `
-      <p style="margin:0 0 12px;font-size:15px;line-height:1.6">A new demo was booked on eduaitor.com.</p>
+      <p style="margin:0 0 12px;font-size:15px;line-height:1.6">A new demo was requested on eduaitor.com. Please connect with this lead.</p>
       ${detailTable([
-        ["Institution", demo.instName],
-        ["Type", demo.instType],
-        ["Students", demo.students],
-        ["Branches", demo.branches],
-        ["Contact", demo.contactName],
-        ["Designation", demo.designation],
+        ["Name", demo.contactName],
         ["Email", demo.email],
         ["Phone", demo.phone],
+        ["Institution", demo.instName],
         ["City", demo.city],
-        ["Date", demo.date || "Flexible"],
-        ["Time", demo.time],
-        ["Mode", demo.mode],
         ["Message", demo.message],
-      ])}
+      ].filter(([, v]) => v))}
     `,
   });
 
   return sendEmail({
     to: getSupportTo(),
-    subject: `Demo request — ${demo.instName || "New lead"} (${demo.contactName || ""})`,
+    subject: `Demo request — ${demo.contactName || "New lead"} (${demo.phone || demo.email || ""})`,
     html,
-    text: `New demo: ${demo.instName}\nContact: ${demo.contactName}\nEmail: ${demo.email}\nPhone: ${demo.phone}`,
+    text: `New demo request\nName: ${demo.contactName}\nEmail: ${demo.email}\nPhone: ${demo.phone}`,
   });
 };
 
@@ -260,7 +280,7 @@ export const sendContactLeadNotification = async (lead) => {
     to: getSupportTo(),
     subject: `Website enquiry — ${lead.name || "New lead"}`,
     html,
-    text: `Enquiry from ${lead.name}\nPhone: ${lead.phone}\nEmail: ${lead.email || "—"}\nSource: ${lead.source}`,
+    text: `Enquiry from ${lead.name}\nPhone: ${lead.phone}\nEmail: ${lead.email || ""}\nSource: ${lead.source}`,
   });
 };
 
@@ -271,23 +291,16 @@ export const sendContactLeadAcknowledgment = async (lead) => {
   }
 
   const name = lead.name || "there";
+  const { email, phone, website } = getPublicContact();
   const html = wrapBrandedEmail({
     title: "Thanks for contacting Eduaitor",
     preheader: "We received your message",
     bodyHtml: `
       <p style="margin:0 0 12px;font-size:15px;line-height:1.6">Hi <strong>${escapeHtml(name)}</strong>,</p>
       <p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:${BRAND.ink}">
-        Thanks for reaching out. Our team has received your message and will get back to you shortly.
+        Thank you for reaching out. We’ve received your message and our team will get back to you shortly.
       </p>
-      ${detailTable([
-        ["Phone", lead.phone],
-        ["School", lead.schoolName],
-        ["City", lead.city],
-        ["Message", lead.message],
-      ])}
-      <p style="margin:0;font-size:14px;color:${BRAND.muted}">
-        Prefer to talk now? Email <a href="mailto:support@eduaitor.com" style="color:${BRAND.teal}">support@eduaitor.com</a>.
-      </p>
+      ${contactDetailsBlock()}
     `,
   });
 
@@ -295,6 +308,6 @@ export const sendContactLeadAcknowledgment = async (lead) => {
     to: lead.email,
     subject: "We received your Eduaitor enquiry",
     html,
-    text: `Hi ${name},\n\nThanks for contacting Eduaitor. We'll get back to you shortly.\n\n— Eduaitor`,
+    text: `Hi ${name},\n\nThank you for reaching out. We’ve received your message and our team will get back to you shortly.\n\nContact us:\nEmail: ${email}\nPhone: ${phone}\nWebsite: ${website}\n\n— Eduaitor`,
   });
 };

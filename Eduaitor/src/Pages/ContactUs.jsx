@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import "./ContactUs.css";
 import { API_URL } from "../lib/api";
+import { useContactPopup } from "../Components/ContactPopup";
 
 const defaultContact = {
   phone: "+91 6366 180 333",
@@ -459,20 +459,8 @@ const reachIconMap = {
   user: I.user,
 };
 
-const initialForm = {
-  name: "",
-  schoolName: "",
-  phone: "",
-  email: "",
-  city: "",
-  message: "",
-};
-
 export default function ContactUs() {
-  const [form, setForm] = useState(initialForm);
-  const [errors, setErrors] = useState({});
-  const [status, setStatus] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const { openContactPopup } = useContactPopup();
   const [openFaq, setOpenFaq] = useState(0);
   const [contact, setContact] = useState(defaultContact);
   const [reachUs, setReachUs] = useState(defaultReachUs);
@@ -514,64 +502,8 @@ export default function ContactUs() {
     return () => controller.abort();
   }, []);
 
-  const onChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
-  };
-
-  const validate = () => {
-    const next = {};
-    if (!form.name.trim()) next.name = "Required";
-    if (!form.schoolName.trim()) next.schoolName = "Required";
-    if (!form.phone.trim()) next.phone = "Required";
-    else if (!/^\d{10}$/.test(form.phone.replace(/\D/g, "")))
-      next.phone = "Enter 10 digits";
-    if (!form.email.trim()) next.email = "Required";
-    else if (!/\S+@\S+\.\S+/.test(form.email)) next.email = "Invalid email";
-    if (!form.city.trim()) next.city = "Required";
-    return next;
-  };
-
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    const next = validate();
-    if (Object.keys(next).length) {
-      setErrors(next);
-      return;
-    }
-    setSubmitting(true);
-    setStatus("");
-    try {
-      const response = await fetch(`${API_URL}/demo/book`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contactName: form.name.trim(),
-          instName: form.schoolName.trim(),
-          instType: "school",
-          phone: form.phone.replace(/\D/g, ""),
-          email: form.email.trim(),
-          city: form.city.trim(),
-          message: form.message.trim(),
-          mode: "zoom",
-        }),
-      });
-
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok || data.success === false) {
-        throw new Error(data.message || "Unable to book demo");
-      }
-
-      setStatus("Thank you! We'll confirm your demo shortly.");
-      setForm(initialForm);
-      setErrors({});
-    } catch (err) {
-      setStatus(err.message || "Something went wrong. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  const openDemo = () => openContactPopup("contact-book-demo");
+  const openSales = () => openContactPopup("contact-talk-sales");
 
   return (
     <div className="cu">
@@ -593,12 +525,12 @@ export default function ContactUs() {
               we'd love to understand your goals and show you how EduAitor can help.
             </p>
             <div className="cu-hero__actions">
-              <a href="#demo-form" className="cu-btn cu-btn--primary">
+              <button type="button" className="cu-btn cu-btn--primary" onClick={openDemo}>
                 <span aria-hidden="true">{I.calendar}</span> Book a Demo
-              </a>
-              <a href="#get-in-touch" className="cu-btn cu-btn--outline">
+              </button>
+              <button type="button" className="cu-btn cu-btn--outline" onClick={openSales}>
                 <span aria-hidden="true">{I.phone}</span> Talk to Sales
-              </a>
+              </button>
             </div>
           </div>
           <div className="cu-hero__visual">
@@ -697,12 +629,21 @@ export default function ContactUs() {
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
-                <a
-                  href={opt.href}
+                <button
+                  type="button"
                   className={`cu-btn ${opt.solid ? "cu-btn--solid" : "cu-btn--ghost"}`}
+                  onClick={() =>
+                    openContactPopup(
+                      opt.id === "demo"
+                        ? "contact-connect-demo"
+                        : opt.id === "sales"
+                          ? "contact-connect-sales"
+                          : `contact-connect-${opt.id}`,
+                    )
+                  }
                 >
                   {opt.cta} →
-                </a>
+                </button>
               </article>
             ))}
           </div>
@@ -719,119 +660,27 @@ export default function ContactUs() {
         </div>
       </section>
 
-      {/* 3 — Demo form */}
+      {/* 3 — Demo CTA */}
       <section className="cu-demo" id="demo-form">
         <div className="cu-container">
           <div className="cu-section-head">
             <p className="cu-eyebrow">— BOOK YOUR PERSONALIZED DEMO —</p>
-            <h2>Tell Us About Your School</h2>
-            <p>Share a few details and our team will schedule a personalized demo just for you.</p>
+            <h2>Request a Demo</h2>
+            <p>Share your name, email, and phone — our support team will connect with you.</p>
           </div>
 
           <div className="cu-demo__shell">
-            <form className="cu-form" onSubmit={onSubmit} noValidate>
-              <div className="cu-form__row cu-form__row--2">
-                <label>
-                  <span className="cu-form__label">
-                    Name <em>*</em>
-                  </span>
-                  <input
-                    name="name"
-                    value={form.name}
-                    onChange={onChange}
-                    placeholder="Enter your name"
-                  />
-                  {errors.name && <span className="cu-err">{errors.name}</span>}
-                </label>
-                <label>
-                  <span className="cu-form__label">
-                    School Name <em>*</em>
-                  </span>
-                  <input
-                    name="schoolName"
-                    value={form.schoolName}
-                    onChange={onChange}
-                    placeholder="Enter school name"
-                  />
-                  {errors.schoolName && <span className="cu-err">{errors.schoolName}</span>}
-                </label>
-              </div>
-
-              <div className="cu-form__row cu-form__row--2">
-                <label>
-                  <span className="cu-form__label">
-                    Phone <em>*</em>
-                  </span>
-                  <div className="cu-phone">
-                    <span>+91</span>
-                    <input
-                      name="phone"
-                      value={form.phone}
-                      onChange={onChange}
-                      placeholder="Enter phone number"
-                    />
-                  </div>
-                  {errors.phone && <span className="cu-err">{errors.phone}</span>}
-                </label>
-                <label>
-                  <span className="cu-form__label">
-                    Email <em>*</em>
-                  </span>
-                  <input
-                    type="email"
-                    name="email"
-                    value={form.email}
-                    onChange={onChange}
-                    placeholder="Enter email address"
-                  />
-                  {errors.email && <span className="cu-err">{errors.email}</span>}
-                </label>
-              </div>
-
-              <div className="cu-form__row cu-form__row--2">
-                <label>
-                  <span className="cu-form__label">
-                    City <em>*</em>
-                  </span>
-                  <input
-                    name="city"
-                    value={form.city}
-                    onChange={onChange}
-                    placeholder="Enter city"
-                  />
-                  {errors.city && <span className="cu-err">{errors.city}</span>}
-                </label>
-              </div>
-
-              <label className="cu-form__message">
-                <span className="cu-form__label">Message</span>
-                <textarea
-                  name="message"
-                  value={form.message}
-                  onChange={onChange}
-                  rows={3}
-                  placeholder="Anything specific you'd like us to know? (Optional)"
-                />
-              </label>
-
-              <div className="cu-form__foot">
-                <p className="cu-privacy">
-                  Your information is safe with us. We respect your privacy.
-                </p>
-                <button type="submit" className="cu-btn cu-btn--primary" disabled={submitting}>
-                  {submitting ? "Scheduling..." : "Schedule My Demo →"}
-                </button>
-              </div>
-              {status && (
-                <p
-                  className={`cu-status${
-                    /thank you|confirm/i.test(status) ? "" : " cu-status--error"
-                  }`}
-                >
-                  {status}
-                </p>
-              )}
-            </form>
+            <div className="cu-form" style={{ textAlign: "center", padding: "2rem 1.5rem" }}>
+              <p style={{ marginBottom: "1.25rem", color: "#475569" }}>
+                It only takes a minute. Leave your details and we’ll call or email you.
+              </p>
+              <button type="button" className="cu-btn cu-btn--primary" onClick={openDemo}>
+                Request Demo →
+              </button>
+              <p className="cu-privacy" style={{ marginTop: "1rem" }}>
+                Your information is safe with us. We respect your privacy.
+              </p>
+            </div>
 
             <aside className="cu-expect">
               <div className="cu-expect__head">
@@ -1076,12 +925,12 @@ export default function ContactUs() {
               <p>Our team is here to help you with any queries you may have.</p>
             </div>
             <div className="cu-faq__actions">
-              <a href="#demo-form" className="cu-btn cu-btn--primary">
+              <button type="button" className="cu-btn cu-btn--primary" onClick={openDemo}>
                 Book a Demo
-              </a>
-              <a href="#get-in-touch" className="cu-btn cu-btn--outline">
+              </button>
+              <button type="button" className="cu-btn cu-btn--outline" onClick={openSales}>
                 Talk to Our Team
-              </a>
+              </button>
             </div>
           </div>
         </div>
@@ -1127,14 +976,14 @@ export default function ContactUs() {
               <strong>Let's build it together.</strong>
             </p>
             <div className="cu-chapter__actions">
-              <Link to="/bookademo" className="cu-btn cu-btn--primary">
+              <button type="button" className="cu-btn cu-btn--primary" onClick={openDemo}>
                 Book a Demo
                 <small>See EduAitor in action</small>
-              </Link>
-              <a href="#get-in-touch" className="cu-btn cu-btn--outline">
+              </button>
+              <button type="button" className="cu-btn cu-btn--outline" onClick={openSales}>
                 Talk to Sales
                 <small>Speak with our team</small>
-              </a>
+              </button>
             </div>
           </div>
           <div className="cu-chapter__trust">
