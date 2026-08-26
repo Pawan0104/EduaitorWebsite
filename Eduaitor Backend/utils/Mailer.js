@@ -50,6 +50,23 @@ function isSmtpConfigured() {
   );
 }
 
+function isRelayConfigured() {
+  return Boolean(process.env.MAIL_RELAY_URL && process.env.MAIL_RELAY_SECRET);
+}
+
+function parseFrom(fromHeader) {
+  const raw = String(fromHeader || "").trim();
+  const match = raw.match(/^(.*)<([^>]+)>$/);
+  if (match) {
+    return {
+      name: match[1].trim().replace(/^"|"$/g, "") || "Eduaitor",
+      email: match[2].trim(),
+    };
+  }
+  if (raw.includes("@")) return { name: "Eduaitor", email: raw };
+  return { name: "Eduaitor", email: "support@eduaitor.com" };
+}
+
 let smtpTransporter = null;
 
 function getSmtpTransporter() {
@@ -190,20 +207,97 @@ async function sendViaResend({ to, subject, html }) {
   return { id: result.data?.id, provider: "resend" };
 }
 
+async function sendViaRelay({ to, subject, html, text }) {
+  const url = process.env.MAIL_RELAY_URL;
+  const secret = process.env.MAIL_RELAY_SECRET;
+  if (!url || !secret) throw new Error("Mail relay not configured");
+
+  const from = parseFrom(getFrom());
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 20_000);
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Mail-Relay-Secret": secret,
+      },
+      body: JSON.stringify({
+        to: Array.isArray(to) ? to[0] : to,
+        subject,
+        text: text || "",
+        html: html || "",
+        fromEmail: from.email,
+        fromName: from.name,
+      }),
+      signal: controller.signal,
+    });
+    const data = await res.json().catch(() => null);
+    if (!data || typeof data !== "object") {
+      throw new Error(
+        "Mail relay returned non-JSON (ensure public_html/mail-relay is live)",
+      );
+    }
+    if (!res.ok || data.ok === false) {
+      throw new Error(data.error || `Relay HTTP ${res.status}`);
+    }
+    console.log("[mail] Relay sent:", data.id || "ok", "to:", to, subject);
+    return { id: data.id || `relay-${Date.now()}`, provider: "cpanel-relay" };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 /**
- * Prefer eduaitor.com SMTP; fall back to Resend if SMTP unset.
+ * Delivery order (Render-safe):
+ * 1) cPanel relay — GoDaddy mail() works; Render→SMTP often times out
+ * 2) SMTP — works locally / if unblocked
+ * 3) Resend — only if domain verified
  */
 async function sendEmail({ to, subject, html, text }) {
   if (!to) throw new Error("Email recipient is missing");
 
+  const errors = [];
+
+  if (isRelayConfigured()) {
+    try {
+      return await sendViaRelay({ to, subject, html, text });
+    } catch (err) {
+      const msg = err?.message || String(err);
+      console.warn("[mail] relay failed:", msg);
+      errors.push(`relay: ${msg}`);
+    }
+  }
+
   if (isSmtpConfigured()) {
-    return sendViaSmtp({ to, subject, html, text });
+    try {
+      return await Promise.race([
+        sendViaSmtp({ to, subject, html, text }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("SMTP send timeout")), 12_000),
+        ),
+      ]);
+    } catch (err) {
+      const msg = err?.message || String(err);
+      console.warn("[mail] SMTP failed:", msg);
+      errors.push(`smtp: ${msg}`);
+    }
   }
+
   if (process.env.RESEND_API_KEY) {
-    return sendViaResend({ to, subject, html });
+    try {
+      return await sendViaResend({ to, subject, html });
+    } catch (err) {
+      const msg = err?.message || String(err);
+      console.warn("[mail] Resend failed:", msg);
+      errors.push(`resend: ${msg}`);
+    }
   }
+
   throw new Error(
-    "Mail not configured. Set EMAIL_HOST/EMAIL_USER/EMAIL_PASS (or RESEND_API_KEY).",
+    errors.length
+      ? `Mail send failed (${errors.join(" | ")})`
+      : "Mail not configured. Set MAIL_RELAY_URL/MAIL_RELAY_SECRET (recommended) or EMAIL_HOST/EMAIL_USER/EMAIL_PASS.",
   );
 }
 
