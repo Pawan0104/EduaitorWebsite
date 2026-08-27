@@ -31,7 +31,6 @@ export const ecosystemModules = [
     ],
     ctaTitle: "Experience the Power of One Intelligent Ecosystem",
     ctaText: "Join thousands of schools that trust EduAitor to simplify operations and accelerate success.",
-    preview: "/ecosystem/01-admin-panel.png",
   },
   {
     id: "admissions",
@@ -61,7 +60,6 @@ export const ecosystemModules = [
     ],
     ctaTitle: "Simplify Admissions. Increase Enrollments.",
     ctaText: "Turn more enquiries into admissions with a smarter, automated admissions suite.",
-    preview: "/ecosystem/02-admissions-panel.png",
   },
   {
     id: "academics",
@@ -93,7 +91,6 @@ export const ecosystemModules = [
     ctaTitle: "Better Academics. Better Outcomes.",
     ctaText:
       "EduAitor Academic Suite helps you streamline academic operations, boost teacher productivity, and improve student performance.",
-    preview: "/ecosystem/03-academics-panel.png",
   },
   {
     id: "ai-assessment",
@@ -127,7 +124,6 @@ export const ecosystemModules = [
     ],
     ctaTitle: "Assess Smarter. Teach Better. Impact Every Student.",
     ctaText: "Create high-quality assessments in seconds and give teachers more time to teach.",
-    preview: "/ecosystem/04-ai-assessment-panel.png",
   },
   {
     id: "ai-assistant",
@@ -158,7 +154,6 @@ export const ecosystemModules = [
     ],
     ctaTitle: "Better Understanding. Better Learning. Better Future.",
     ctaText: "Empower every student with an AI learning companion that never sleeps.",
-    preview: "/ecosystem/05-ai-assistant-panel.png",
   },
   {
     id: "parent-suite",
@@ -460,7 +455,6 @@ export const ecosystemModules = [
     ],
     ctaTitle: "Data. Insights. Impact.",
     ctaText: "Turn school data into decisions that improve outcomes every day.",
-    preview: "/ecosystem/16-analytics-panel.png",
   },
   {
     id: "integrations",
@@ -490,7 +484,6 @@ export const ecosystemModules = [
     ],
     ctaTitle: "One Platform. Endless Possibilities.",
     ctaText: "Integrate the tools your school already trusts into one intelligent ecosystem.",
-    preview: "/ecosystem/17-integrations-panel.png",
   },
   {
     id: "security",
