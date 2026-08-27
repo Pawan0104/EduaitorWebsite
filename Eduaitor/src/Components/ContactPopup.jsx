@@ -125,7 +125,7 @@ export function ContactPopupProvider({ children }) {
     setStatus("");
 
     const controller = new AbortController();
-    const timeoutId = window.setTimeout(() => controller.abort(), 25000);
+    const timeoutId = window.setTimeout(() => controller.abort(), 35000);
 
     try {
       const response = await fetch(`${API_URL}/contact-leads`, {

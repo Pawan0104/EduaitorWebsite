@@ -27,46 +27,60 @@ export const bookDemo = async (req, res) => {
             });
         }
 
-        const demo = await Demo.create({
-            instName,
-            instType,
-            students,
-            branches,
-            contactName,
-            designation,
-            email,
-            phone,
-            city,
-            date,
-            time,
-            mode,
-            message,
-        });
+        const demo = await Promise.race([
+            Demo.create({
+                instName,
+                instType,
+                students,
+                branches,
+                contactName,
+                designation,
+                email,
+                phone,
+                city,
+                date,
+                time,
+                mode,
+                message,
+            }),
+            new Promise((_, reject) =>
+                setTimeout(() => reject(new Error("Database save timed out")), 10_000)
+            ),
+        ]);
 
         // Respond immediately — do not wait on SMTP.
         res.status(201).json({
             success: true,
             message: "Thanks! Our team will contact you shortly.",
-            data: demo,
+            data: { id: demo._id, contactName: demo.contactName, email: demo.email, phone: demo.phone },
         });
 
-        Promise.resolve()
-            .then(async () => {
-                try {
-                    await sendAdminNotification(demo);
-                } catch (mailErr) {
-                    console.error("Admin mail error:", mailErr.message || mailErr);
-                }
-                try {
-                    await sendUserConfirmation(demo);
-                } catch (mailErr) {
-                    console.error("User mail error:", mailErr.message || mailErr);
-                }
-            })
-            .catch((err) => console.error("Demo mail queue error:", err));
+        setImmediate(() => {
+            Promise.resolve()
+                .then(async () => {
+                    try {
+                        await sendAdminNotification(demo);
+                    } catch (mailErr) {
+                        console.error("Admin mail error:", mailErr.message || mailErr);
+                    }
+                    try {
+                        await sendUserConfirmation(demo);
+                    } catch (mailErr) {
+                        console.error("User mail error:", mailErr.message || mailErr);
+                    }
+                })
+                .catch((err) => console.error("Demo mail queue error:", err));
+        });
     } catch (err) {
         console.error("bookDemo error:", err);
-        return res.status(500).json({ success: false, message: "Server error." });
+        if (res.headersSent) return;
+        const timedOut = /timed out/i.test(err?.message || "");
+        return res.status(timedOut ? 504 : 500).json({
+            success: false,
+            message: timedOut
+                ? "Taking too long to save. Please try again in a moment."
+                : "Server error.",
+        });
     }
 };
 

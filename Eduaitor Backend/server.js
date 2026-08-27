@@ -73,7 +73,13 @@ app.use(express.urlencoded({ extended: true }));
 
 /* ─── HEALTH ─── */
 app.get("/", (req, res) => {
-    res.json({ status: "ok", message: "EduAitor API running 🚀" });
+    res.json({
+        status: "ok",
+        message: "EduAitor API running 🚀",
+        mailRelay: Boolean(process.env.MAIL_RELAY_URL && process.env.MAIL_RELAY_SECRET),
+        smtp: Boolean(process.env.EMAIL_HOST && process.env.EMAIL_USER && process.env.EMAIL_PASS),
+        build: "async-mail-v3",
+    });
 });
 
 /* ─── ROUTES ─── */

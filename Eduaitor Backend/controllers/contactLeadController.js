@@ -37,15 +37,20 @@ export const createContactLead = async (req, res) => {
       });
     }
 
-    const lead = await ContactLead.create({
-      name,
-      phone,
-      email: email || undefined,
-      schoolName: schoolName || undefined,
-      city: city || undefined,
-      message: message || undefined,
-      source,
-    });
+    const lead = await Promise.race([
+      ContactLead.create({
+        name,
+        phone,
+        email: email || undefined,
+        schoolName: schoolName || undefined,
+        city: city || undefined,
+        message: message || undefined,
+        source,
+      }),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Database save timed out")), 10_000)
+      ),
+    ]);
 
     const payload = {
       name,
@@ -57,41 +62,51 @@ export const createContactLead = async (req, res) => {
       source,
     };
 
-    // Respond immediately — SMTP can hang and should not block the form.
+    // Respond immediately — never wait on email delivery.
     res.status(201).json({
       success: true,
-      message: email
-        ? "Thanks! Our team will contact you shortly."
-        : "Thanks! Our team will contact you shortly.",
-      data: lead,
+      message: "Thanks! Our team will contact you shortly.",
+      data: {
+        id: lead._id,
+        name: lead.name,
+        email: lead.email,
+        phone: lead.phone,
+        source: lead.source,
+      },
     });
 
-    Promise.resolve()
-      .then(async () => {
-        try {
-          await sendContactLeadNotification(payload);
-        } catch (mailErr) {
-          console.error(
-            "Contact lead support mail error:",
-            mailErr.message || mailErr
-          );
-        }
-        if (!email) return;
-        try {
-          await sendContactLeadAcknowledgment(payload);
-        } catch (mailErr) {
-          console.error(
-            "Contact lead user mail error:",
-            mailErr.message || mailErr
-          );
-        }
-      })
-      .catch((err) => console.error("Contact lead mail queue error:", err));
+    setImmediate(() => {
+      Promise.resolve()
+        .then(async () => {
+          try {
+            await sendContactLeadNotification(payload);
+          } catch (mailErr) {
+            console.error(
+              "Contact lead support mail error:",
+              mailErr.message || mailErr
+            );
+          }
+          if (!email) return;
+          try {
+            await sendContactLeadAcknowledgment(payload);
+          } catch (mailErr) {
+            console.error(
+              "Contact lead user mail error:",
+              mailErr.message || mailErr
+            );
+          }
+        })
+        .catch((err) => console.error("Contact lead mail queue error:", err));
+    });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({
+    if (res.headersSent) return;
+    const timedOut = /timed out/i.test(err?.message || "");
+    return res.status(timedOut ? 504 : 500).json({
       success: false,
-      message: "Unable to submit request. Please try again.",
+      message: timedOut
+        ? "Taking too long to save. Please try again in a moment."
+        : "Unable to submit request. Please try again.",
     });
   }
 };
