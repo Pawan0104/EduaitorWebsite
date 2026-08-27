@@ -91,7 +91,7 @@ const defaultSettings = {
   description:
     "EduAitor is an AI-powered School Operating System that simplifies operations, empowers educators, engages parents and helps every student reach their full potential.",
   emails: ["hello@eduaitor.com"],
-  phones: ["+91 89557 89557"],
+  phones: ["+91 72300 60069"],
   address:
     "EduAitor Technologies Pvt. Ltd. B-28, Sector-63, Noida, Uttar Pradesh - 201301, India",
   copyright: "© 2026 EduAitor Technologies Pvt. Ltd. All rights reserved.",

@@ -4,7 +4,7 @@ import { API_URL } from "../lib/api";
 import { useContactPopup } from "../Components/ContactPopup";
 
 const defaultContact = {
-  phone: "+91 6366 180 333",
+  phone: "+91 72300 60069",
   email: "hello@eduaitor.com",
 };
 
@@ -390,9 +390,9 @@ const defaultReachCards = [
     title: "Sales",
     desc: "For product demos, pricing, and general inquiries.",
     email: "sales@eduaitor.com",
-    phone: "+91 6366 180 333",
+    phone: "+91 72300 60069",
     cta: "Talk to Sales",
-    href: "tel:+916366180333",
+    href: "tel:+917230060069",
     openInNewTab: false,
   },
   {
@@ -401,7 +401,7 @@ const defaultReachCards = [
     title: "Enterprise",
     desc: "For school groups, multi-campus institutions, and enterprise solutions.",
     email: "enterprise@eduaitor.com",
-    phone: "+91 6366 180 334",
+    phone: "+91 72300 60069",
     cta: "Contact Enterprise Team",
     href: "mailto:enterprise@eduaitor.com",
     openInNewTab: false,
@@ -412,7 +412,7 @@ const defaultReachCards = [
     title: "Support",
     desc: "For technical support, training, or help with your account.",
     email: "support@eduaitor.com",
-    phone: "+91 6366 180 335",
+    phone: "+91 72300 60069",
     cta: "Get Support",
     href: "mailto:support@eduaitor.com",
     openInNewTab: false,

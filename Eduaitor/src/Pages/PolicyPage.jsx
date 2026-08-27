@@ -24,7 +24,7 @@ const RESOURCE_META = {
       {
         heading: "Contact Support",
         content:
-          "Still need help? Reach our support team at hello@eduaitor.com or +91 89557 89557. We typically respond within one business day.",
+          "Still need help? Reach our support team at hello@eduaitor.com or +91 72300 60069. We typically respond within one business day.",
       },
     ],
   },

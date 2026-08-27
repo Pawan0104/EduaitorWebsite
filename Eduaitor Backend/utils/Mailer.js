@@ -153,7 +153,7 @@ function getPublicContact() {
     process.env.SUPPORT_MAIL ||
     process.env.ADMIN_MAIL ||
     "support@eduaitor.com";
-  const phone = process.env.SUPPORT_PHONE || "+91 89557 89557";
+  const phone = process.env.SUPPORT_PHONE || "+91 72300 60069";
   const website = process.env.PUBLIC_SITE_URL || "https://www.eduaitor.com";
   return { email, phone, website };
 }
