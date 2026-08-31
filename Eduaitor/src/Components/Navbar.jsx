@@ -43,14 +43,6 @@ const Navbar = () => {
           <li onClick={closeMenu}>
             <NavLink to="/why">Why EduAitor</NavLink>
           </li>
-          <li className="nb-ignitex-item" onClick={closeMenu}>
-            <NavLink to="/ignitex" className="nb-ignitex">
-              <span className="nb-ignitex__cord" aria-hidden="true" />
-              <span className="nb-ignitex__board">
-                <span className="nb-ignitex__label">IgniteX</span>
-              </span>
-            </NavLink>
-          </li>
           <li onClick={closeMenu}>
             <NavLink to="/plans">Pricing</NavLink>
           </li>
@@ -65,6 +57,22 @@ const Navbar = () => {
             >
               Contact
             </button>
+          </li>
+          <li className="nb-ignitex-item" onClick={closeMenu}>
+            <NavLink
+              to="/ignitex"
+              className="nb-ignitex"
+              aria-label="IgniteX"
+            >
+              <span className="nb-ignitex__cord" aria-hidden="true" />
+              <span className="nb-ignitex__board">
+                <img
+                  src="/ignitex/ignitex-nav-logo.png"
+                  alt="IgniteX — Build Future-Ready Students"
+                  className="nb-ignitex__logo"
+                />
+              </span>
+            </NavLink>
           </li>
         </ul>
 
