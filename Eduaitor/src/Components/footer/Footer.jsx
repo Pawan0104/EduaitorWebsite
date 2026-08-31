@@ -83,6 +83,7 @@ const legalItems = [
   { label: "Privacy Policy", to: "/privacy-policy" },
   { label: "Terms & Conditions", to: "/terms-and-conditions" },
   { label: "Refund & Cancellation Policy", to: "/refund-policy" },
+  { label: "Delete Account", to: "/delete-account" },
 ];
 
 const defaultSettings = {

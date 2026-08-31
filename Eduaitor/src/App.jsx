@@ -16,6 +16,7 @@ import LegalPage from "./Pages/LegalPage";
 import PolicyPage from "./Pages/PolicyPage";
 import WhyEduAitorPage from "./Pages/WhyEduAitorPage";
 import IgniteXPage from "./Pages/IgniteXPage";
+import DeleteAccountPage from "./Pages/DeleteAccountPage";
 import { ContactPopupProvider } from "./Components/ContactPopup";
 import { getSettingsCached } from "./lib/settingsCache";
 
@@ -52,6 +53,7 @@ const App = () => {
             path="/refund-policy"
             element={<PolicyPage policyKey="refundPolicy" />}
           />
+          <Route path="/delete-account" element={<DeleteAccountPage />} />
           <Route
             path="/help-center"
             element={

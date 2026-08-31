@@ -1,0 +1,196 @@
+/* Delete Account Request — extends Policy/CMS visual language */
+
+.dar-body {
+  max-width: 1040px;
+}
+
+.dar-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.15fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.dar-info__list {
+  margin: 14px 0 0;
+  padding-left: 1.15rem;
+  color: var(--cms-text);
+  font-size: 0.94rem;
+  line-height: 1.7;
+}
+
+.dar-info__list li + li {
+  margin-top: 10px;
+}
+
+.dar-info__list a,
+.dar-info__note a {
+  color: var(--cms-blue);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.dar-info__list a:hover,
+.dar-info__note a:hover {
+  text-decoration: underline;
+}
+
+.dar-info__note {
+  margin: 22px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--cms-border);
+  font-size: 0.88rem;
+  color: var(--cms-muted);
+}
+
+.dar-form {
+  display: grid;
+  gap: 14px;
+}
+
+.dar-form__sub {
+  margin: -4px 0 4px;
+  color: var(--cms-muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.dar-form label {
+  display: grid;
+  gap: 6px;
+}
+
+.dar-form label > span {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.dar-form input[type="text"],
+.dar-form input[type="email"],
+.dar-form input[type="tel"],
+.dar-form textarea {
+  width: 100%;
+  border: 1px solid #dbe3ef;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font: inherit;
+  color: #0f172a;
+  outline: none;
+  background: #fff;
+  resize: vertical;
+}
+
+.dar-form input:focus,
+.dar-form textarea:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.dar-phone {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  border: 1px solid #dbe3ef;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.dar-phone > span {
+  padding: 12px;
+  background: #f8fbff;
+  color: #475569;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border-right: 1px solid #dbe3ef;
+}
+
+.dar-phone input {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.dar-phone:focus-within {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.dar-check {
+  display: grid !important;
+  grid-template-columns: auto 1fr;
+  gap: 10px !important;
+  align-items: flex-start;
+  margin-top: 4px;
+}
+
+.dar-check input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--cms-blue);
+}
+
+.dar-check > span {
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+  color: var(--cms-text) !important;
+  line-height: 1.5;
+}
+
+.dar-error {
+  color: #dc2626;
+  font-size: 0.78rem;
+  font-style: normal;
+}
+
+.dar-status {
+  margin: 2px 0 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.dar-status.is-ok {
+  color: #15803d;
+}
+
+.dar-status.is-error {
+  color: #dc2626;
+}
+
+.dar-submit {
+  border: 0;
+  border-radius: 12px;
+  padding: 13px 16px;
+  background: #2563eb;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.dar-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+}
+
+.dar-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+@media (max-width: 860px) {
+  .dar-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .dar-form {
+    gap: 12px;
+  }
+}

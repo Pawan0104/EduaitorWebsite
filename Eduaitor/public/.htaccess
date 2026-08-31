@@ -22,7 +22,7 @@
 
   # SPA routes that collide with public asset folders → React app
   # (without this, Apache serves the folder and returns 403 with -Indexes)
-  RewriteRule ^(ecosystem|why|ignitex|contact|solutions|pricing|home|future-skills)/?$ /index.html [L]
+  RewriteRule ^(ecosystem|why|ignitex|contact|solutions|pricing|home|future-skills|delete-account)/?$ /index.html [L]
 
   # Other client-side routes with no physical folder
   RewriteCond %{REQUEST_FILENAME} !-f
