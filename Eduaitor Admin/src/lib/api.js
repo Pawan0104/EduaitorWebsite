@@ -42,6 +42,22 @@ export const hasValidAdminToken = () => {
   }
 };
 
+export const getAdminJwtPayload = () => {
+  const token = getAdminToken();
+  if (!token) return null;
+
+  try {
+    const encoded = token
+      .split(".")[1]
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
+    const padded = encoded.padEnd(Math.ceil(encoded.length / 4) * 4, "=");
+    return JSON.parse(atob(padded));
+  } catch {
+    return null;
+  }
+};
+
 const redirectToLogin = () => {
   clearAdminSession();
   const base = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");

@@ -10,6 +10,7 @@ import Contacts from "./pages/Contacts";
 import Institute from "./pages/Institute";
 import Testimonials from "../src/pages/Testimonials";
 import Award from "./pages/Award";
+import HomeShortcuts from "./pages/HomeShortcuts";
 
 const ComingSoon = ({ name }) => (
   <div className="flex items-center justify-center min-h-[60vh] t-base">
@@ -57,6 +58,7 @@ export default function App() {
       >
         <Route index element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
+        <Route path="home-shortcuts" element={<HomeShortcuts />} />
         <Route path="plan" element={<Plan />} />
         <Route path="demo" element={<Demos />} />
         <Route path="contact" element={<Contacts />} />

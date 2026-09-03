@@ -11,6 +11,7 @@ import testimonialRoute from "./routes/testimonialsRoute.js";
 import  awardRoute from "./routes/awardRoute.js";
 import authRoute from "./routes/authRoute.js";
 import contactLeadRoute from "./routes/contactLeadRoute.js";
+import homeFrequentIconsRoute from "./routes/homeFrequentIconsRoute.js";
 
 const app = express();
 app.set("trust proxy", 1);
@@ -91,6 +92,7 @@ app.use("/api/contact-leads", contactLeadRoute);
 app.use("/api/logos", logoRoute);
 app.use("/api/testimonials", testimonialRoute);
 app.use("/api/awards", awardRoute);
+app.use("/api/home-frequent-icons", homeFrequentIconsRoute);
 
 /* ─── 404 ─── */
 app.use((req, res) => {

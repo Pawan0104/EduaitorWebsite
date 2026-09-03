@@ -13,6 +13,7 @@ import {
   FaSignOutAlt,
   FaTimes,
   FaCalendarAlt,
+  FaThLarge,
 } from "react-icons/fa";
 
 const NAV_SECTIONS = [
@@ -23,6 +24,11 @@ const NAV_SECTIONS = [
         name: "Dashboard",
         path: "/admin/dashboard",
         icon: <FaTachometerAlt />,
+      },
+      {
+        name: "Home Shortcuts",
+        path: "/admin/home-shortcuts",
+        icon: <FaThLarge />,
       },
       { name: "Plans", path: "/admin/plan", icon: <FaBook /> },
       { name: "Demos", path: "/admin/demo", icon: <FaCalendarAlt /> },

@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   FaUsers,
   FaBook,
@@ -5,8 +6,12 @@ import {
   FaEnvelope,
   FaArrowUp,
   FaArrowDown,
+  FaCalendarAlt,
+  FaImages,
+  FaBlog,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { apiClient, getAdminJwtPayload } from "../lib/api";
 
 const STATS = [
   {
@@ -48,14 +53,81 @@ const ACTIVITY = [
   { action: "Team member added", time: "Yesterday" },
 ];
 
-const QUICK_LINKS = [
-  { label: "View Demo Booking", path: "/admin/demo" },
-  { label: "View Contacts", path: "/admin/contact" },
-  { label: "Upload Image", path: "/admin/gallery" },
-  { label: "New Blog", path: "/admin/blog" },
+// “Frequently used icons” shown on the dashboard home/front screen.
+// This list must stay consistent with `HomeShortcuts` + backend defaults.
+const HOME_SHORTCUT_CATALOG = [
+  {
+    id: "demoBooking",
+    label: "View Demo Booking",
+    path: "/admin/demo",
+    icon: <FaCalendarAlt size={14} />,
+  },
+  {
+    id: "contacts",
+    label: "View Contacts",
+    path: "/admin/contact",
+    icon: <FaEnvelope size={14} />,
+  },
+  {
+    id: "uploadImage",
+    label: "Upload Image",
+    path: "/admin/gallery",
+    icon: <FaImages size={14} />,
+  },
+  {
+    id: "newBlog",
+    label: "New Blog",
+    path: "/admin/blog",
+    icon: <FaBlog size={14} />,
+  },
 ];
 
+const DEFAULT_HOME_SHORTCUT_IDS = HOME_SHORTCUT_CATALOG.map((c) => c.id);
+
 export default function Dashboard() {
+  const [selectedShortcutIds, setSelectedShortcutIds] = useState(
+    DEFAULT_HOME_SHORTCUT_IDS,
+  );
+  const [loadingShortcuts, setLoadingShortcuts] = useState(true);
+
+  const loadShortcuts = async () => {
+    const payload = getAdminJwtPayload();
+
+    const role = localStorage.getItem("homeShortcutRole") || "admin";
+    const schoolId =
+      localStorage.getItem("homeShortcutSchoolId") || "default";
+    const actorId =
+      localStorage.getItem("homeShortcutActorId") ||
+      payload?.email ||
+      "admin";
+
+    try {
+      setLoadingShortcuts(true);
+      const res = await apiClient.get("/home-frequent-icons", {
+        params: { schoolId, role, actorId },
+      });
+
+      const ids = Array.isArray(res.data?.homeFrequentIcons)
+        ? res.data.homeFrequentIcons
+        : [];
+      setSelectedShortcutIds(ids.length ? ids : DEFAULT_HOME_SHORTCUT_IDS);
+    } catch (err) {
+      console.error("Failed to load home shortcuts:", err?.response?.data);
+      setSelectedShortcutIds(DEFAULT_HOME_SHORTCUT_IDS);
+    } finally {
+      setLoadingShortcuts(false);
+    }
+  };
+
+  useEffect(() => {
+    loadShortcuts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const quickActions = selectedShortcutIds
+    .map((id) => HOME_SHORTCUT_CATALOG.find((c) => c.id === id))
+    .filter(Boolean);
+
   return (
     <div className="p-5 lg:p-8 space-y-8 max-w-7xl mx-auto w-full t-base">
       {/* Header */}
@@ -130,13 +202,18 @@ export default function Dashboard() {
             <h2 className="text-sm font-bold mb-4 t-text">Quick Actions</h2>
 
             <div className="space-y-2.5">
-              {QUICK_LINKS.map((q) => (
+              {quickActions.map((q) => (
                 <Link
-                  key={q.label}
+                  key={q.id}
                   to={q.path}
                   className="flex items-center justify-between px-4 py-3 rounded-xl border text-sm font-semibold transition-all t-hover t-border t-text"
                 >
-                  {q.label}
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm t-accent-bg t-accent-text border border-(--accent-border)">
+                      {q.icon}
+                    </div>
+                    <span>{q.label}</span>
+                  </div>
                   <svg
                     className="w-3.5 h-3.5 opacity-60"
                     fill="none"
