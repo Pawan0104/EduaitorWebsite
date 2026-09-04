@@ -76,7 +76,7 @@ const LoginSignup = () => {
         <div className="login-left">
           <div className="brand-section">
             <img
-              src="/logo1-Photoroom.png"
+              src="/logo1-eduaitor-v2.png"
               alt="EduAItor"
               className="logo-title-img"
             />

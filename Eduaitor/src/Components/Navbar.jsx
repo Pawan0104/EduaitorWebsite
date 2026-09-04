@@ -20,7 +20,7 @@ const Navbar = () => {
         >
           <div className="nb-logo-row">
             <img
-              src="/logo1-Photoroom.png"
+              src="/logo1-eduaitor-v2.png"
               alt="EduAItor"
               className="nb-logo-img"
             />

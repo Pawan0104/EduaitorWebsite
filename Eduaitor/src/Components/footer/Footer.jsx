@@ -167,7 +167,7 @@ const Footer = () => {
           <div className="ft-brand">
             <Link to="/" className="ft-logo" aria-label="EduAItor home">
               <img
-                src="/logo1-Photoroom.png"
+                src="/logo1-eduaitor-v2.png"
                 alt={settings.siteName || "EduAItor"}
                 className="ft-logo-img"
               />

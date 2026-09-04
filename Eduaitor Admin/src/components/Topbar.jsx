@@ -67,7 +67,7 @@ export default function Topbar({ toggleSidebar }) {
           ) : (
             // Show IMAGE in Light Mode
             <img
-              src="/logo1-Photoroom.png"
+              src="/logo1-eduaitor-v2.png"
               alt="EduAItor"
               className="h-12 sm:h-15 w-auto object-contain transition-all duration-300 ease-in-out"
               style={{

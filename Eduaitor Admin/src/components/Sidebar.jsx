@@ -88,7 +88,7 @@ export default function Sidebar({ closeSidebar }) {
             ) : (
               // Light Mode: Show IMAGE only
               <img
-                src="/logo1-Photoroom.png"
+                src="/logo1-eduaitor-v2.png"
                 alt="EduAItor"
                 className="h-12 w-auto object-contain"
               />
