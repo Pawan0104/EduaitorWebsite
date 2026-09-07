@@ -10,6 +10,7 @@ import Contacts from "./pages/Contacts";
 import Institute from "./pages/Institute";
 import Testimonials from "../src/pages/Testimonials";
 import Award from "./pages/Award";
+import Blog from "./pages/Blog";
 import HomeShortcuts from "./pages/HomeShortcuts";
 
 const ComingSoon = ({ name }) => (
@@ -66,7 +67,7 @@ export default function App() {
         <Route path="testimonial" element={<Testimonials />} />
         <Route path="award" element={<Award />} />
         <Route path="gallery" element={<ComingSoon name="Gallery" />} />
-        <Route path="blog" element={<ComingSoon name="Blogs" />} />
+        <Route path="blog" element={<Blog />} />
         <Route path="setting" element={<Setting />} />
         <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
       </Route>

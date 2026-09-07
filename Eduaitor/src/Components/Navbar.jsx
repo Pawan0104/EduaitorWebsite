@@ -44,6 +44,9 @@ const Navbar = () => {
             <NavLink to="/why">Why EduAitor</NavLink>
           </li>
           <li onClick={closeMenu}>
+            <NavLink to="/blogs">Blogs</NavLink>
+          </li>
+          <li onClick={closeMenu}>
             <NavLink to="/plans">Pricing</NavLink>
           </li>
           <li>

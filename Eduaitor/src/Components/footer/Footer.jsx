@@ -6,18 +6,11 @@ import {
   FaBrain,
   FaUsers,
   FaSchool,
-  FaShieldAlt,
   FaMobileAlt,
-  FaChalkboardTeacher,
   FaUserGraduate,
-  FaUserCog,
-  FaBullseye,
   FaBookOpen,
-  FaQuestionCircle,
   FaFileAlt,
   FaChartBar,
-  FaPlayCircle,
-  FaDownload,
   FaMagic,
   FaInfoCircle,
   FaFlag,
@@ -25,6 +18,7 @@ import {
   FaHandshake,
   FaCalendarAlt,
   FaHeadset,
+  FaRupeeSign,
   FaMapMarkerAlt,
   FaEnvelope,
   FaPhoneAlt,
@@ -42,32 +36,51 @@ import { API_URL } from "../../lib/api";
 
 const productItems = [
   { label: "Features", to: "/ecosystem", icon: FaStar },
-  { label: "Academics", to: "/solution", icon: FaGraduationCap },
-  { label: "AI & Learning", to: "/solution", icon: FaBrain },
-  { label: "Parent Suite", to: "/solution", icon: FaUsers },
-  { label: "Admin Suite", to: "/solution", icon: FaSchool },
-  { label: "Security", to: "/aboutus", icon: FaShieldAlt },
   { label: "Mobile Apps", to: "/#ecosystem", icon: FaMobileAlt },
+  {
+    label: "AI Academic Assistant",
+    to: "/ai-academic-assistant",
+    icon: FaBrain,
+  },
+  {
+    label: "AI Question Paper Generator",
+    to: "/ai-question-paper-generator",
+    icon: FaFileAlt,
+  },
+  { label: "AI Worksheet Generator", to: "/ai-worksheet-generator", icon: FaBookOpen },
+  { label: "AI Report Card Generator", to: "/ai-report-card-generator", icon: FaGraduationCap },
+  { label: "AI School Analytics", to: "/ai-school-analytics", icon: FaChartBar },
 ];
 
 const solutionItems = [
-  { label: "For Schools", to: "/solution", icon: FaSchool },
-  { label: "For Teachers", to: "/solution", icon: FaChalkboardTeacher },
-  { label: "For Parents", to: "/solution", icon: FaUsers },
-  { label: "For Students", to: "/solution", icon: FaUserGraduate },
-  { label: "By Role", to: "/#stakeholders", icon: FaUserCog },
-  { label: "By Need", to: "/solution", icon: FaBullseye },
-  { label: "By Board", to: "/solution", icon: FaBookOpen },
-];
-
-const resourceItems = [
-  { label: "Help Center", to: "/help-center", icon: FaQuestionCircle },
-  { label: "Knowledge Base", to: "/knowledge-base", icon: FaBookOpen },
-  { label: "Blogs", to: "/blogs", icon: FaFileAlt },
-  { label: "Case Studies", to: "/case-studies", icon: FaChartBar },
-  { label: "Webinars", to: "/webinars", icon: FaPlayCircle },
-  { label: "Downloads", to: "/downloads", icon: FaDownload },
-  { label: "What's New", to: "/whats-new", icon: FaMagic },
+  {
+    label: "School Management Software",
+    to: "/school-erp-software/school-management-software",
+    icon: FaSchool,
+  },
+  { label: "AI School ERP", to: "/ai-school-erp", icon: FaBrain },
+  {
+    label: "Attendance Management",
+    to: "/attendance-management-system",
+    icon: FaCalendarAlt,
+  },
+  {
+    label: "Fee Management Software",
+    to: "/fee-management-software",
+    icon: FaRupeeSign,
+  },
+  {
+    label: "Exam Management System",
+    to: "/exam-management-system",
+    icon: FaFileAlt,
+  },
+  { label: "Parent Mobile App", to: "/parent-mobile-app", icon: FaMobileAlt },
+  {
+    label: "Student Information System",
+    to: "/student-information-system",
+    icon: FaUserGraduate,
+  },
+  { label: "School LMS", to: "/school-lms", icon: FaBookOpen },
 ];
 
 const companyItems = [
@@ -98,9 +111,9 @@ const defaultSettings = {
   copyright: "© 2026 EduAitor Technologies Pvt. Ltd. All rights reserved.",
 };
 
-function FooterCol({ title, items }) {
+function FooterCol({ title, items, colClass }) {
   return (
-    <div className="ft-col">
+    <div className={colClass ? `ft-col ${colClass}` : "ft-col"}>
       <h3 className="ft-col-title">{title}</h3>
       <ul className="ft-links">
         {items.map(({ label, to, icon: Icon }) => (
@@ -187,9 +200,8 @@ const Footer = () => {
             </div>
           </div>
 
-          <FooterCol title="PRODUCT" items={productItems} />
-          <FooterCol title="SOLUTIONS" items={solutionItems} />
-          <FooterCol title="RESOURCES" items={resourceItems} />
+          <FooterCol title="PRODUCT" items={productItems} colClass="ft-col--product" />
+          <FooterCol title="SOLUTIONS" items={solutionItems} colClass="ft-col--solutions" />
           <FooterCol title="COMPANY" items={companyItems} />
 
           <div className="ft-cta">

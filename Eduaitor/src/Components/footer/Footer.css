@@ -14,7 +14,7 @@
   margin: 0 auto;
   padding: 72px 36px 56px;
   display: grid;
-  grid-template-columns: 1.45fr repeat(4, minmax(140px, 1fr)) 1.35fr;
+  grid-template-columns: 1.35fr minmax(200px, 1.15fr) minmax(210px, 1.3fr) minmax(130px, 0.85fr) 1.3fr;
   gap: 0;
   align-items: start;
 }
@@ -133,6 +133,12 @@
 .ft-link:hover {
   color: #2563eb;
   background: rgba(37, 99, 235, 0.04);
+}
+
+.ft-col--solutions .ft-link,
+.ft-col--product .ft-link {
+  font-size: 12px;
+  white-space: nowrap;
 }
 
 .ft-link-left {
@@ -457,6 +463,11 @@
   .ft-col {
     border-left: none;
     padding: 0 8px 0 0;
+  }
+
+  .ft-col--solutions .ft-link,
+  .ft-col--product .ft-link {
+    white-space: normal;
   }
 
   .ft-bottom-inner {

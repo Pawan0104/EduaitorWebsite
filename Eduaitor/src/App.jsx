@@ -19,6 +19,10 @@ import IgniteXPage from "./Pages/IgniteXPage";
 import DeleteAccountPage from "./Pages/DeleteAccountPage";
 import { ContactPopupProvider } from "./Components/ContactPopup";
 import { getSettingsCached } from "./lib/settingsCache";
+import FeatureLanding from "./Components/FeatureLandingPage";
+import { featureLandingPages } from "./data/featureLandingPages.jsx";
+import Blogs from "./Pages/Blogs";
+import BlogDetail from "./Pages/BlogDetail";
 
 const App = () => {
   useEffect(() => {
@@ -66,10 +70,8 @@ const App = () => {
               <PolicyPage policyKey="knowledgeBase" section="resources" />
             }
           />
-          <Route
-            path="/blogs"
-            element={<PolicyPage policyKey="blogs" section="resources" />}
-          />
+          <Route path="/blogs" element={<Blogs />} />
+          <Route path="/blog/:slug" element={<BlogDetail />} />
           <Route
             path="/case-studies"
             element={
@@ -112,6 +114,13 @@ const App = () => {
           />
           <Route path="/why" element={<WhyEduAitorPage />} />
           <Route path="/ignitex" element={<IgniteXPage />} />
+          {featureLandingPages.map((page) => (
+            <Route
+              key={page.path}
+              path={page.path}
+              element={<FeatureLanding page={page} />}
+            />
+          ))}
         </Routes>
       </div>
       <Footer />
