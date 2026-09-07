@@ -12,6 +12,8 @@ import  awardRoute from "./routes/awardRoute.js";
 import authRoute from "./routes/authRoute.js";
 import contactLeadRoute from "./routes/contactLeadRoute.js";
 import homeFrequentIconsRoute from "./routes/homeFrequentIconsRoute.js";
+import blogPostRoute from "./routes/blogPostRoute.js";
+import blogCommentRoute from "./routes/blogCommentRoute.js";
 
 const app = express();
 app.set("trust proxy", 1);
@@ -93,6 +95,8 @@ app.use("/api/logos", logoRoute);
 app.use("/api/testimonials", testimonialRoute);
 app.use("/api/awards", awardRoute);
 app.use("/api/home-frequent-icons", homeFrequentIconsRoute);
+app.use("/api/blog-posts", blogPostRoute);
+app.use("/api/blog-comments", blogCommentRoute);
 
 /* ─── 404 ─── */
 app.use((req, res) => {
