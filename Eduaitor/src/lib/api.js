@@ -1,4 +1,4 @@
-const PRODUCTION_API = "https://eduaitor-website-backend.onrender.com/api";
+const PRODUCTION_API = "https://eduaitorwebsite.onrender.com/api";
 const LOCAL_API = "http://localhost:5000/api";
 
 const envUrl = (import.meta.env.VITE_API_URL || "").trim();
