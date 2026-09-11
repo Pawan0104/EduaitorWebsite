@@ -70,7 +70,7 @@ export default function LandingScreen({ onStart }) {
     let mounted = true;
     fetchLandingStats().then((s) => {
       if (!mounted || !s) return;
-      const players = Math.max(10, s.totalPlayers || 0);
+      const players = (s.totalPlayers || 0) + (1 + Math.floor(Math.random() * 9));
       setStats([
         { icon: "👥", value: players, suffix: "+", label: "Players" },
         { icon: "🏆", value: s.bestScore || 0, suffix: "", label: "Highest Score" },
