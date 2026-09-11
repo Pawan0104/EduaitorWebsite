@@ -1,0 +1,25 @@
+{
+  "name": "brainleague",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "EDUAITOR BRAIN LEAGUE — a 2-3 minute gamified brain challenge for the Eduaitor website.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "deploy:site": "vite build && node ./scripts/copy-to-eduaitor.mjs",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "framer-motion": "^13.2.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-toastify": "^11.0.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.2.1",
+    "@vitejs/plugin-react": "^5.1.1",
+    "tailwindcss": "^4.2.1",
+    "vite": "^7.3.1"
+  }
+}

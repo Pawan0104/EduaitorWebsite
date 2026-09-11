@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+a,
+.cursor-pointer {
+  cursor: pointer;
+}
+
+button:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #f5faff;
+  font-family: "Baloo 2", "Segoe UI", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
