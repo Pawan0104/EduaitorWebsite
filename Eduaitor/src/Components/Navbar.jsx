@@ -5,9 +5,13 @@ import { useContactPopup } from "./ContactPopup";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [playOpen, setPlayOpen] = useState(false);
   const { openContactPopup } = useContactPopup();
 
-  const closeMenu = () => setIsMenuOpen(false);
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+    setPlayOpen(false);
+  };
 
   return (
     <header className="navbar">
@@ -48,6 +52,30 @@ const Navbar = () => {
           </li>
           <li onClick={closeMenu}>
             <NavLink to="/plans">Pricing</NavLink>
+          </li>
+          <li className={playOpen ? "nb-drop open" : "nb-drop"}>
+            <button
+              type="button"
+              className="nb-play-link"
+              onClick={() => setPlayOpen((v) => !v)}
+              aria-expanded={playOpen}
+              aria-haspopup="true"
+            >
+              Play <span className="nb-caret" aria-hidden="true">▾</span>
+            </button>
+            <div className="nb-pop-menu">
+              <Link
+                to="/brain-league"
+                onClick={() => setPlayOpen(false)}
+                className="nb-pop-item"
+              >
+                <span className="nb-pop-emoji" aria-hidden="true">🧠</span>
+                <span className="nb-pop-text">
+                  <strong>Brain League</strong>
+                  <small>100-question brain quiz</small>
+                </span>
+              </Link>
+            </div>
           </li>
           <li>
             <button

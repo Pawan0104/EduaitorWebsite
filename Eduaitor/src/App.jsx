@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./Components/Navbar";
 import Home from "./Pages/Home";
 import SolutionPage from "./Pages/SolutionPage";
@@ -23,8 +23,12 @@ import FeatureLanding from "./Components/FeatureLandingPage";
 import { featureLandingPages } from "./data/featureLandingPages.jsx";
 import Blogs from "./Pages/Blogs";
 import BlogDetail from "./Pages/BlogDetail";
+import BrainLeaguePage from "./Pages/BrainLeaguePage";
 
 const App = () => {
+  const location = useLocation();
+  const hideChrome = location.pathname.startsWith("/brain-league");
+
   useEffect(() => {
     getSettingsCached().catch(() => {});
   }, []);
@@ -32,8 +36,8 @@ const App = () => {
   return (
     <ContactPopupProvider>
       <ScrollToTop />
-      <Navbar />
-      <div className="main-content">
+      {!hideChrome && <Navbar />}
+      <div className={hideChrome ? "main-content no-chrome" : "main-content"}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/ecosystem" element={<EcosystemPage />} />
@@ -114,6 +118,7 @@ const App = () => {
           />
           <Route path="/why" element={<WhyEduAitorPage />} />
           <Route path="/ignitex" element={<IgniteXPage />} />
+          <Route path="/brain-league" element={<BrainLeaguePage />} />
           {featureLandingPages.map((page) => (
             <Route
               key={page.path}
@@ -123,7 +128,7 @@ const App = () => {
           ))}
         </Routes>
       </div>
-      <Footer />
+      {!hideChrome && <Footer />}
     </ContactPopupProvider>
   );
 };
