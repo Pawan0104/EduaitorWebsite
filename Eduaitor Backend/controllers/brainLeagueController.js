@@ -1,8 +1,11 @@
 import BrainQuestion from "../models/brainQuestion.js";
 import BrainSetting from "../models/brainSetting.js";
 import BrainAttempt from "../models/brainAttempt.js";
+import BrainOtp from "../models/brainOtp.js";
 import { DEFAULT_BANK, DEFAULT_SETTINGS, bankToDocuments } from "../data/brainLeagueSeed.js";
 import { rateLimit } from "express-rate-limit";
+import jwt from "jsonwebtoken";
+import { e164Phone, sendWhatsAppOtp } from "../utils/whatsapp.js";
 
 /* ── Validation ──────────────────────────────────────────────────────────────── */
 
@@ -120,6 +123,104 @@ export const attemptLimiter = rateLimit({
 
 /* ── Public ──────────────────────────────────────────────────────────────────── */
 
+/** Generate + deliver a WhatsApp OTP for the given Indian phone number. */
+export const sendOtp = async (req, res) => {
+  try {
+    const rawPhone = String(req.body?.phone || "").trim();
+    const phone = e164Phone(rawPhone);
+    if (!phone) return res.status(400).json({ message: "Valid 10-digit phone number is required" });
+
+    const now = Date.now();
+    const dayStart = new Date();
+    dayStart.setHours(0, 0, 0, 0);
+
+    const [recent, sentToday] = await Promise.all([
+      BrainOtp.findOne({ phone, createdAt: { $gte: new Date(now - 60_000) } }).lean(),
+      BrainOtp.countDocuments({ phone, createdAt: { $gte: dayStart } }),
+    ]);
+
+    if (recent) {
+      return res.status(429).json({ message: "Please wait 60 seconds before requesting another OTP" });
+    }
+    if (sentToday >= 5) {
+      return res.status(429).json({
+        message: "Too many OTP requests for this number today. Try again tomorrow.",
+      });
+    }
+
+    const code = String(Math.floor(100000 + Math.random() * 900000));
+    await BrainOtp.deleteMany({ phone });
+    await BrainOtp.create({ phone, code, expiresAt: new Date(now + 5 * 60_000) });
+
+    const templateName = process.env.WHATSAPP_OTP_TEMPLATE_NAME || "otp_verification";
+    let result;
+    try {
+      result = await sendWhatsAppOtp({ phone, code, templateName });
+    } catch (err) {
+      await BrainOtp.deleteOne({ phone });
+      console.error("sendWhatsAppOtp delivery error:", err.message);
+      return res.status(502).json({ message: "Could not deliver OTP via WhatsApp. Try again." });
+    }
+
+    if (!result.sent) {
+      return res.json({
+        sent: false,
+        devCode: code,
+        message: "WhatsApp not configured — OTP shown for testing",
+      });
+    }
+
+    return res.json({ sent: true, message: "OTP sent to your WhatsApp" });
+  } catch (err) {
+    console.error("sendOtp error:", err);
+    res.status(500).json({ message: "Failed to send OTP" });
+  }
+};
+
+/** Verify a phone + code and issue a short-lived signed verification token. */
+export const verifyOtp = async (req, res) => {
+  try {
+    const rawPhone = String(req.body?.phone || "").trim();
+    const phone = e164Phone(rawPhone);
+    const code = String(req.body?.code || "").trim();
+    if (!phone || !code) return res.status(400).json({ message: "Phone number and code are required" });
+
+    const otp = await BrainOtp.findOne({ phone });
+    if (!otp) return res.status(400).json({ message: "No OTP found for this number. Send a new one." });
+
+    if (otp.expiresAt.getTime() < Date.now()) {
+      await BrainOtp.deleteOne({ _id: otp._id });
+      return res.status(400).json({ message: "OTP expired. Send a new one." });
+    }
+
+    if (otp.code !== code) {
+      otp.attempts = (otp.attempts || 0) + 1;
+      if (otp.attempts >= 5) {
+        await BrainOtp.deleteOne({ _id: otp._id });
+        return res.status(400).json({ message: "Too many wrong attempts. Send a new OTP." });
+      }
+      await otp.save();
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    await BrainOtp.deleteOne({ _id: otp._id });
+
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      return res.status(500).json({ message: "Verification service is not configured" });
+    }
+
+    const verification = jwt.sign(JSON.parse(JSON.stringify({ phone, purpose: "brain-verify" })), secret, {
+      expiresIn: "30m",
+    });
+
+    return res.json({ ok: true, verification, phone });
+  } catch (err) {
+    console.error("verifyOtp error:", err);
+    res.status(500).json({ message: "Failed to verify OTP" });
+  }
+};
+
 export const getConfig = async (_req, res) => {
   try {
     const [questions, settings] = await Promise.all([
@@ -151,7 +252,8 @@ export const getConfig = async (_req, res) => {
 
 export const submitAttempt = async (req, res) => {
   try {
-    const { name, email, phone, score, badgeName, topType, durationMs, results, channel } = req.body || {};
+    const { name, email, phone, verification, score, badgeName, topType, durationMs, results, channel } =
+      req.body || {};
     if (!name) return res.status(400).json({ message: "Name is required" });
     if (typeof score !== "number" || score < 0 || score > 100) {
       return res.status(400).json({ message: "Invalid score" });
@@ -162,11 +264,25 @@ export const submitAttempt = async (req, res) => {
     if (!safeEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(safeEmail)) {
       return res.status(400).json({ message: "Valid email is required" });
     }
-    const safePhone = phone != null ? cleanStr(String(phone), 16) : "";
-    const phoneDigits = safePhone.replace(/^\+?91/, "").replace(/\D/g, "");
-    if (!safePhone || phoneDigits.length !== 10) {
+    const safePhoneRaw = phone != null ? cleanStr(String(phone), 16) : "";
+    const safePhone = e164Phone(safePhoneRaw);
+    if (!safePhone) {
       return res.status(400).json({ message: "Valid 10-digit phone is required" });
     }
+
+    let verified = false;
+    if (process.env.JWT_SECRET && verification) {
+      try {
+        const payload = jwt.verify(String(verification), process.env.JWT_SECRET);
+        verified = payload?.purpose === "brain-verify" && payload?.phone === safePhone;
+      } catch {
+        verified = false;
+      }
+    }
+    if (!verified) {
+      return res.status(403).json({ message: "Phone verification required" });
+    }
+
     const safeResults = Array.isArray(results)
       ? results
           .filter((r) => r && typeof r.category === "string" && typeof r.points === "number")

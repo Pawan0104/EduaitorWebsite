@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { COLORS } from "../theme";
 import { LANDING_STATS, TOTAL_CHALLENGES } from "../gameData";
 import { useCountUp, useLocalStorage } from "../useLocalStorage";
+import { isApiAvailable, sendOtp, verifyOtp } from "../gameApi";
 
 const fmtAvg = (seconds) => {
   const m = Math.floor(seconds / 60);
@@ -20,7 +21,7 @@ const isPhoneValid = (value) => {
   return digits.length === 10;
 };
 
-function Field({ label, value, onChange, error, placeholder, type = "text", maxLength = 24 }) {
+function Field({ label, value, onChange, error, disabled = false, placeholder, type = "text", maxLength = 24 }) {
   return (
     <div>
       <label className="text-[12px] font-extrabold mb-1.5 block" style={{ color: COLORS.ink }}>
@@ -32,8 +33,9 @@ function Field({ label, value, onChange, error, placeholder, type = "text", maxL
         maxLength={maxLength}
         placeholder={placeholder}
         type={type}
+        disabled={disabled}
         autoComplete="off"
-        className="w-full rounded-2xl border-2 px-4 py-3 text-[15px] font-bold outline-none focus:ring-4"
+        className="w-full rounded-2xl border-2 px-4 py-3 text-[15px] font-bold outline-none focus:ring-4 disabled:opacity-60"
         style={{
           borderColor: error ? "#E5484D" : "#DCEBFF",
           background: COLORS.card,
@@ -47,12 +49,76 @@ function Field({ label, value, onChange, error, placeholder, type = "text", maxL
 }
 
 export default function LandingScreen({ onStart }) {
+  const apiAvailable = isApiAvailable();
   const [stored, setStored] = useLocalStorage("bl.profile", { name: "", email: "", phone: "" });
   const [name, setName] = useState(stored.name || "");
   const [email, setEmail] = useState(stored.email || "");
   const [phone, setPhone] = useState(stored.phone || "");
   const [errors, setErrors] = useState({});
   const [tapped, setTapped] = useState(false);
+
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [otpError, setOtpError] = useState("");
+  const [devCode, setDevCode] = useState("");
+  const [verification, setVerification] = useState("");
+  const [sending, setSending] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+
+  const resetOtp = () => {
+    setOtpSent(false);
+    setOtpCode("");
+    setOtpError("");
+    setDevCode("");
+    setVerification("");
+  };
+
+  const changePhone = (e) => {
+    setPhone(e.target.value);
+    if (errors.phone) setErrors((p) => ({ ...p, phone: "" }));
+    resetOtp();
+  };
+
+  const requestOtp = async () => {
+    setOtpError("");
+    setDevCode("");
+    if (!isPhoneValid(phone.trim())) {
+      setErrors((p) => ({ ...p, phone: "Enter a valid 10-digit phone number." }));
+      return;
+    }
+    setSending(true);
+    try {
+      const res = await sendOtp(normalizePhone(phone.trim()));
+      if (!res.ok) {
+        setOtpError(res.message || "Failed to request OTP. Try again.");
+        return;
+      }
+      setOtpSent(true);
+      if (res.devCode) setDevCode(res.devCode);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const verify = async () => {
+    if (otpCode.trim().length < 4) {
+      setOtpError("Enter the 6-digit code you received.");
+      return;
+    }
+    setVerifying(true);
+    setOtpError("");
+    try {
+      const res = await verifyOtp(normalizePhone(phone.trim()), otpCode.trim());
+      if (!res.ok || !res.verification) {
+        setOtpError(res.message || "Verification failed. Try again.");
+        return;
+      }
+      setVerification(res.verification);
+      setPhone(res.phone || phone);
+    } finally {
+      setVerifying(false);
+    }
+  };
 
   const start = () => {
     if (tapped) return;
@@ -62,15 +128,23 @@ export default function LandingScreen({ onStart }) {
     else if (!EMAIL_RE.test(email.trim())) nextErrors.email = "Enter a valid email address.";
     if (!phone.trim()) nextErrors.phone = "Please enter your phone number.";
     else if (!isPhoneValid(phone.trim())) nextErrors.phone = "Enter a valid 10-digit phone number.";
+    if (apiAvailable && !verification) nextErrors.otp = "Verify your phone via WhatsApp first.";
     if (Object.keys(nextErrors).length) {
       setErrors(nextErrors);
       return;
     }
     setTapped(true);
-    const profile = { name: name.trim(), email: email.trim(), phone: normalizePhone(phone.trim()) };
+    const profile = {
+      name: name.trim(),
+      email: email.trim(),
+      phone: normalizePhone(phone.trim()),
+      verification: verification || "",
+    };
     setStored(profile);
     onStart(profile);
   };
+
+  const verified = Boolean(verification);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-5 py-10 relative overflow-hidden"
@@ -164,12 +238,92 @@ export default function LandingScreen({ onStart }) {
         <Field
           label="Phone number (10 digits)"
           value={phone}
-          onChange={(e) => { setPhone(e.target.value); if (errors.phone) setErrors((p) => ({ ...p, phone: "" })); }}
+          onChange={changePhone}
           error={errors.phone}
+          disabled={verified}
           placeholder="98765 43210"
           type="tel"
           maxLength={14}
         />
+
+        {apiAvailable && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex flex-col gap-2"
+          >
+            {!otpSent && !verified && (
+              <button
+                onClick={requestOtp}
+                disabled={sending}
+                className="w-full rounded-2xl border-2 px-4 py-3 text-[14px] font-extrabold transition-all disabled:opacity-60 cursor-pointer"
+                style={{
+                  borderColor: "#DCEBFF",
+                  background: COLORS.card,
+                  color: COLORS.ink,
+                  boxShadow: "0 4px 14px rgba(45,156,255,0.08)",
+                }}
+              >
+                {sending ? "Sending OTP…" : "📲 Send OTP via WhatsApp"}
+              </button>
+            )}
+
+            {otpSent && !verified && (
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
+                  <input
+                    value={otpCode}
+                    onChange={(e) => { setOtpCode(e.target.value.replace(/\D/g, "")); setOtpError(""); }}
+                    maxLength={6}
+                    placeholder="6-digit code"
+                    inputMode="numeric"
+                    className="flex-1 rounded-2xl border-2 px-4 py-3 text-[15px] font-bold text-center tracking-[0.4em] outline-none focus:ring-4"
+                    style={{
+                      borderColor: otpError ? "#E5484D" : "#DCEBFF",
+                      background: COLORS.card,
+                      color: COLORS.ink,
+                      boxShadow: "0 4px 14px rgba(45,156,255,0.08)",
+                    }}
+                  />
+                  <button
+                    onClick={verify}
+                    disabled={verifying || otpCode.length < 4}
+                    className="px-5 rounded-2xl text-[14px] font-extrabold text-white transition-all disabled:opacity-60 cursor-pointer"
+                    style={{ background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})` }}
+                  >
+                    {verifying ? "…" : "Verify"}
+                  </button>
+                </div>
+                <button
+                  onClick={requestOtp}
+                  disabled={sending}
+                  className="text-[11px] font-bold underline text-left cursor-pointer"
+                  style={{ color: "#6B93BE" }}
+                >
+                  {sending ? "Sending…" : "Resend OTP"}
+                </button>
+              </div>
+            )}
+
+            {devCode && (
+              <p className="text-[11px] font-bold rounded-xl px-3 py-2" style={{ color: "#6B93BE", background: "rgba(45,156,255,0.08)" }}>
+                Test mode — your code: <span className="tracking-[0.3em] text-[13px]">{devCode}</span>
+              </p>
+            )}
+
+            {(otpError || errors.otp) && (
+              <p className="text-[11px] font-bold" style={{ color: "#E5484D" }}>
+                {otpError || errors.otp}
+              </p>
+            )}
+
+            {verified && (
+              <p className="text-[12px] font-extrabold flex items-center gap-1.5" style={{ color: "#16A34A" }}>
+                ✓ Phone verified · {phone}
+              </p>
+            )}
+          </motion.div>
+        )}
       </motion.div>
 
       <motion.button
@@ -178,13 +332,14 @@ export default function LandingScreen({ onStart }) {
         transition={{ delay: 0.9 }}
         whileTap={{ scale: 0.95 }}
         onClick={start}
-        className="w-full max-w-md mt-6 rounded-[22px] py-4.5 text-lg font-extrabold text-white shadow-xl active:scale-95 transition-transform"
+        disabled={apiAvailable && !verified}
+        className="w-full max-w-md mt-6 rounded-[22px] py-4.5 text-lg font-extrabold text-white shadow-xl active:scale-95 transition-all disabled:opacity-45 disabled:cursor-not-allowed"
         style={{
           background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})`,
           boxShadow: `0 12px 26px rgba(255,138,0,0.35)`,
         }}
       >
-        START CHALLENGE ⚡
+        {apiAvailable && !verified ? "VERIFY PHONE TO START" : "START CHALLENGE ⚡"}
       </motion.button>
 
       <p className="mt-6 text-[11px] font-bold" style={{ color: "#9DB8D9" }}>

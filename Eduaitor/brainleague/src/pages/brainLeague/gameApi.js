@@ -12,6 +12,38 @@ const BRAIN_API = (import.meta.env.VITE_BRAIN_API || "").replace(/\/+$/, "");
 
 export const QUERY_KEY = "bl"; // query param used on shared links
 
+export const isApiAvailable = () => Boolean(BRAIN_API);
+
+/** Request a WhatsApp OTP for a phone number. */
+export const sendOtp = async (phone) => {
+  try {
+    const res = await fetch(`${BRAIN_API}/api/brain-league/otp/send`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone }),
+    });
+    const data = await res.json().catch(() => ({}));
+    return { ok: res.ok, status: res.status, ...data };
+  } catch (err) {
+    return { ok: false, message: "Network error — check your connection" };
+  }
+};
+
+/** Verify an OTP and get a short-lived signed verification token. */
+export const verifyOtp = async (phone, code) => {
+  try {
+    const res = await fetch(`${BRAIN_API}/api/brain-league/otp/verify`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone, code }),
+    });
+    const data = await res.json().catch(() => ({}));
+    return { ok: res.ok, status: res.status, ...data };
+  } catch (err) {
+    return { ok: false, message: "Network error — check your connection" };
+  }
+};
+
 /** Fetch the admin-managed quiz config (bank + badges + share message). */
 export const fetchQuizConfig = async () => {
   if (!BRAIN_API) return null;
@@ -50,6 +82,7 @@ export const submitResult = async (session) => {
         name: session.name,
         email: session.email || "",
         phone: session.phone || "",
+        verification: session.verification || "",
         score: session.score,
         badgeName: badge?.name ?? "",
         topType: session.type?.id ?? "",

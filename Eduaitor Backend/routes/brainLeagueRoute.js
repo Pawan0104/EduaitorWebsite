@@ -2,6 +2,8 @@ import express from "express";
 import { requireAdmin } from "../middlewares/auth.js";
 import {
   getConfig,
+  sendOtp,
+  verifyOtp,
   submitAttempt,
   attemptLimiter,
   listQuestions,
@@ -23,6 +25,8 @@ const router = express.Router();
 
 /* ── Public ──────────────────────────────────────────────────────────────────── */
 router.get("/config", getConfig);
+router.post("/otp/send", sendOtp);
+router.post("/otp/verify", verifyOtp);
 router.post("/attempts", attemptLimiter, submitAttempt);
 
 /* ── Admin ───────────────────────────────────────────────────────────────────── */
