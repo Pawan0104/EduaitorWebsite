@@ -14,6 +14,9 @@ import {
   updateSettings,
   listAttempts,
   getStats,
+  listPlayers,
+  getPlayerDetail,
+  getStatsTrend,
 } from "../controllers/brainLeagueController.js";
 
 const router = express.Router();
@@ -41,5 +44,10 @@ router.put("/admin/settings", requireAdmin, updateSettings);
 // Attempts & stats
 router.get("/admin/attempts", requireAdmin, listAttempts);
 router.get("/admin/stats", requireAdmin, getStats);
+router.get("/admin/stats/trend", requireAdmin, getStatsTrend);
+
+// Players
+router.get("/admin/players", requireAdmin, listPlayers);
+router.get("/admin/players/:email", requireAdmin, getPlayerDetail);
 
 export default router;

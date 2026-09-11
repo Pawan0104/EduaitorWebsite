@@ -894,6 +894,482 @@ function formatMs(ms) {
   return `${m}:${String(s % 60).padStart(2, "0")}`;
 }
 
+function formatDate(d) {
+  if (!d) return "—";
+  return new Date(d).toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function BarChart({ data, maxVal, labelKey, valueKey, color = "var(--accent)" }) {
+  const max = maxVal || Math.max(...data.map((d) => d[valueKey]), 1);
+  return (
+    <div className="flex items-end gap-1" style={{ height: 120 }}>
+      {data.map((d, i) => {
+        const h = Math.max(4, (d[valueKey] / max) * 110);
+        return (
+          <div key={i} className="flex flex-col items-center gap-1 flex-1 min-w-0 group relative">
+            <div
+              className="w-full rounded-t-md transition-all"
+              style={{ height: h, background: color, minHeight: 4 }}
+              title={`${d[labelKey]}: ${d[valueKey]}`}
+            />
+            {data.length <= 15 && (
+              <span className="text-[8px] font-bold text-[var(--text-muted)] truncate w-full text-center">
+                {String(d[labelKey]).slice(-5)}
+              </span>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function PlayerReport({ email, onBack }) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await apiFetch(`${API}/brain-league/admin/players/${encodeURIComponent(email)}`);
+        if (!res.ok) throw new Error();
+        setData(await res.json());
+      } catch {
+        // handled below
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [email]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-24 text-[var(--text-muted)] text-sm">
+        Loading player report…
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="flex flex-col items-center gap-4 py-16">
+        <p className="text-sm text-[var(--text-muted)]">Player not found.</p>
+        <button onClick={onBack} className="px-4 py-2 text-xs font-bold rounded-lg border border-[var(--border)] bg-[var(--bg-hover)] text-[var(--text-sec)] cursor-pointer">← Back to Players</button>
+      </div>
+    );
+  }
+
+  const catAvg = data.categoryAvg || {};
+  const badgeCount = data.badgeCount || {};
+  const scoreHistory = (data.scoreHistory || []).slice().reverse();
+
+  return (
+    <div className="flex flex-col gap-5">
+      <button onClick={onBack} className="self-start px-4 py-2 text-xs font-bold rounded-lg border border-[var(--border)] bg-[var(--bg-hover)] text-[var(--text-sec)] cursor-pointer">
+        ← Back to Players
+      </button>
+
+      <div className="t-card rounded-2xl p-5">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-14 h-14 rounded-full flex items-center justify-center text-2xl font-black text-white" style={{ background: "var(--accent)" }}>
+            {(data.name || "?")[0]?.toUpperCase()}
+          </div>
+          <div>
+            <h3 className="text-lg font-black t-text m-0">{data.name}</h3>
+            <p className="text-xs text-[var(--text-muted)] m-0">{data.email}</p>
+            {data.phone && <p className="text-xs text-[var(--text-muted)] m-0">{data.phone}</p>}
+          </div>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <StatCard icon="🎮" label="Total Plays" value={data.totalAttempts} />
+          <StatCard icon="🏆" label="Best Score" value={data.bestScore} />
+          <StatCard icon="📊" label="Avg Score" value={data.avgScore} />
+          <StatCard icon="📅" label="Last Played" value={formatDate(data.lastPlayed)} />
+        </div>
+      </div>
+
+      {scoreHistory.length > 1 && (
+        <div className="t-card rounded-2xl p-5">
+          <h3 className="text-sm font-black t-text mb-3">Score History</h3>
+          <BarChart
+            data={scoreHistory.map((s) => ({ ...s, label: formatDate(s.date) }))}
+            maxVal={100}
+            labelKey="label"
+            valueKey="score"
+            color="var(--accent)"
+          />
+          <div className="flex justify-between mt-2">
+            <span className="text-[10px] font-bold text-[var(--text-muted)]">{formatDate(scoreHistory[0]?.date)}</span>
+            <span className="text-[10px] font-bold text-[var(--text-muted)]">{formatDate(scoreHistory[scoreHistory.length - 1]?.date)}</span>
+          </div>
+        </div>
+      )}
+
+      {Object.keys(catAvg).length > 0 && (
+        <div className="t-card rounded-2xl p-5">
+          <h3 className="text-sm font-black t-text mb-3">Category Averages (of 20)</h3>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+            {CATEGORIES.map((c) => (
+              <div key={c} className="border border-[var(--border)] rounded-xl px-3 py-3 flex flex-col items-center">
+                <span className="text-sm font-black t-text">{catAvg[c] ?? "—"}</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
+                  {CATEGORY_META[c].icon} {CATEGORY_META[c].label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {Object.keys(badgeCount).length > 0 && (
+        <div className="t-card rounded-2xl p-5">
+          <h3 className="text-sm font-black t-text mb-3">Badges Earned</h3>
+          <div className="flex gap-2 flex-wrap">
+            {Object.entries(badgeCount).map(([b, count]) => (
+              <span key={b} className="px-3 py-1.5 text-xs font-bold rounded-full border border-[var(--border)] bg-[var(--bg-base)] text-[var(--text-sec)]">
+                {b} × {count}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="t-card rounded-2xl p-5">
+        <h3 className="text-sm font-black t-text mb-3">All Attempts ({data.attempts?.length || 0})</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] text-left">
+                <th className="pb-3 pr-3">Score</th>
+                <th className="pb-3 pr-3">Badge</th>
+                <th className="pb-3 pr-3">Top Type</th>
+                <th className="pb-3 pr-3">Time</th>
+                <th className="pb-3">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(data.attempts || []).map((a) => (
+                <tr key={a._id} className="border-t border-[var(--border)] text-[var(--text-primary)]">
+                  <td className="py-3 pr-3 font-black">{a.score}</td>
+                  <td className="py-3 pr-3">{a.badgeName || "—"}</td>
+                  <td className="py-3 pr-3 capitalize">{a.topType || "—"}</td>
+                  <td className="py-3 pr-3">{formatMs(a.durationMs)}</td>
+                  <td className="py-3">{formatDate(a.createdAt)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PlayersTab() {
+  const [players, setPlayers] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [selectedEmail, setSelectedEmail] = useState(null);
+  const [toast, setToast] = useState(null);
+
+  const showToast = (msg, type = "success") => setToast({ msg, type });
+
+  const loadPlayers = async (p, q = search) => {
+    try {
+      const params = `page=${p}&limit=50${q ? `&q=${encodeURIComponent(q)}` : ""}`;
+      const res = await apiFetch(`${API}/brain-league/admin/players?${params}`);
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      setPlayers(data.items || []);
+      setTotal(data.total || 0);
+      setTotalPages(data.totalPages || 1);
+    } catch {
+      showToast("Failed to load players", "error");
+    }
+  };
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      await loadPlayers(1);
+      setLoading(false);
+    })();
+  }, []);
+
+  const changePage = (p) => {
+    setPage(p);
+    loadPlayers(p, search);
+  };
+
+  const doSearch = (e) => {
+    e?.preventDefault();
+    setPage(1);
+    loadPlayers(1, search);
+  };
+
+  if (selectedEmail) {
+    return <PlayerReport email={selectedEmail} onBack={() => setSelectedEmail(null)} />;
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-24 text-[var(--text-muted)] text-sm">
+        Loading players…
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="t-card rounded-2xl p-5">
+        <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
+          <h3 className="text-sm font-black t-text m-0">All Players</h3>
+          <div className="flex items-center gap-2">
+            <form onSubmit={doSearch} className="flex items-center gap-2">
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search name / email / phone"
+                className="px-3 py-1.5 text-xs font-bold rounded-lg border border-[var(--border)] bg-[var(--bg-base)] text-[var(--text-primary)] w-56"
+              />
+              <button
+                type="submit"
+                className="px-3 py-1.5 text-xs font-bold rounded-lg border border-[var(--border)] bg-[var(--bg-hover)] text-[var(--text-sec)] cursor-pointer"
+              >
+                Search
+              </button>
+            </form>
+            <span className="text-xs text-[var(--text-muted)]">{total} total</span>
+          </div>
+        </div>
+
+        {players.length === 0 ? (
+          <div className="text-center py-14 border border-dashed border-[var(--border)] rounded-xl text-[var(--text-muted)] text-sm">
+            No players yet.
+          </div>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] text-left">
+                    <th className="pb-3 pr-3">Name</th>
+                    <th className="pb-3 pr-3">Email</th>
+                    <th className="pb-3 pr-3">Phone</th>
+                    <th className="pb-3 pr-3">Plays</th>
+                    <th className="pb-3 pr-3">Best</th>
+                    <th className="pb-3 pr-3">Avg</th>
+                    <th className="pb-3 pr-3">Badges</th>
+                    <th className="pb-3">Last Played</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {players.map((p) => (
+                    <tr
+                      key={p.email}
+                      className="border-t border-[var(--border)] text-[var(--text-primary)] cursor-pointer hover:bg-[var(--bg-hover)] transition-colors"
+                      onClick={() => setSelectedEmail(p.email)}
+                    >
+                      <td className="py-3 pr-3 font-semibold">{p.name}</td>
+                      <td className="py-3 pr-3 text-[var(--text-sec)]">{p.email}</td>
+                      <td className="py-3 pr-3 text-[var(--text-sec)]">{p.phone || "—"}</td>
+                      <td className="py-3 pr-3 font-black">{p.attempts}</td>
+                      <td className="py-3 pr-3 font-black">{p.bestScore}</td>
+                      <td className="py-3 pr-3">{p.avgScore}</td>
+                      <td className="py-3 pr-3">
+                        {(p.badges || []).filter(Boolean).length > 0
+                          ? p.badges.filter(Boolean).join(", ")
+                          : "—"}
+                      </td>
+                      <td className="py-3">{formatDate(p.lastPlayed)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-4">
+                <button
+                  onClick={() => changePage(page - 1)}
+                  disabled={page <= 1}
+                  className="px-3 py-1.5 text-xs font-bold rounded-lg border border-[var(--border)] bg-[var(--bg-hover)] text-[var(--text-sec)] cursor-pointer disabled:opacity-40"
+                >
+                  ← Prev
+                </button>
+                <span className="text-xs font-bold text-[var(--text-muted)]">
+                  Page {page} of {totalPages}
+                </span>
+                <button
+                  onClick={() => changePage(page + 1)}
+                  disabled={page >= totalPages}
+                  className="px-3 py-1.5 text-xs font-bold rounded-lg border border-[var(--border)] bg-[var(--bg-hover)] text-[var(--text-sec)] cursor-pointer disabled:opacity-40"
+                >
+                  Next →
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      {toast && <Toast msg={toast.msg} type={toast.type} onDone={() => setToast(null)} />}
+    </div>
+  );
+}
+
+function AnalyticsTab() {
+  const [period, setPeriod] = useState("week");
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState(null);
+
+  const showToast = (msg, type = "success") => setToast({ msg, type });
+
+  const loadTrend = async (p) => {
+    setLoading(true);
+    try {
+      const res = await apiFetch(`${API}/brain-league/admin/stats/trend?period=${p}`);
+      if (!res.ok) throw new Error();
+      setData(await res.json());
+    } catch {
+      showToast("Failed to load analytics", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadTrend(period);
+  }, [period]);
+
+  const maxAttempts = data ? Math.max(...data.buckets.map((b) => b.attempts), 1) : 1;
+
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => setPeriod("week")}
+          className={`px-4 py-2 rounded-xl text-xs font-bold border cursor-pointer transition-all ${
+            period === "week"
+              ? "bg-[var(--accent-soft)] border-[var(--accent-border)] text-[var(--accent-text)]"
+              : "bg-[var(--bg-elevated)] border-[var(--border)] text-[var(--text-sec)] hover:text-[var(--text-primary)]"
+          }`}
+        >
+          Weekly (12 weeks)
+        </button>
+        <button
+          onClick={() => setPeriod("month")}
+          className={`px-4 py-2 rounded-xl text-xs font-bold border cursor-pointer transition-all ${
+            period === "month"
+              ? "bg-[var(--accent-soft)] border-[var(--accent-border)] text-[var(--accent-text)]"
+              : "bg-[var(--bg-elevated)] border-[var(--border)] text-[var(--text-sec)] hover:text-[var(--text-primary)]"
+          }`}
+        >
+          Monthly (12 months)
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-24 text-[var(--text-muted)] text-sm">
+          Loading analytics…
+        </div>
+      ) : !data ? (
+        <div className="text-center py-14 border border-dashed border-[var(--border)] rounded-xl text-[var(--text-muted)] text-sm">
+          No data available.
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <StatCard icon="🎮" label="Total Attempts" value={data.totalAttempts} />
+            <StatCard icon="👥" label="Unique Players" value={data.totalPlayers} />
+            <StatCard icon="📊" label="Avg Score" value={data.avgScore} />
+          </div>
+
+          <div className="t-card rounded-2xl p-5">
+            <h3 className="text-sm font-black t-text mb-3">
+              Attempts per {period === "week" ? "Day" : "Month"}
+            </h3>
+            {data.buckets.length > 0 ? (
+              <BarChart
+                data={data.buckets.map((b) => ({ ...b, label: b.label.slice(-5) }))}
+                maxVal={maxAttempts}
+                labelKey="label"
+                valueKey="attempts"
+                color="var(--accent)"
+              />
+            ) : (
+              <p className="text-xs text-[var(--text-muted)]">No data in this period.</p>
+            )}
+          </div>
+
+          {data.scoreBands.length > 0 && (
+            <div className="t-card rounded-2xl p-5">
+              <h3 className="text-sm font-black t-text mb-3">Score Distribution</h3>
+              <div className="flex items-end gap-3" style={{ height: 120 }}>
+                {data.scoreBands.map((b, i) => {
+                  const maxC = Math.max(...data.scoreBands.map((x) => x.count), 1);
+                  const h = Math.max(4, (b.count / maxC) * 110);
+                  const colors = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#3b82f6"];
+                  return (
+                    <div key={i} className="flex flex-col items-center gap-1 flex-1">
+                      <span className="text-[10px] font-bold t-text">{b.count}</span>
+                      <div className="w-full rounded-t-md" style={{ height: h, background: colors[i] || "var(--accent)" }} />
+                      <span className="text-[9px] font-bold text-[var(--text-muted)]">{b.label}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {data.topPlayers.length > 0 && (
+            <div className="t-card rounded-2xl p-5">
+              <h3 className="text-sm font-black t-text mb-3">Top Players (by attempts)</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] text-left">
+                      <th className="pb-3 pr-3">#</th>
+                      <th className="pb-3 pr-3">Name</th>
+                      <th className="pb-3 pr-3">Email</th>
+                      <th className="pb-3 pr-3">Plays</th>
+                      <th className="pb-3 pr-3">Avg</th>
+                      <th className="pb-3">Best</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.topPlayers.map((p, i) => (
+                      <tr key={p.email} className="border-t border-[var(--border)] text-[var(--text-primary)]">
+                        <td className="py-3 pr-3 font-bold text-[var(--text-muted)]">{i + 1}</td>
+                        <td className="py-3 pr-3 font-semibold">{p.name}</td>
+                        <td className="py-3 pr-3 text-[var(--text-sec)]">{p.email}</td>
+                        <td className="py-3 pr-3 font-black">{p.attempts}</td>
+                        <td className="py-3 pr-3">{p.avgScore}</td>
+                        <td className="py-3 font-black">{p.bestScore}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {toast && <Toast msg={toast.msg} type={toast.type} onDone={() => setToast(null)} />}
+    </div>
+  );
+}
+
 function AttemptsTab() {
   const [stats, setStats] = useState(null);
   const [attempts, setAttempts] = useState([]);
@@ -1112,7 +1588,9 @@ function AttemptsTab() {
 const TABS = [
   { id: "questions", label: "Questions", icon: "📝" },
   { id: "badges", label: "Badges & Settings", icon: "🏅" },
+  { id: "players", label: "Players", icon: "👥" },
   { id: "attempts", label: "Attempts", icon: "📊" },
+  { id: "analytics", label: "Analytics", icon: "📈" },
 ];
 
 export default function BrainLeague() {
@@ -1171,7 +1649,9 @@ export default function BrainLeague() {
 
           {activeTab === "questions" && <QuestionsTab />}
           {activeTab === "badges" && <BadgesTab />}
+          {activeTab === "players" && <PlayersTab />}
           {activeTab === "attempts" && <AttemptsTab />}
+          {activeTab === "analytics" && <AnalyticsTab />}
         </main>
       </div>
     </div>

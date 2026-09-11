@@ -420,3 +420,242 @@ export const getStats = async (_req, res) => {
     res.status(500).json({ message: "Failed to fetch stats" });
   }
 };
+
+/* ── Admin: Players ──────────────────────────────────────────────────────── */
+
+export const listPlayers = async (req, res) => {
+  try {
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.min(200, Math.max(1, Number(req.query.limit) || 50));
+    const skip = (page - 1) * limit;
+    const q = (req.query.q || "").trim();
+
+    const match = q
+      ? {
+          $or: [
+            { name: { $regex: q, $options: "i" } },
+            { email: { $regex: q, $options: "i" } },
+            { phone: { $regex: q, $options: "i" } },
+          ],
+        }
+      : {};
+
+    const [items, total] = await Promise.all([
+      BrainAttempt.aggregate([
+        { $match: match },
+        {
+          $group: {
+            _id: { $toLower: "$email" },
+            email: { $first: "$email" },
+            name: { $first: "$name" },
+            phone: { $first: "$phone" },
+            attempts: { $sum: 1 },
+            bestScore: { $max: "$score" },
+            avgScore: { $avg: "$score" },
+            totalScore: { $sum: "$score" },
+            lastPlayed: { $max: "$createdAt" },
+            firstPlayed: { $min: "$createdAt" },
+            badges: { $addToSet: "$badgeName" },
+          },
+        },
+        { $sort: { lastPlayed: -1 } },
+        { $skip: skip },
+        { $limit: limit },
+      ]),
+      BrainAttempt.aggregate([
+        { $match: match },
+        { $group: { _id: { $toLower: "$email" } } },
+        { $count: "n" },
+      ]),
+    ]);
+
+    const count = total?.[0]?.n ?? 0;
+
+    res.json({
+      items: items.map((p) => ({
+        email: p.email,
+        name: p.name,
+        phone: p.phone,
+        attempts: p.attempts,
+        bestScore: p.bestScore,
+        avgScore: Math.round((p.avgScore || 0) * 10) / 10,
+        totalScore: p.totalScore,
+        lastPlayed: p.lastPlayed,
+        firstPlayed: p.firstPlayed,
+        badges: (p.badges || []).filter(Boolean),
+      })),
+      total: count,
+      page,
+      limit,
+      totalPages: Math.ceil(count / limit),
+    });
+  } catch (err) {
+    console.error("listPlayers error:", err);
+    res.status(500).json({ message: "Failed to fetch players" });
+  }
+};
+
+export const getPlayerDetail = async (req, res) => {
+  try {
+    const email = (req.params.email || "").trim().toLowerCase();
+    if (!email) return res.status(400).json({ message: "Email is required" });
+
+    const attempts = await BrainAttempt.find({ email })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    if (!attempts.length) {
+      return res.status(404).json({ message: "No attempts found for this player" });
+    }
+
+    const first = attempts[attempts.length - 1];
+    const best = attempts.reduce((m, a) => (a.score > m.score ? a : m), attempts[0]);
+    const avg = Math.round((attempts.reduce((s, a) => s + a.score, 0) / attempts.length) * 10) / 10;
+
+    const categoryAvg = {};
+    const catCounts = {};
+    for (const a of attempts) {
+      for (const r of a.results || []) {
+        categoryAvg[r.category] = (categoryAvg[r.category] || 0) + (r.points || 0);
+        catCounts[r.category] = (catCounts[r.category] || 0) + 1;
+      }
+    }
+    for (const c of Object.keys(categoryAvg)) {
+      categoryAvg[c] = Math.round((categoryAvg[c] / (catCounts[c] || 1)) * 10) / 10;
+    }
+
+    const badgeCount = {};
+    for (const a of attempts) {
+      if (a.badgeName) badgeCount[a.badgeName] = (badgeCount[a.badgeName] || 0) + 1;
+    }
+
+    const scoreHistory = attempts.map((a) => ({
+      score: a.score,
+      badge: a.badgeName,
+      date: a.createdAt,
+      topType: a.topType,
+    }));
+
+    res.json({
+      name: first.name,
+      email: first.email,
+      phone: first.phone,
+      totalAttempts: attempts.length,
+      bestScore: best.score,
+      avgScore: avg,
+      firstPlayed: first.createdAt,
+      lastPlayed: best.createdAt,
+      badgeCount,
+      categoryAvg,
+      scoreHistory,
+      attempts: attempts.map((a) => ({
+        _id: a._id,
+        score: a.score,
+        badgeName: a.badgeName,
+        topType: a.topType,
+        durationMs: a.durationMs,
+        results: a.results,
+        channel: a.channel,
+        createdAt: a.createdAt,
+      })),
+    });
+  } catch (err) {
+    console.error("getPlayerDetail error:", err);
+    res.status(500).json({ message: "Failed to fetch player detail" });
+  }
+};
+
+/* ── Admin: Stats Trend (weekly / monthly) ────────────────────────────────── */
+
+export const getStatsTrend = async (req, res) => {
+  try {
+    const period = req.query.period === "month" ? "month" : "week";
+    const buckets = period === "week" ? 12 : 12;
+
+    const now = new Date();
+    const startDate = new Date();
+    if (period === "week") {
+      startDate.setDate(now.getDate() - (buckets * 7));
+    } else {
+      startDate.setMonth(now.getMonth() - buckets);
+    }
+
+    const [dailyData, topPlayers, scoreBands] = await Promise.all([
+      BrainAttempt.aggregate([
+        { $match: { createdAt: { $gte: startDate } } },
+        {
+          $group: {
+            _id: {
+              $dateToString: { format: period === "week" ? "%Y-%m-%d" : "%Y-%m", date: "$createdAt" },
+            },
+            attempts: { $sum: 1 },
+            avgScore: { $avg: "$score" },
+            bestScore: { $max: "$score" },
+            players: { $addToSet: { $toLower: "$email" } },
+          },
+        },
+        { $sort: { _id: 1 } },
+      ]),
+      BrainAttempt.aggregate([
+        { $match: { createdAt: { $gte: startDate } } },
+        {
+          $group: {
+            _id: { $toLower: "$email" },
+            name: { $first: "$name" },
+            email: { $first: "$email" },
+            attempts: { $sum: 1 },
+            avgScore: { $avg: "$score" },
+            bestScore: { $max: "$score" },
+          },
+        },
+        { $sort: { attempts: -1 } },
+        { $limit: 10 },
+      ]),
+      BrainAttempt.aggregate([
+        { $match: { createdAt: { $gte: startDate } } },
+        {
+          $bucket: {
+            groupBy: "$score",
+            boundaries: [0, 20, 40, 60, 80, 101],
+            default: "other",
+            output: { count: { $sum: 1 } },
+          },
+        },
+      ]),
+    ]);
+
+    const totalAttempts = dailyData.reduce((s, d) => s + d.attempts, 0);
+    const totalPlayers = dailyData.reduce((s, d) => s + (d.players?.length || 0), 0);
+    const avgScore = dailyData.length
+      ? Math.round((dailyData.reduce((s, d) => s + d.avgScore * d.attempts, 0) / totalAttempts) * 10) / 10
+      : 0;
+
+    res.json({
+      period,
+      totalAttempts,
+      totalPlayers,
+      avgScore,
+      buckets: dailyData.map((d) => ({
+        label: d._id,
+        attempts: d.attempts,
+        avgScore: Math.round(d.avgScore * 10) / 10,
+        bestScore: d.bestScore,
+        players: d.players?.length || 0,
+      })),
+      topPlayers: topPlayers.map((p) => ({
+        name: p.name,
+        email: p.email,
+        attempts: p.attempts,
+        avgScore: Math.round(p.avgScore * 10) / 10,
+        bestScore: p.bestScore,
+      })),
+      scoreBands: scoreBands.map((b) => ({
+        label: b._id === "other" ? "other" : `${b._id}-${(b._id || 0) + 19}`,
+        count: b.count,
+      })),
+    });
+  } catch (err) {
+    console.error("getStatsTrend error:", err);
+    res.status(500).json({ message: "Failed to fetch trend stats" });
+  }
+};
