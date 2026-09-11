@@ -2,6 +2,7 @@ import express from "express";
 import { requireAdmin } from "../middlewares/auth.js";
 import {
   getConfig,
+  getLandingStats,
   sendOtp,
   verifyOtp,
   submitAttempt,
@@ -25,6 +26,7 @@ const router = express.Router();
 
 /* ── Public ──────────────────────────────────────────────────────────────────── */
 router.get("/config", getConfig);
+router.get("/stats", getLandingStats);
 router.post("/otp/send", sendOtp);
 router.post("/otp/verify", verifyOtp);
 router.post("/attempts", attemptLimiter, submitAttempt);

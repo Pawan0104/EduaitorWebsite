@@ -14,6 +14,18 @@ export const QUERY_KEY = "bl"; // query param used on shared links
 
 export const isApiAvailable = () => Boolean(BRAIN_API);
 
+/** Lightweight public landing stats (players, best score, avg time). */
+export const fetchLandingStats = async () => {
+  if (!BRAIN_API) return null;
+  try {
+    const res = await fetch(`${BRAIN_API}/api/brain-league/stats`);
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+};
+
 /** Request a WhatsApp OTP for a phone number. */
 export const sendOtp = async (phone) => {
   try {

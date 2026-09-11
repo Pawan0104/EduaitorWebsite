@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { COLORS } from "../theme";
 import { LANDING_STATS, TOTAL_CHALLENGES } from "../gameData";
 import { useCountUp, useLocalStorage } from "../useLocalStorage";
-import { isApiAvailable, sendOtp, verifyOtp } from "../gameApi";
+import { isApiAvailable, sendOtp, verifyOtp, fetchLandingStats } from "../gameApi";
 
 const fmtAvg = (seconds) => {
   const m = Math.floor(seconds / 60);
@@ -64,6 +64,23 @@ export default function LandingScreen({ onStart }) {
   const [verification, setVerification] = useState("");
   const [sending, setSending] = useState(false);
   const [verifying, setVerifying] = useState(false);
+  const [stats, setStats] = useState(LANDING_STATS);
+
+  useEffect(() => {
+    let mounted = true;
+    fetchLandingStats().then((s) => {
+      if (!mounted || !s) return;
+      const players = Math.max(10, s.totalPlayers || 0);
+      setStats([
+        { icon: "👥", value: players, suffix: "+", label: "Players" },
+        { icon: "🏆", value: s.bestScore || 0, suffix: "", label: "Highest Score" },
+        { icon: "⚡", value: Math.round((s.avgDurationMs || 0) / 1000), suffix: "s", label: "Avg Time" },
+      ]);
+    });
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const resetOtp = () => {
     setOtpSent(false);
@@ -206,7 +223,7 @@ export default function LandingScreen({ onStart }) {
 
       {/* stats */}
       <div className="grid grid-cols-3 gap-3 w-full max-w-md mt-8">
-        {LANDING_STATS.map((s, i) => (
+        {stats.map((s, i) => (
           <StatItem key={s.label} stat={s} delay={0.4 + i * 0.12} />
         ))}
       </div>

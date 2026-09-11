@@ -250,6 +250,45 @@ export const getConfig = async (_req, res) => {
   }
 };
 
+/** Lightweight public stats for the landing screen (no auth). */
+export const getLandingStats = async (_req, res) => {
+  try {
+    const [agg] = await BrainAttempt.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalAttempts: { $sum: 1 },
+          players: { $addToSet: { $toLower: { $ifNull: ["$email", "$name"] } } },
+          bestScore: { $max: "$score" },
+          avgDurationMs: { $avg: "$durationMs" },
+          avgScore: { $avg: "$score" },
+        },
+      },
+    ]);
+
+    if (!agg) {
+      return res.json({
+        totalPlayers: 0,
+        bestScore: 0,
+        avgDurationMs: 0,
+        avgScore: 0,
+        totalAttempts: 0,
+      });
+    }
+
+    return res.json({
+      totalPlayers: agg.players?.length ?? 0,
+      bestScore: agg.bestScore ?? 0,
+      avgDurationMs: Math.round(agg.avgDurationMs || 0),
+      avgScore: Math.round((agg.avgScore || 0) * 10) / 10,
+      totalAttempts: agg.totalAttempts ?? 0,
+    });
+  } catch (err) {
+    console.error("getLandingStats error:", err);
+    res.status(500).json({ message: "Failed to fetch landing stats" });
+  }
+};
+
 export const submitAttempt = async (req, res) => {
   try {
     const { name, email, phone, verification, score, badgeName, topType, durationMs, results, channel } =
