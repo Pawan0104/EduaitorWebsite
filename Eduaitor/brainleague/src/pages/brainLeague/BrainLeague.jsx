@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import LandingScreen from "./screens/LandingScreen";
 import IntroScreen from "./screens/IntroScreen";
@@ -45,6 +45,7 @@ export default function BrainLeague() {
 
   const [, setBest] = useLocalStorage("bl.best", null);
   const [plays, setPlays] = useLocalStorage("bl.plays", 0);
+  const runStartRef = useRef(Date.now());
 
   const go = useCallback((s) => setScreen(s), []);
 
@@ -59,6 +60,7 @@ export default function BrainLeague() {
     setEmail(profile?.email || "");
     setPhone(profile?.phone || "");
     setVerification(profile?.verification || "");
+    runStartRef.current = Date.now();
     resetRun();
     go("intro");
   };
@@ -79,7 +81,8 @@ export default function BrainLeague() {
     const type = brainTypeFor(catScores);
     const strengths = strengthsFor(catScores);
     const score = totalScore(results);
-    const session = { name, email, phone, verification, score, type, strengths, results };
+    const durationMs = Date.now() - runStartRef.current;
+    const session = { name, email, phone, verification, score, type, strengths, results, durationMs };
 
     setProfile({ score, type, strengths });
     setBest((prev) => (prev && prev.score >= score ? prev : { name, score, type: type.id, at: Date.now() }));

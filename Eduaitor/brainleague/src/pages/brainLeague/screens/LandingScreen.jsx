@@ -74,7 +74,7 @@ export default function LandingScreen({ onStart }) {
       setStats([
         { icon: "👥", value: players, suffix: "+", label: "Players" },
         { icon: "🏆", value: s.bestScore || 0, suffix: "", label: "Highest Score" },
-        { icon: "⚡", value: Math.round((s.avgDurationMs || 0) / 1000), suffix: "s", label: "Avg Time" },
+        { icon: "⚡", value: Math.max(60, Math.round((s.avgDurationMs || 0) / 1000)), suffix: "s", label: "Avg Time" },
       ]);
     });
     return () => {
