@@ -12,6 +12,7 @@ import Testimonials from "../src/pages/Testimonials";
 import Award from "./pages/Award";
 import Blog from "./pages/Blog";
 import HomeShortcuts from "./pages/HomeShortcuts";
+import BrainLeague from "./pages/BrainLeague";
 
 const ComingSoon = ({ name }) => (
   <div className="flex items-center justify-center min-h-[60vh] t-base">
@@ -66,6 +67,7 @@ export default function App() {
         <Route path="institute" element={<Institute />} />
         <Route path="testimonial" element={<Testimonials />} />
         <Route path="award" element={<Award />} />
+        <Route path="brain-league" element={<BrainLeague />} />
         <Route path="gallery" element={<ComingSoon name="Gallery" />} />
         <Route path="blog" element={<Blog />} />
         <Route path="setting" element={<Setting />} />

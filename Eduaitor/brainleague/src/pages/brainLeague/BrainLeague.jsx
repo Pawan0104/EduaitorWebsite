@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import LandingScreen from "./screens/LandingScreen";
 import IntroScreen from "./screens/IntroScreen";
@@ -10,7 +10,9 @@ import { useSound } from "./useSound";
 import { useLocalStorage } from "./useLocalStorage";
 import { totalScore, brainTypeFor, strengthsFor, badgeFor } from "./scoring";
 import { TOTAL_CHALLENGES } from "./gameData";
-import { submitResult } from "./gameApi";
+import { fetchQuizConfig, submitResult } from "./gameApi";
+import { applyQuizConfig } from "./quizConfig";
+import { setRemoteBank } from "./questions";
 
 const SCREENS = ["landing", "intro", "challenge", "analysis", "result", "share"];
 
@@ -25,6 +27,18 @@ export default function BrainLeague() {
   const [name, setName] = useState("");
   const [results, setResults] = useState([]);
   const [profile, setProfile] = useState({ score: 0, type: null, strengths: [] });
+
+  useEffect(() => {
+    let mounted = true;
+    fetchQuizConfig().then((cfg) => {
+      if (!mounted || !cfg) return;
+      applyQuizConfig(cfg);
+      if (cfg.bank) setRemoteBank(cfg.bank);
+    });
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const [, setBest] = useLocalStorage("bl.best", null);
   const [plays, setPlays] = useLocalStorage("bl.plays", 0);

@@ -1,4 +1,5 @@
-import { BRAIN_TYPES, STRENGTH_LABELS, FALLBACK_STRENGTHS, BADGES, PER_CHALLENGE } from "./gameData";
+import { BRAIN_TYPES, STRENGTH_LABELS, FALLBACK_STRENGTHS, PER_CHALLENGE } from "./gameData";
+import { badges } from "./quizConfig";
 
 /**
  * Convert a raw challenge attempt into game points + stars.
@@ -29,7 +30,10 @@ export const scoreChallenge = ({ key, correct, ms, timeLimitMs }) => {
 export const totalScore = (results) =>
   results.reduce((sum, r) => sum + (r.points || 0), 0);
 
-export const badgeFor = (score) => BADGES.find((b) => score >= b.min) || BADGES[BADGES.length - 1];
+export const badgeFor = (score) => {
+  const list = badges();
+  return list.find((b) => score >= b.min) || list[list.length - 1];
+};
 
 /**
  * Pick a brain type from the per-category scores (0–20 each of the 5).

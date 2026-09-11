@@ -187,114 +187,138 @@
   transition: color 0.2s ease;
 }
 
-/* ── Play popup menu ── */
-.nb-drop {
+/* ── Brain League ribbon ── */
+.nb-brain {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  padding: 0;
+  transform-origin: top center;
+  animation: nb-brain-sway 3.8s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.nb-brain__cord {
+  display: block;
+  width: 2px;
+  height: 11px;
+  background: linear-gradient(180deg, #60a5fa, #2563eb);
+  border-radius: 2px;
   position: relative;
 }
 
-.nb-play-link {
-  appearance: none;
-  background: none;
-  border: 0;
-  padding: 0 0 4px;
-  margin: 0;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 500;
-  color: #334155;
-  cursor: pointer;
+.nb-brain__cord::before,
+.nb-brain__cord::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #bfdbfe;
+  border: 1.5px solid #2563eb;
+  box-shadow: inset 0 1px 0 #fff;
+}
+
+.nb-brain__cord::before {
+  left: -8px;
+}
+
+.nb-brain__cord::after {
+  right: -8px;
+}
+
+.nb-brain__board {
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  transition: color 0.2s ease;
+  gap: 8px;
+  padding: 6px 12px 14px;
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  border-radius: 0 0 12px 12px;
+  box-shadow:
+    0 12px 24px rgba(29, 78, 216, 0.35),
+    0 0 0 1px rgba(96, 165, 250, 0.45);
+  clip-path: polygon(0 0, 100% 0, 100% 88%, 50% 100%, 0 88%);
 }
 
-.nb-play-link:hover,
-.nb-drop.open .nb-play-link {
-  color: var(--primary);
+.nb-brain__icon {
+  font-size: 20px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
 }
 
-.nb-caret {
-  font-size: 10px;
-  transition: transform 0.2s ease;
+.nb-brain__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
 }
 
-.nb-drop.open .nb-caret {
-  transform: rotate(180deg);
+.nb-brain__text strong {
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
 }
 
-.nb-pop-menu {
-  position: absolute;
-  top: calc(100% + 12px);
-  left: 50%;
-  transform: translateX(-50%) translateY(-6px);
-  min-width: 230px;
-  background: #ffffff;
-  border-radius: 14px;
-  padding: 8px;
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.14);
-  border: 1px solid rgba(37, 99, 235, 0.14);
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
-  z-index: 1100;
+.nb-brain__text small {
+  color: #dbeafe;
+  font-size: 9.5px;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
-.nb-pop-menu::before {
-  content: "";
-  position: absolute;
-  top: -7px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-bottom: 8px solid #ffffff;
-  filter: drop-shadow(0 -1px 0 rgba(37, 99, 235, 0.1));
+.nb-brain:hover .nb-brain__board {
+  filter: brightness(1.1);
+  box-shadow:
+    0 14px 28px rgba(29, 78, 216, 0.45),
+    0 0 0 2px rgba(147, 197, 253, 0.7);
 }
 
-.nb-drop.open .nb-pop-menu {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-  transform: translateX(-50%) translateY(0);
+@keyframes nb-brain-sway {
+  0%,
+  100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
 }
 
-.nb-pop-item {
+/* Mobile menu entry for Brain League (hidden on desktop nav) */
+.nb-brain-mobile {
+  display: none;
+}
+
+.nb-brain-mobile__link {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 11px 12px;
-  border-radius: 10px;
+  padding: 9px 12px;
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  border-radius: 12px;
   text-decoration: none;
-  transition: background 0.18s ease;
+  color: #fff;
 }
 
-.nb-pop-item:hover {
-  background: #eff6ff;
+.nb-brain-mobile__link > span:first-child {
+  font-size: 24px;
 }
 
-.nb-pop-emoji {
-  font-size: 26px;
-  line-height: 1;
-}
-
-.nb-pop-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.nb-pop-text strong {
-  color: #0b1f3a;
+.nb-brain-mobile__link strong {
+  display: block;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: 0.04em;
 }
 
-.nb-pop-text small {
-  color: #64748b;
-  font-size: 11.5px;
-  font-weight: 500;
+.nb-brain-mobile__link small {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #dbeafe;
 }
 
 .nav-links li a:hover,
@@ -408,44 +432,18 @@
     align-self: stretch;
   }
 
-  .nb-drop {
-    position: static;
+  .nb-brain-mobile {
+    display: block;
     width: 100%;
   }
 
-  .nb-play-link {
-    padding: 10px 0;
-    font-size: 15px;
+  .nb-brain-mobile__link {
     width: 100%;
-    justify-content: space-between;
+    justify-content: flex-start;
   }
 
-  .nb-pop-menu {
-    position: static;
-    transform: none;
-    min-width: 0;
-    width: 100%;
-    margin-top: 2px;
-    box-shadow: none;
-    border: 1px solid rgba(37, 99, 235, 0.14);
-    visibility: hidden;
-    opacity: 0;
-    max-height: 0;
-    overflow: hidden;
-    padding: 0 8px;
-    transition: opacity 0.18s ease, max-height 0.18s ease;
-  }
-
-  .nb-pop-menu::before {
+  .nb-brain {
     display: none;
-  }
-
-  .nb-drop.open .nb-pop-menu {
-    visibility: visible;
-    opacity: 1;
-    max-height: 160px;
-    transform: none;
-    padding: 8px;
   }
 
   .nav-links li a.nb-ignitex {

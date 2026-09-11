@@ -1,42 +1,15 @@
-// ── EDUAITOR BRAIN LEAGUE · 100-question bank ────────────────────────────────
-// 5 categories × 20 questions. Every play picks ONE random question per
-// category, so different users get different quizzes on every run.
-// The bank can be replaced at runtime via setRemoteBank() (pushed from the
-// admin-managed backend). When a remote bank is not available we fall back
-// to the bundled STATIC_BANK below.
+// Default EDUAITOR BRAIN LEAGUE bank — mirrors the original bundled game data.
+// Used to seed the database and as the admin "restore defaults" payload.
 
-export function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
+const MEMORY_POOL = [
+  "🐶", "🍎", "🚲", "🌙", "⚽", "🦋", "🎈", "📚", "🍕", "🌈", "🚀", "🎧",
+  "🍓", "🐢", "🦁", "🍩", "⛵", "🎲", "🐧", "🌻", "🏀", "🎸", "🍉", "🦊",
+];
 
-export const countTriangles = (n) => {
-  let total = 0;
-  for (let s = 1; s <= n; s++) total += ((n - s + 1) * (n - s + 2)) / 2;
-  for (let s = 1; s <= Math.floor(n / 2); s++) total += ((n - 2 * s + 1) * (n - 2 * s + 2)) / 2;
-  return total;
-};
-
-/** 4 shuffled numeric options, always including the answer. */
-function numOptions(answer) {
-  const cand = [answer, answer - 1, answer + 1, answer - 2, answer + 3, answer - 5];
-  const uniq = [...new Set(cand)].filter((x) => x >= 1);
-  while (uniq.length < 4) uniq.push(answer + uniq.length);
-  return shuffle(uniq).slice(0, 4);
-}
-
-export function ordinal(n) {
-  const s = ["th", "st", "nd", "rd"];
-  const v = n % 100;
-  return n + (s[(v - 20) % 10] || s[v] || s[0]);
-}
-
-// ── OBSERVATION ──────────────────────────────────────────────────────────────
-const OBSERVATION_TRIANGLES = [3, 4, 5, 6].map((n) => ({ kind: "triangles", n }));
+const OBSERVATION_TRIANGLES = [3, 4, 5, 6].map((n) => ({
+  kind: "triangles",
+  config: { n },
+}));
 
 const OBSERVATION_COUNTS = [
   { target: "🍕", count: 8, decoys: ["🍔", "🍟", "🌮", "🍩"], size: 6 },
@@ -55,10 +28,7 @@ const OBSERVATION_COUNTS = [
   { target: "🐧", count: 12, decoys: ["🦜", "🐦", "🦉", "🐤"], size: 6 },
   { target: "🔵", count: 10, decoys: ["🔴", "🟢", "🟡", "🟣"], size: 6 },
   { target: "🦄", count: 6, decoys: ["🐪", "🦙", "🐴", "🦓"], size: 6 },
-].map((q) => ({ kind: "count", ...q }));
-
-// ── MEMORY ───────────────────────────────────────────────────────────────────
-const MEMORY_POOL = ["🐶", "🍎", "🚲", "🌙", "⚽", "🦋", "🎈", "📚", "🍕", "🌈", "🚀", "🎧", "🍓", "🐢", "🦁", "🍩", "⛵", "🎲", "🐧", "🌻", "🏀", "🎸", "🍉", "🦊"];
+].map((c) => ({ kind: "count", config: c }));
 
 const MEMORY_SETS = [
   ["🐶", "🍎", "🚲", "🌙", "⚽"],
@@ -81,10 +51,9 @@ const MEMORY_SETS = [
   ["🦈", "🍓", "🎵", "🐢", "💍"],
   ["🎃", "🐨", "🍊", "🎸", "🧀"],
   ["🏄", "🦜", "🍩", "🐼", "⏰"],
-].map((set) => ({ kind: "memory", set, pool: MEMORY_POOL }));
+].map((set) => ({ kind: "memory", config: { set, pool: MEMORY_POOL } }));
 
-// ── LOGIC ────────────────────────────────────────────────────────────────────
-const LOGIC_BANK = [
+const LOGIC = [
   { seq: [2, 4, 8, 16], answer: 32, traps: [18, 24, 34] },
   { seq: [3, 6, 9, 12], answer: 15, traps: [13, 14, 18] },
   { seq: [5, 15, 45, 135], answer: 405, traps: [180, 275, 500] },
@@ -105,10 +74,9 @@ const LOGIC_BANK = [
   { seq: [2, 12, 72, 432], answer: 2592, traps: [1728, 2590, 3000] },
   { seq: [2, 3, 5, 8, 13], answer: 21, traps: [18, 20, 34] },
   { seq: [1, 9, 81, 729], answer: 6561, traps: [6000, 6560, 6600] },
-].map((q) => ({ kind: "logic", ...q }));
+].map((q) => ({ kind: "logic", config: q }));
 
-// ── PATTERN ──────────────────────────────────────────────────────────────────
-const PATTERN_BANK = [
+const PATTERN = [
   { seq: ["A", "C", "E", "G"], answer: "I", traps: ["H", "K", "F"] },
   { seq: ["B", "D", "F", "H"], answer: "J", traps: ["I", "L", "G"] },
   { seq: ["A", "Z", "B", "Y"], answer: "C", traps: ["D", "X", "B"] },
@@ -129,10 +97,9 @@ const PATTERN_BANK = [
   { seq: ["A", "D", "G", "J"], answer: "M", traps: ["N", "K", "L"] },
   { seq: ["B", "E", "H", "K"], answer: "N", traps: ["L", "M", "O"] },
   { seq: ["Z", "Y", "X", "W"], answer: "V", traps: ["U", "X", "T"] },
-].map((q) => ({ kind: "pattern", ...q }));
+].map((q) => ({ kind: "pattern", config: q }));
 
-// ── SPEED ────────────────────────────────────────────────────────────────────
-const SPEED_BANK = [
+const SPEED = [
   { target: 7, size: 6 }, { target: 3, size: 6 }, { target: 5, size: 6 },
   { target: 9, size: 6 }, { target: 2, size: 6 }, { target: 4, size: 6 },
   { target: 8, size: 6 }, { target: 1, size: 6 }, { target: 6, size: 6 },
@@ -140,85 +107,45 @@ const SPEED_BANK = [
   { target: 5, size: 5 }, { target: 9, size: 5 }, { target: 2, size: 5 },
   { target: 4, size: 5 }, { target: 8, size: 5 }, { target: 1, size: 5 },
   { target: 6, size: 5 }, { target: 0, size: 5 },
-].map((q) => ({ kind: "speed", ...q }));
+].map((q) => ({ kind: "speed", config: q }));
 
-/** Bundled default bank (same 100 questions, keyed by category). */
-export const STATIC_BANK = {
+/** Grouped default bank: each item is { kind, config } (category implied by group). */
+export const DEFAULT_BANK = {
   observation: [...OBSERVATION_TRIANGLES, ...OBSERVATION_COUNTS],
   memory: MEMORY_SETS,
-  logic: LOGIC_BANK,
-  pattern: PATTERN_BANK,
-  speed: SPEED_BANK,
+  logic: LOGIC,
+  pattern: PATTERN,
+  speed: SPEED,
 };
 
-/** Admin-managed bank installed at runtime (setRemoteBank). */
-let REMOTE_BANK = null;
-
-export const setRemoteBank = (bank) => {
-  REMOTE_BANK = bank;
+export const DEFAULT_SETTINGS = {
+  key: "global",
+  quizTitle: "EDUAITOR BRAIN LEAGUE",
+  shareMessage:
+    "🧠 EDUAITOR BRAIN LEAGUE CHALLENGE!\n\n{name} scored {score}/100 — {badgeEmoji} {badgeName}!\nCan Your Brain Beat Mine?\n\nSmarter Schools. Stronger Students. — EduAItor",
+  badges: [
+    { min: 81, emoji: "🏆", name: "Brain Legend", label: "BRAIN LEGEND", color: "#FFB800", gradient: ["#FFB800", "#FF8A00"], desc: "An elite mind that crushes every challenge." },
+    { min: 61, emoji: "⚡", name: "Brain Ace", label: "BRAIN ACE", color: "#2D9CFF", gradient: ["#2D9CFF", "#5AC8FA"], desc: "Fast, sharp and consistently on the podium." },
+    { min: 41, emoji: "🎯", name: "Sharp Mind", label: "SHARP MIND", color: "#27AE60", gradient: ["#27AE60", "#1E9E6A"], desc: "Reliable focus across the whole board." },
+    { min: 21, emoji: "🥉", name: "Growing Mind", label: "GROWING MIND", color: "#FF8A00", gradient: ["#FF8A00", "#FFC24D"], desc: "You're building serious momentum." },
+    { min: 0, emoji: "🌱", name: "Brain Rookie", label: "BRAIN ROOKIE", color: "#8B5CF6", gradient: ["#8B5CF6", "#A78BFA"], desc: "Every legend started somewhere." },
+  ],
 };
 
-function bankFor(category) {
-  if (Array.isArray(REMOTE_BANK?.[category]) && REMOTE_BANK[category].length) {
-    return REMOTE_BANK[category];
-  }
-  return STATIC_BANK[category] || [];
-}
-
-const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
-
-/**
- * Builds one fully-resolved random question for a category from the active
- * bank (remote or bundled). The result is stable per play (memoized) so
- * options never reshuffle.
- */
-export function buildQuestion(key) {
-  const item = pick(bankFor(key));
-  if (!item) return null;
-
-  switch (item.kind) {
-    case "triangles": {
-      const answer = countTriangles(item.n);
-      return { key, kind: "triangles", n: item.n, answer, options: numOptions(answer) };
-    }
-
-    case "count": {
-      return {
-        key,
-        kind: "count",
-        target: item.target,
-        count: item.count,
-        decoys: item.decoys,
-        size: item.size,
-        answer: item.count,
-        options: numOptions(item.count),
-      };
-    }
-
-    case "memory": {
-      const position = 1 + Math.floor(Math.random() * 5);
-      const answer = item.set[position - 1];
-      const pool = Array.isArray(item.pool) ? item.pool : MEMORY_POOL;
-      const decoys = shuffle(pool.filter((e) => e !== answer)).slice(0, 4);
-      const options = shuffle([answer, ...decoys]).slice(0, 5);
-      return { key, show: item.set, position, answer, options };
-    }
-
-    case "logic":
-    case "pattern": {
-      return {
-        key,
-        seq: item.seq,
-        answer: item.answer,
-        options: shuffle([item.answer, ...item.traps]),
-      };
-    }
-
-    case "speed": {
-      return { key, target: item.target, size: item.size };
-    }
-
-    default:
-      return null;
-  }
+/** Flattens the grouped bank into BrainQuestion documents for insertion. */
+export function bankToDocuments(bank = DEFAULT_BANK) {
+  const docs = [];
+  Object.entries(bank).forEach(([category, list]) => {
+    list.forEach((item, index) => {
+      docs.push({
+        category,
+        kind: item.kind,
+        config: item.config ?? item,
+        label: item.label ?? "",
+        enabled: item.enabled !== false,
+        order: index,
+      });
+    });
+  });
+  return docs;
 }

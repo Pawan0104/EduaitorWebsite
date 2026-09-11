@@ -5,13 +5,9 @@ import { useContactPopup } from "./ContactPopup";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [playOpen, setPlayOpen] = useState(false);
   const { openContactPopup } = useContactPopup();
 
-  const closeMenu = () => {
-    setIsMenuOpen(false);
-    setPlayOpen(false);
-  };
+  const closeMenu = () => setIsMenuOpen(false);
 
   return (
     <header className="navbar">
@@ -53,29 +49,14 @@ const Navbar = () => {
           <li onClick={closeMenu}>
             <NavLink to="/plans">Pricing</NavLink>
           </li>
-          <li className={playOpen ? "nb-drop open" : "nb-drop"}>
-            <button
-              type="button"
-              className="nb-play-link"
-              onClick={() => setPlayOpen((v) => !v)}
-              aria-expanded={playOpen}
-              aria-haspopup="true"
-            >
-              Play <span className="nb-caret" aria-hidden="true">▾</span>
-            </button>
-            <div className="nb-pop-menu">
-              <Link
-                to="/brain-league"
-                onClick={() => setPlayOpen(false)}
-                className="nb-pop-item"
-              >
-                <span className="nb-pop-emoji" aria-hidden="true">🧠</span>
-                <span className="nb-pop-text">
-                  <strong>Brain League</strong>
-                  <small>100-question brain quiz</small>
-                </span>
-              </Link>
-            </div>
+          <li className="nb-brain-mobile" onClick={closeMenu}>
+            <Link to="/brain-league" className="nb-brain-mobile__link">
+              <span aria-hidden="true">🧠</span>
+              <span>
+                <strong>Brain League</strong>
+                <small>100-question brain quiz</small>
+              </span>
+            </Link>
           </li>
           <li>
             <button
@@ -108,6 +89,16 @@ const Navbar = () => {
         </ul>
 
         <div className="nav-btn">
+          <Link to="/brain-league" onClick={closeMenu} className="nb-brain" aria-label="Brain League quiz">
+            <span className="nb-brain__cord" aria-hidden="true" />
+            <span className="nb-brain__board">
+              <span className="nb-brain__icon" aria-hidden="true">🧠</span>
+              <span className="nb-brain__text">
+                <strong>Brain League</strong>
+                <small>100-Q Brain Quiz</small>
+              </span>
+            </span>
+          </Link>
           <NavLink to="/login" onClick={closeMenu}>
             <button type="button" className="login-btn">
               Login

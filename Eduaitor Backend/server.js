@@ -14,6 +14,7 @@ import contactLeadRoute from "./routes/contactLeadRoute.js";
 import homeFrequentIconsRoute from "./routes/homeFrequentIconsRoute.js";
 import blogPostRoute from "./routes/blogPostRoute.js";
 import blogCommentRoute from "./routes/blogCommentRoute.js";
+import brainLeagueRoute from "./routes/brainLeagueRoute.js";
 
 const app = express();
 app.set("trust proxy", 1);
@@ -97,6 +98,7 @@ app.use("/api/awards", awardRoute);
 app.use("/api/home-frequent-icons", homeFrequentIconsRoute);
 app.use("/api/blog-posts", blogPostRoute);
 app.use("/api/blog-comments", blogCommentRoute);
+app.use("/api/brain-league", brainLeagueRoute);
 
 /* ─── 404 ─── */
 app.use((req, res) => {

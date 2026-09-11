@@ -14,6 +14,7 @@ import {
   FaTimes,
   FaCalendarAlt,
   FaThLarge,
+  FaBrain,
 } from "react-icons/fa";
 
 const NAV_SECTIONS = [
@@ -32,6 +33,11 @@ const NAV_SECTIONS = [
       },
       { name: "Plans", path: "/admin/plan", icon: <FaBook /> },
       { name: "Demos", path: "/admin/demo", icon: <FaCalendarAlt /> },
+      {
+        name: "Brain League",
+        path: "/admin/brain-league",
+        icon: <FaBrain />,
+      },
       // { name: "Team", path: "/admin/team", icon: <FaUsers /> },
       // { name: "Visits", path: "/admin/visit", icon: <FaCalendarCheck /> },
     ],
