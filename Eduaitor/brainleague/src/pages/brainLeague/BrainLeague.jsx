@@ -89,6 +89,8 @@ export default function BrainLeague() {
     setPlays((p) => p + 1);
     submitResult(session); // future backend hook (fire-and-forget)
 
+    // Quiz completed → require a fresh login the next time this phone plays.
+    localStorage.removeItem("bl.verification");
     go("result");
   }, [results, name, email, phone, verification, setBest, setPlays, go]);
 

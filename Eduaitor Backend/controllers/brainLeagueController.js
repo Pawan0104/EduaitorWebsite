@@ -210,11 +210,20 @@ export const verifyOtp = async (req, res) => {
       return res.status(500).json({ message: "Verification service is not configured" });
     }
 
+    // Token stays valid long enough for one full quiz run (refresh-safe), even if
+    // the player closes the tab and comes back before finishing.
     const verification = jwt.sign(JSON.parse(JSON.stringify({ phone, purpose: "brain-verify" })), secret, {
-      expiresIn: "30m",
+      expiresIn: "30d",
     });
 
-    return res.json({ ok: true, verification, phone });
+    const prev = await BrainAttempt.findOne({ phone }).lean().select("score");
+    return res.json({
+      ok: true,
+      verification,
+      phone,
+      alreadyPlayed: Boolean(prev),
+      previousScore: prev?.score ?? null,
+    });
   } catch (err) {
     console.error("verifyOtp error:", err);
     res.status(500).json({ message: "Failed to verify OTP" });
@@ -258,7 +267,7 @@ export const getLandingStats = async (_req, res) => {
         $group: {
           _id: null,
           totalAttempts: { $sum: 1 },
-          players: { $addToSet: { $toLower: { $ifNull: ["$email", "$name"] } } },
+          players: { $addToSet: { $toLower: { $ifNull: ["$phone", { $ifNull: ["$email", "$name"] }] } } },
           bestScore: { $max: "$score" },
           avgDurationMs: { $avg: "$durationMs" },
           avgScore: { $avg: "$score" },
@@ -328,19 +337,31 @@ export const submitAttempt = async (req, res) => {
           .slice(0, 6)
       : [];
 
-    await BrainAttempt.create({
-      name: safeName,
-      email: safeEmail,
-      phone: safePhone,
-      score,
-      badgeName: badgeName != null ? String(badgeName) : "",
-      topType: topType != null ? String(topType) : "",
-      durationMs: typeof durationMs === "number" ? durationMs : 0,
-      results: safeResults,
-      channel: channel != null ? String(channel) : "web",
-    });
+    // One record per verified phone — a replay OVERRIDES the previous score.
+    const existing = await BrainAttempt.findOne({ phone: safePhone }).lean().select("score");
 
-    res.status(201).json({ ok: true });
+    await BrainAttempt.findOneAndUpdate(
+      { phone: safePhone },
+      {
+        $set: {
+          name: safeName,
+          email: safeEmail,
+          score,
+          badgeName: badgeName != null ? String(badgeName) : "",
+          topType: topType != null ? String(topType) : "",
+          durationMs: typeof durationMs === "number" ? durationMs : 0,
+          results: safeResults,
+          channel: channel != null ? String(channel) : "web",
+        },
+      },
+      { upsert: true, new: true }
+    );
+
+    res.status(201).json({
+      ok: true,
+      replaced: Boolean(existing),
+      previousScore: existing?.score ?? null,
+    });
   } catch (err) {
     console.error("submitAttempt error:", err);
     res.status(500).json({ message: "Failed to record attempt" });

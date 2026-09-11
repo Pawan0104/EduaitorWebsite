@@ -51,6 +51,7 @@ function Field({ label, value, onChange, error, disabled = false, placeholder, t
 export default function LandingScreen({ onStart }) {
   const apiAvailable = isApiAvailable();
   const [stored, setStored] = useLocalStorage("bl.profile", { name: "", email: "", phone: "" });
+  const [storedVerification, setStoredVerification] = useLocalStorage("bl.verification", null);
   const [name, setName] = useState(stored.name || "");
   const [email, setEmail] = useState(stored.email || "");
   const [phone, setPhone] = useState(stored.phone || "");
@@ -61,18 +62,30 @@ export default function LandingScreen({ onStart }) {
   const [otpCode, setOtpCode] = useState("");
   const [otpError, setOtpError] = useState("");
   const [devCode, setDevCode] = useState("");
-  const [verification, setVerification] = useState("");
+  const [verification, setVerification] = useState(storedVerification?.token || "");
   const [sending, setSending] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [stats, setStats] = useState(LANDING_STATS);
+  const [overrideRequired, setOverrideRequired] = useState(false);
+  const [prevScore, setPrevScore] = useState(null);
+
+  // If the player verified but hasn't finished the quiz yet, keep them logged in
+  // across refreshes — no OTP prompt until the quiz is completed.
+  useEffect(() => {
+    if (storedVerification?.token && storedVerification?.phone) {
+      setVerification(storedVerification.token);
+      setPhone(storedVerification.phone);
+      setOtpSent(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     let mounted = true;
     fetchLandingStats().then((s) => {
       if (!mounted || !s) return;
-      const players = (s.totalPlayers || 0) + (1 + Math.floor(Math.random() * 9));
       setStats([
-        { icon: "👥", value: players, suffix: "+", label: "Players" },
+        { icon: "👥", value: s.totalPlayers || 0, suffix: "", label: "Players" },
         { icon: "🏆", value: s.bestScore || 0, suffix: "", label: "Highest Score" },
         { icon: "⚡", value: Math.max(60, Math.round((s.avgDurationMs || 0) / 1000)), suffix: "s", label: "Avg Time" },
       ]);
@@ -88,6 +101,8 @@ export default function LandingScreen({ onStart }) {
     setOtpError("");
     setDevCode("");
     setVerification("");
+    setOverrideRequired(false);
+    setPrevScore(null);
   };
 
   const changePhone = (e) => {
@@ -132,6 +147,12 @@ export default function LandingScreen({ onStart }) {
       }
       setVerification(res.verification);
       setPhone(res.phone || phone);
+      setOtpSent(true);
+      setStoredVerification({ token: res.verification, phone: res.phone || normalizePhone(phone.trim()) });
+      if (res.alreadyPlayed) {
+        setPrevScore(res.previousScore ?? null);
+        setOverrideRequired(true);
+      }
     } finally {
       setVerifying(false);
     }
@@ -146,6 +167,7 @@ export default function LandingScreen({ onStart }) {
     if (!phone.trim()) nextErrors.phone = "Please enter your phone number.";
     else if (!isPhoneValid(phone.trim())) nextErrors.phone = "Enter a valid 10-digit phone number.";
     if (apiAvailable && !verification) nextErrors.otp = "Verify your phone via WhatsApp first.";
+    if (apiAvailable && overrideRequired) nextErrors.otp = "Confirm the replay option below to replace your previous score.";
     if (Object.keys(nextErrors).length) {
       setErrors(nextErrors);
       return;
@@ -338,6 +360,39 @@ export default function LandingScreen({ onStart }) {
               <p className="text-[12px] font-extrabold flex items-center gap-1.5" style={{ color: "#16A34A" }}>
                 ✓ Phone verified · {phone}
               </p>
+            )}
+
+            {overrideRequired && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-2xl border-2 px-4 py-3 flex flex-col gap-3"
+                style={{ borderColor: "#FFB800", background: "rgba(255,184,0,0.08)" }}
+              >
+                <p className="text-[12.5px] font-extrabold leading-snug" style={{ color: COLORS.ink }}>
+                  This number already played
+                  {prevScore != null ? ` and scored ${prevScore}/100` : ""} before.
+                </p>
+                <p className="text-[12px] font-bold leading-snug" style={{ color: "#FF8A00" }}>
+                  Playing again will REPLACE your previous score with the new one.
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setOverrideRequired(false)}
+                    className="flex-1 rounded-2xl px-4 py-2.5 text-[13px] font-extrabold text-white transition-all cursor-pointer"
+                    style={{ background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})` }}
+                  >
+                    Yes, play & replace
+                  </button>
+                  <button
+                    onClick={() => { setOverrideRequired(false); resetOtp(); setStoredVerification(null); }}
+                    className="flex-1 rounded-2xl px-4 py-2.5 text-[13px] font-extrabold border-2 cursor-pointer"
+                    style={{ borderColor: "#DCEBFF", color: COLORS.ink, background: COLORS.card }}
+                  >
+                    Use another number
+                  </button>
+                </div>
+              </motion.div>
             )}
           </motion.div>
         )}
