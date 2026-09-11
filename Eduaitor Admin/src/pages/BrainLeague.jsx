@@ -901,6 +901,7 @@ function AttemptsTab() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
   const [toast, setToast] = useState(null);
 
   const showToast = (msg, type = "success") => setToast({ msg, type });
@@ -915,9 +916,10 @@ function AttemptsTab() {
     }
   };
 
-  const loadAttempts = async (p) => {
+  const loadAttempts = async (p, q = search) => {
     try {
-      const res = await apiFetch(`${API}/brain-league/admin/attempts?page=${p}&limit=50`);
+      const params = `page=${p}&limit=50${q ? `&q=${encodeURIComponent(q)}` : ""}`;
+      const res = await apiFetch(`${API}/brain-league/admin/attempts?${params}`);
       if (!res.ok) throw new Error();
       const data = await res.json();
       setAttempts(data.items || []);
@@ -938,7 +940,13 @@ function AttemptsTab() {
 
   const changePage = (p) => {
     setPage(p);
-    loadAttempts(p);
+    loadAttempts(p, search);
+  };
+
+  const doSearch = (e) => {
+    e?.preventDefault();
+    setPage(1);
+    loadAttempts(1, search);
   };
 
   if (loading) {
@@ -1003,9 +1011,25 @@ function AttemptsTab() {
       )}
 
       <div className="t-card rounded-2xl p-5">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
           <h3 className="text-sm font-black t-text m-0">Recent Player Attempts</h3>
-          <span className="text-xs text-[var(--text-muted)]">{total} total</span>
+          <div className="flex items-center gap-2">
+            <form onSubmit={doSearch} className="flex items-center gap-2">
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search name / email / phone"
+                className="px-3 py-1.5 text-xs font-bold rounded-lg border border-[var(--border)] bg-[var(--bg-base)] text-[var(--text-primary)] w-56"
+              />
+              <button
+                type="submit"
+                className="px-3 py-1.5 text-xs font-bold rounded-lg border border-[var(--border)] bg-[var(--bg-hover)] text-[var(--text-sec)] cursor-pointer"
+              >
+                Search
+              </button>
+            </form>
+            <span className="text-xs text-[var(--text-muted)]">{total} total</span>
+          </div>
         </div>
 
         {attempts.length === 0 ? (
@@ -1019,6 +1043,8 @@ function AttemptsTab() {
                 <thead>
                   <tr className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] text-left">
                     <th className="pb-3 pr-3">Player</th>
+                    <th className="pb-3 pr-3">Email</th>
+                    <th className="pb-3 pr-3">Phone</th>
                     <th className="pb-3 pr-3">Score</th>
                     <th className="pb-3 pr-3">Badge</th>
                     <th className="pb-3 pr-3">Top Type</th>
@@ -1033,6 +1059,8 @@ function AttemptsTab() {
                       className="border-t border-[var(--border)] text-[var(--text-primary)]"
                     >
                       <td className="py-3 pr-3 font-semibold">{a.name}</td>
+                      <td className="py-3 pr-3 text-[var(--text-sec)]">{a.email || "—"}</td>
+                      <td className="py-3 pr-3 text-[var(--text-sec)]">{a.phone || "—"}</td>
                       <td className="py-3 pr-3 font-black">{a.score}</td>
                       <td className="py-3 pr-3">{a.badgeName || "—"}</td>
                       <td className="py-3 pr-3 capitalize">{a.topType || "—"}</td>

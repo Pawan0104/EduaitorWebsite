@@ -25,6 +25,8 @@ export default function BrainLeague() {
   const [screen, setScreen] = useState("landing");
   const [challengeIdx, setChallengeIdx] = useState(0);
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [results, setResults] = useState([]);
   const [profile, setProfile] = useState({ score: 0, type: null, strengths: [] });
 
@@ -51,8 +53,10 @@ export default function BrainLeague() {
     setChallengeIdx(0);
   };
 
-  const onStart = (finalName) => {
-    setName(finalName);
+  const onStart = (profile) => {
+    setName(profile?.name || "Player");
+    setEmail(profile?.email || "");
+    setPhone(profile?.phone || "");
     resetRun();
     go("intro");
   };
@@ -73,7 +77,7 @@ export default function BrainLeague() {
     const type = brainTypeFor(catScores);
     const strengths = strengthsFor(catScores);
     const score = totalScore(results);
-    const session = { name, score, type, strengths, results };
+    const session = { name, email, phone, score, type, strengths, results };
 
     setProfile({ score, type, strengths });
     setBest((prev) => (prev && prev.score >= score ? prev : { name, score, type: type.id, at: Date.now() }));
@@ -81,7 +85,7 @@ export default function BrainLeague() {
     submitResult(session); // future backend hook (fire-and-forget)
 
     go("result");
-  }, [results, name, setBest, setPlays, go]);
+  }, [results, name, email, phone, setBest, setPlays, go]);
 
   const playAgain = () => {
     resetRun();

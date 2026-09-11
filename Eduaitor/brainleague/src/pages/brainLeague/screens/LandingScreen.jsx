@@ -10,16 +10,66 @@ const fmtAvg = (seconds) => {
   return `${m}m ${s}s`;
 };
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+const normalizePhone = (value) => value.replace(/[\s\-()]/g, "");
+
+const isPhoneValid = (value) => {
+  const v = normalizePhone(value);
+  const digits = v.replace(/^\+?91/, "").replace(/\D/g, "");
+  return digits.length === 10;
+};
+
+function Field({ label, value, onChange, error, placeholder, type = "text", maxLength = 24 }) {
+  return (
+    <div>
+      <label className="text-[12px] font-extrabold mb-1.5 block" style={{ color: COLORS.ink }}>
+        {label}
+      </label>
+      <input
+        value={value}
+        onChange={onChange}
+        maxLength={maxLength}
+        placeholder={placeholder}
+        type={type}
+        autoComplete="off"
+        className="w-full rounded-2xl border-2 px-4 py-3 text-[15px] font-bold outline-none focus:ring-4"
+        style={{
+          borderColor: error ? "#E5484D" : "#DCEBFF",
+          background: COLORS.card,
+          color: COLORS.ink,
+          boxShadow: "0 4px 14px rgba(45,156,255,0.08)",
+        }}
+      />
+      {error && <p className="text-[11px] font-bold mt-1" style={{ color: "#E5484D" }}>{error}</p>}
+    </div>
+  );
+}
+
 export default function LandingScreen({ onStart }) {
-  const [nameStored, setNameStored] = useLocalStorage("bl.name", "");
-  const [name, setName] = useState(nameStored);
+  const [stored, setStored] = useLocalStorage("bl.profile", { name: "", email: "", phone: "" });
+  const [name, setName] = useState(stored.name || "");
+  const [email, setEmail] = useState(stored.email || "");
+  const [phone, setPhone] = useState(stored.phone || "");
+  const [errors, setErrors] = useState({});
   const [tapped, setTapped] = useState(false);
 
   const start = () => {
     if (tapped) return;
+    const nextErrors = {};
+    if (!name.trim()) nextErrors.name = "Please enter your name.";
+    if (!email.trim()) nextErrors.email = "Please enter your email address.";
+    else if (!EMAIL_RE.test(email.trim())) nextErrors.email = "Enter a valid email address.";
+    if (!phone.trim()) nextErrors.phone = "Please enter your phone number.";
+    else if (!isPhoneValid(phone.trim())) nextErrors.phone = "Enter a valid 10-digit phone number.";
+    if (Object.keys(nextErrors).length) {
+      setErrors(nextErrors);
+      return;
+    }
     setTapped(true);
-    setNameStored(name.trim());
-    onStart(name.trim() || "Player");
+    const profile = { name: name.trim(), email: email.trim(), phone: normalizePhone(phone.trim()) };
+    setStored(profile);
+    onStart(profile);
   };
 
   return (
@@ -87,28 +137,38 @@ export default function LandingScreen({ onStart }) {
         ))}
       </div>
 
-      {/* name */}
+      {/* player details */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.75 }}
-        className="w-full max-w-md mt-8"
+        className="w-full max-w-md mt-8 flex flex-col gap-4"
       >
-        <label className="text-[12px] font-extrabold mb-1.5 block" style={{ color: COLORS.ink }}>
-          What's your name?
-        </label>
-        <input
+        <Field
+          label="What's your name?"
           value={name}
-          onChange={(e) => setName(e.target.value)}
-          maxLength={24}
+          onChange={(e) => { setName(e.target.value); if (errors.name) setErrors((p) => ({ ...p, name: "" })); }}
+          error={errors.name}
           placeholder="Enter your name…"
-          className="w-full rounded-2xl border-2 px-4 py-3 text-[15px] font-bold outline-none focus:ring-4"
-          style={{
-            borderColor: "#DCEBFF",
-            background: COLORS.card,
-            color: COLORS.ink,
-            boxShadow: "0 4px 14px rgba(45,156,255,0.08)",
-          }}
+          maxLength={24}
+        />
+        <Field
+          label="Email address"
+          value={email}
+          onChange={(e) => { setEmail(e.target.value); if (errors.email) setErrors((p) => ({ ...p, email: "" })); }}
+          error={errors.email}
+          placeholder="you@example.com"
+          type="email"
+          maxLength={80}
+        />
+        <Field
+          label="Phone number (10 digits)"
+          value={phone}
+          onChange={(e) => { setPhone(e.target.value); if (errors.phone) setErrors((p) => ({ ...p, phone: "" })); }}
+          error={errors.phone}
+          placeholder="98765 43210"
+          type="tel"
+          maxLength={14}
         />
       </motion.div>
 

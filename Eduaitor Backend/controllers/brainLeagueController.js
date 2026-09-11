@@ -151,12 +151,22 @@ export const getConfig = async (_req, res) => {
 
 export const submitAttempt = async (req, res) => {
   try {
-    const { name, score, badgeName, topType, durationMs, results, channel } = req.body || {};
+    const { name, email, phone, score, badgeName, topType, durationMs, results, channel } = req.body || {};
     if (!name) return res.status(400).json({ message: "Name is required" });
     if (typeof score !== "number" || score < 0 || score > 100) {
       return res.status(400).json({ message: "Invalid score" });
     }
     const safeName = cleanStr(String(name), 30);
+
+    const safeEmail = email != null ? cleanStr(String(email), 120) : "";
+    if (!safeEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(safeEmail)) {
+      return res.status(400).json({ message: "Valid email is required" });
+    }
+    const safePhone = phone != null ? cleanStr(String(phone), 16) : "";
+    const phoneDigits = safePhone.replace(/^\+?91/, "").replace(/\D/g, "");
+    if (!safePhone || phoneDigits.length !== 10) {
+      return res.status(400).json({ message: "Valid 10-digit phone is required" });
+    }
     const safeResults = Array.isArray(results)
       ? results
           .filter((r) => r && typeof r.category === "string" && typeof r.points === "number")
@@ -165,6 +175,8 @@ export const submitAttempt = async (req, res) => {
 
     await BrainAttempt.create({
       name: safeName,
+      email: safeEmail,
+      phone: safePhone,
       score,
       badgeName: badgeName != null ? String(badgeName) : "",
       topType: topType != null ? String(topType) : "",
@@ -313,14 +325,25 @@ export const listAttempts = async (req, res) => {
     const page = Math.max(1, Number(req.query.page) || 1);
     const limit = Math.min(200, Math.max(1, Number(req.query.limit) || 50));
     const skip = (page - 1) * limit;
+    const q = (req.query.q || "").trim();
+
+    const filter = q
+      ? {
+          $or: [
+            { name: { $regex: q, $options: "i" } },
+            { email: { $regex: q, $options: "i" } },
+            { phone: { $regex: q, $options: "i" } },
+          ],
+        }
+      : {};
 
     const [items, total] = await Promise.all([
-      BrainAttempt.find({})
+      BrainAttempt.find(filter)
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
         .lean(),
-      BrainAttempt.countDocuments(),
+      BrainAttempt.countDocuments(filter),
     ]);
 
     res.json({

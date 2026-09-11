@@ -8,6 +8,19 @@ const brainAttemptSchema = new mongoose.Schema(
       required: [true, "Player name is required"],
       maxlength: [30, "Name cannot exceed 30 characters"],
     },
+    email: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      required: [true, "Email is required"],
+      maxlength: [120, "Email cannot exceed 120 characters"],
+    },
+    phone: {
+      type: String,
+      trim: true,
+      required: [true, "Phone is required"],
+      maxlength: [16, "Phone cannot exceed 16 characters"],
+    },
     score: {
       type: Number,
       required: true,
@@ -45,5 +58,7 @@ const brainAttemptSchema = new mongoose.Schema(
 );
 
 brainAttemptSchema.index({ createdAt: -1 });
+brainAttemptSchema.index({ email: 1 });
+brainAttemptSchema.index({ phone: 1 });
 
 export default mongoose.model("BrainAttempt", brainAttemptSchema);

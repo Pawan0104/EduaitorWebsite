@@ -48,6 +48,8 @@ export const submitResult = async (session) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name: session.name,
+        email: session.email || "",
+        phone: session.phone || "",
         score: session.score,
         badgeName: badge?.name ?? "",
         topType: session.type?.id ?? "",
