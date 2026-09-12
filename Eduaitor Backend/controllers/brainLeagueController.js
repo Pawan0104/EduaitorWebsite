@@ -156,6 +156,9 @@ export const sendOtp = async (req, res) => {
     let result;
     try {
       result = await sendWhatsAppOtp({ phone, code, templateName });
+      if (result.sent && result.wamid) {
+        await BrainOtp.updateOne({ phone }, { $set: { wamid: result.wamid } });
+      }
     } catch (err) {
       await BrainOtp.deleteOne({ phone });
       console.error("sendWhatsAppOtp delivery error:", err.message);

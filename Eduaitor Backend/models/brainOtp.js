@@ -16,6 +16,19 @@ const brainOtpSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    wamid: {
+      type: String,
+      index: true,
+    },
+    deliveryStatus: {
+      type: String,
+    },
+    deliveredAt: {
+      type: Date,
+    },
+    deliveryError: {
+      type: String,
+    },
     expiresAt: {
       type: Date,
       required: true,

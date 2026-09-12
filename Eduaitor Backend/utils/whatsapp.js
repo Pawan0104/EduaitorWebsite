@@ -45,5 +45,6 @@ export async function sendWhatsAppOtp({ phone, code, templateName }) {
     throw new Error(`WhatsApp API HTTP ${res.status}: ${text}`);
   }
 
-  return { sent: true };
+  const body = await res.json().catch(() => ({}));
+  return { sent: true, wamid: body?.messages?.[0]?.id };
 }
