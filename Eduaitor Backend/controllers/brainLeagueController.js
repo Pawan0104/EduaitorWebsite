@@ -267,7 +267,7 @@ export const getLandingStats = async (_req, res) => {
         $group: {
           _id: null,
           totalAttempts: { $sum: 1 },
-          players: { $addToSet: { $toLower: { $ifNull: ["$phone", { $ifNull: ["$email", "$name"] }] } } },
+          players: { $addToSet: { $toLower: { $ifNull: ["$email", { $ifNull: ["$phone", "$name"] }] } } },
           bestScore: { $max: "$score" },
           avgDurationMs: { $avg: "$durationMs" },
           avgScore: { $avg: "$score" },
