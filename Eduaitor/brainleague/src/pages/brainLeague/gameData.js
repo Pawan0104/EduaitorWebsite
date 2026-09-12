@@ -1,6 +1,6 @@
 import { COLORS } from "./theme";
 
-/** Challenge definitions (extensible — weekly packs plug in here later). */
+/** Challenge catalog (8 brain games). Each run draws a random 5 from this pool. */
 export const CHALLENGES = [
   {
     key: "observation",
@@ -42,11 +42,47 @@ export const CHALLENGES = [
     timeLimit: 10,
     tagline: "Fastest brain wins.",
   },
+  {
+    key: "quickmath",
+    title: "Quick Math",
+    icon: "➗",
+    short: "Crunch the numbers",
+    timeLimit: 15,
+    tagline: "Fast heads do fast sums.",
+  },
+  {
+    key: "oddone",
+    title: "Odd One Out",
+    icon: "🕵️",
+    short: "Spot the imposter",
+    timeLimit: 12,
+    tagline: "One of these is NOT like the others.",
+  },
+  {
+    key: "pairs",
+    title: "Spot the Pair",
+    icon: "🔍",
+    short: "Find the twins",
+    timeLimit: 12,
+    tagline: "Two cards are identical. Find them both.",
+  },
 ];
 
-export const TOTAL_CHALLENGES = CHALLENGES.length;
+/** Rounds per run — a random 5 picked from the CHALLENGES pool. */
+export const TOTAL_CHALLENGES = 5;
 export const MAX_SCORE = 100;
 export const PER_CHALLENGE = MAX_SCORE / TOTAL_CHALLENGES; // 20
+
+/* ── Bonus system (score = base 0-100 + bonus) ────────────────────────────── */
+export const MAX_LIVES = 3;
+export const COMBO_BONUS_AT = 3; // combo of 3+ starts paying out
+export const COMBO_BONUS = 4; // per correct while on fire
+export const PERFECT_BONUS = 10; // all rounds correct
+export const LIVES_BONUS_PER = 2; // per heart left at the end
+export const BOSS_POINT = 2; // per boss hit
+export const BOSS_HIT_CAP = 10; // 2 × 10 = max +20
+export const BOSS_DURATION = 20; // seconds
+export const MAX_TOTAL_SCORE = 200;
 
 export const BRAIN_TYPES = {
   eagle: {
@@ -85,6 +121,9 @@ export const STRENGTH_LABELS = {
   logic: "Logical Thinker",
   pattern: "Pattern Hunter",
   speed: "Lightning Reflexes",
+  quickmath: "Number Wizard",
+  oddone: "Spot-the-Difference Eye",
+  pairs: "Twin Finder",
 };
 
 export const FALLBACK_STRENGTHS = ["Never Gives Up", "Born Competitor"];

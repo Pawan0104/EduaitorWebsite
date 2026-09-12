@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { COLORS } from "../theme";
-import { CHALLENGES } from "../gameData";
+import { MAX_LIVES, COMBO_BONUS_AT } from "../gameData";
 import { scoreChallenge } from "../scoring";
 import { buildQuestion, ordinal } from "../questions";
 import ProgressBar from "../components/ProgressBar";
@@ -10,8 +10,7 @@ import TrianglePuzzle from "../components/TrianglePuzzle";
 import NumberGrid from "../components/NumberGrid";
 import CountEmojiGrid from "../components/CountEmojiGrid";
 
-const MEMORY_SHOW_MS = 3000;
-
+/** Sequence row of number/letter tiles with a trailing blank. */
 function SequenceRow({ items, wide }) {
   return (
     <div className="flex items-end gap-2.5 flex-wrap justify-center px-4">
@@ -39,7 +38,99 @@ function SequenceRow({ items, wide }) {
   );
 }
 
-/** The 5 challenge bodies, each driven by a randomly drawn bank question. */
+/** Spot-the-pair: tap two identical cards (mismatches just reset). */
+function PairGrid({ question, answered, onAnswer }) {
+  const [first, setFirst] = useState(null);
+  const [wrong, setWrong] = useState(false);
+
+  const tap = (i) => {
+    if (answered) return;
+    if (first === null) {
+      setFirst(i);
+      return;
+    }
+    if (first === i) {
+      setFirst(null);
+      return;
+    }
+    if (question.cards[i] === question.cards[first]) {
+      onAnswer(true);
+    } else {
+      setWrong(true);
+      setFirst(null);
+      setTimeout(() => setWrong(false), 350);
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center gap-5">
+      <p className="text-[17px] font-extrabold text-center px-4" style={{ color: COLORS.ink }}>
+        Tap the two identical cards!
+      </p>
+      <motion.div
+        animate={wrong ? { x: [-6, 6, -4, 4, 0] } : { x: 0 }}
+        transition={{ duration: 0.35 }}
+        className="grid grid-cols-4 gap-2.5"
+      >
+        {question.cards.map((e, i) => {
+          const active = first === i;
+          return (
+            <motion.button
+              key={i}
+              disabled={answered}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => tap(i)}
+              className="rounded-2xl flex items-center justify-center disabled:opacity-70"
+              style={{
+                width: 62,
+                height: 62,
+                background: active ? "#FFF4D6" : COLORS.card,
+                border: `3px solid ${active ? COLORS.secondary : "#DCEBFF"}`,
+                boxShadow: "0 6px 16px rgba(45,156,255,0.1)",
+              }}
+            >
+              <span className="text-[30px]">{e}</span>
+            </motion.button>
+          );
+        })}
+      </motion.div>
+    </div>
+  );
+}
+
+/** Odd-one-out: 9 (or 12) tiles, exactly one different. */
+function OddOneGrid({ question, answered, onAnswer }) {
+  const cols = question.grid.length > 9 ? 4 : 3;
+  return (
+    <div className="flex flex-col items-center gap-5">
+      <p className="text-[17px] font-extrabold text-center px-4" style={{ color: COLORS.ink }}>
+        Tap the one that's different!
+      </p>
+      <div className="grid gap-2.5" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
+        {question.grid.map((e, i) => (
+          <motion.button
+            key={i}
+            disabled={answered}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => onAnswer(i === question.answer)}
+            className="rounded-2xl flex items-center justify-center disabled:opacity-70"
+            style={{
+              width: 58,
+              height: 58,
+              background: COLORS.card,
+              border: "3px solid #DCEBFF",
+              boxShadow: "0 6px 16px rgba(45,156,255,0.1)",
+            }}
+          >
+            <span className="text-[30px]">{e}</span>
+          </motion.button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** The brain-game bodies, each driven by a randomly drawn bank question. */
 function ChallengeBody({ question, phase, answered, onAnswer }) {
   if (!question) return null;
 
@@ -137,6 +228,32 @@ function ChallengeBody({ question, phase, answered, onAnswer }) {
         </div>
       );
 
+    case "quickmath":
+      return (
+        <div className="flex flex-col items-center gap-6">
+          <motion.div
+            initial={{ scale: 0.7, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="rounded-3xl px-10 py-6 text-[40px] font-extrabold"
+            style={{ background: COLORS.card, color: COLORS.blue, boxShadow: "0 10px 26px rgba(45,156,255,0.14)" }}
+          >
+            {question.expr} = ?
+          </motion.div>
+          <p className="text-[17px] font-extrabold" style={{ color: COLORS.ink }}>Crack it fast!</p>
+          <div className="grid grid-cols-2 gap-3 w-full max-w-[320px]">
+            {question.options.map((opt) => (
+              <OptionChip key={opt} disabled={answered} onClick={() => onAnswer(opt === question.answer)} label={opt} />
+            ))}
+          </div>
+        </div>
+      );
+
+    case "oddone":
+      return <OddOneGrid question={question} answered={answered} onAnswer={onAnswer} />;
+
+    case "pairs":
+      return <PairGrid question={question} answered={answered} onAnswer={onAnswer} />;
+
     default:
       return null;
   }
@@ -199,31 +316,41 @@ function TimerRing({ secondsLeft, total, onTimeout, active }) {
   );
 }
 
-export default function ChallengeScreen({ index, pointsSoFar, onFinish, sound }) {
-  const challenge = CHALLENGES[index];
+export default function ChallengeScreen({
+  round,
+  roundIdx,
+  roundsTotal,
+  level = 0,
+  pointsSoFar,
+  combo = 0,
+  hearts = MAX_LIVES,
+  isDouble = false,
+  onFinish,
+  sound,
+}) {
   const { play } = sound;
-  const [phase, setPhase] = useState(challenge.key === "memory" ? "show" : "play");
-  const [secondsLeft, setSecondsLeft] = useState(challenge.timeLimit);
+  const memoryShowMs = level ? 2400 : 3000;
+  const [phase, setPhase] = useState(round.key === "memory" ? "show" : "play");
+  const [secondsLeft, setSecondsLeft] = useState(round.timeLimit);
   const [answered, setAnswered] = useState(false);
   const [feedback, setFeedback] = useState(null);
   const startRef = useRef(null);
-  const timeoutRef = useRef(null);
   const finishRef = useRef(false);
 
   // Random question drawn once per play — cached so options never reshuffle.
-  const question = useMemo(() => buildQuestion(challenge.key), [challenge.key]);
+  const question = useMemo(() => buildQuestion(round.key, level), [round.key, level]);
 
   // Memory show → ask.
   useEffect(() => {
-    if (challenge.key === "memory" && phase === "show") {
-      const t = setTimeout(() => { setPhase("ask"); startRef.current = performance.now(); }, MEMORY_SHOW_MS);
+    if (round.key === "memory" && phase === "show") {
+      const t = setTimeout(() => { setPhase("ask"); startRef.current = performance.now(); }, memoryShowMs);
       return () => clearTimeout(t);
     }
-  }, [challenge.key, phase]);
+  }, [round.key, phase, memoryShowMs]);
 
   // Countdown timer for timed challenges (stopped once answered).
   useEffect(() => {
-    if (challenge.key === "speed") return;
+    if (round.key === "speed") return;
     if (answered || (phase !== "play" && phase !== "ask")) return;
     startRef.current = startRef.current ?? performance.now();
     const iv = setInterval(() => {
@@ -234,9 +361,8 @@ export default function ChallengeScreen({ index, pointsSoFar, onFinish, sound })
       });
     }, 100);
     return () => clearInterval(iv);
-  }, [challenge.key, phase, play, answered]);
+  }, [round.key, phase, play, answered]);
 
-  // Elapsed ms at answer/timeout.
   const elapsedMs = () => (startRef.current ? performance.now() - startRef.current : 0);
 
   const resolve = (correct) => {
@@ -244,35 +370,47 @@ export default function ChallengeScreen({ index, pointsSoFar, onFinish, sound })
     finishRef.current = true;
     setAnswered(true);
     const ms = Math.round(elapsedMs());
-    const raw = { key: challenge.key, correct, ms: challenge.key === "speed" ? ms : ms, timeLimitMs: challenge.timeLimit * 1000 };
+    const raw = { key: round.key, correct, ms, timeLimitMs: round.timeLimit * 1000, isDouble };
     const scored = scoreChallenge(raw);
     setFeedback(scored);
-    play(correct || challenge.key === "speed" ? "correct" : "wrong");
+    play(correct || round.key === "speed" ? "correct" : "wrong");
     if (scored.points > 0) setTimeout(() => play("coin"), 350);
 
-    timeoutRef.current = setTimeout(() => onFinish({ ...raw, ...scored }), 1500);
+    if (typeof onFinish === "function") {
+      setTimeout(() => onFinish({ ...raw, ...scored }), 1500);
+    }
   };
 
   const onTimeout = () => {
-    if (challenge.key === "speed") return; // speed never times out buttons
-    resolve(challenge.key === "memory" ? false : null);
+    if (round.key === "speed") return; // speed never times out buttons
+    resolve(round.key === "memory" ? false : null);
   };
 
-  const timedActive = challenge.key !== "speed" && !answered && (phase === "play" || phase === "ask");
+  const timedActive = round.key !== "speed" && !answered && (phase === "play" || phase === "ask");
 
   return (
     <div className="min-h-screen flex flex-col px-5 py-6"
       style={{ background: `linear-gradient(180deg, #F5FAFF 0%, #EAF4FF 100%)` }}
     >
-      <GameChrome index={index} pointsSoFar={pointsSoFar} sound={sound} />
+      <GameChrome roundIdx={roundIdx} roundsTotal={roundsTotal} pointsSoFar={pointsSoFar} hearts={hearts} combo={combo} sound={sound} />
 
       <div className="flex items-center justify-between mt-4 mb-3">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl">{challenge.icon}</span>
-          <h2 className="text-[19px] font-extrabold" style={{ color: COLORS.ink }}>{challenge.title} Challenge</h2>
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-2xl">{round.icon}</span>
+          <h2 className="text-[19px] font-extrabold" style={{ color: COLORS.ink }}>{round.title} Challenge</h2>
+          {isDouble && (
+            <motion.span
+              animate={{ scale: [1, 1.12, 1] }}
+              transition={{ repeat: Infinity, duration: 1.1 }}
+              className="text-[11px] font-extrabold px-2 py-1 rounded-full text-white"
+              style={{ background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})` }}
+            >
+              ⚡ DOUBLE POINTS
+            </motion.span>
+          )}
         </div>
-        {challenge.key !== "speed" && (
-          <TimerRing secondsLeft={secondsLeft} total={challenge.timeLimit} active={timedActive} onTimeout={onTimeout} />
+        {round.key !== "speed" && (
+          <TimerRing secondsLeft={secondsLeft} total={round.timeLimit} active={timedActive} onTimeout={onTimeout} />
         )}
       </div>
 
@@ -302,6 +440,16 @@ export default function ChallengeScreen({ index, pointsSoFar, onFinish, sound })
                 {feedback.points > 0 ? "+" : "±"}
                 {feedback.points} points
               </motion.p>
+              {feedback.points > 0 && isDouble && (
+                <p className="text-[13px] font-extrabold mt-1" style={{ color: COLORS.secondary }}>
+                  ⚡ DOUBLE! +{feedback.points} bonus
+                </p>
+              )}
+              {feedback.points > 0 && combo + 1 >= COMBO_BONUS_AT && (
+                <p className="text-[13px] font-extrabold mt-1" style={{ color: COLORS.danger }}>
+                  🔥 COMBO x{combo + 1}!
+                </p>
+              )}
             </motion.div>
           </motion.div>
         )}
@@ -310,15 +458,37 @@ export default function ChallengeScreen({ index, pointsSoFar, onFinish, sound })
   );
 }
 
-function GameChrome({ index, pointsSoFar, sound }) {
+function GameChrome({ roundIdx, roundsTotal, pointsSoFar, hearts, combo, sound }) {
   const { muted, toggle } = sound;
   return (
     <div className="w-full flex flex-col gap-2">
       <div className="flex items-center gap-3">
         <span className="text-2xl">🧠</span>
         <div className="flex-1">
-          <ProgressBar value={(index / CHALLENGES.length) * 100} level={index + 1} total={CHALLENGES.length} />
+          <ProgressBar value={(roundIdx / roundsTotal) * 100} level={roundIdx + 1} total={roundsTotal} />
         </div>
+        <div className="flex items-center gap-1" aria-label={`${hearts} lives left`}>
+          {Array.from({ length: MAX_LIVES }).map((_, i) => (
+            <motion.span
+              key={i}
+              animate={{ scale: i < hearts ? 1 : 0.8, opacity: i < hearts ? 1 : 0.3 }}
+              className="text-[15px]"
+            >
+              {i < hearts ? "❤️" : "🖤"}
+            </motion.span>
+          ))}
+        </div>
+        {combo >= 2 && (
+          <motion.div
+            key={combo}
+            initial={{ scale: 1.5 }}
+            animate={{ scale: 1 }}
+            className="rounded-full px-2.5 py-1 text-[12px] font-extrabold"
+            style={{ background: "#FFE4E1", color: COLORS.danger }}
+          >
+            🔥 {combo}
+          </motion.div>
+        )}
         <motion.div key={pointsSoFar} initial={{ scale: 1.4 }} animate={{ scale: 1 }}
           className="rounded-full px-3 py-1 text-[12px] font-extrabold flex items-center gap-1"
           style={{ background: "#FFF4D6", color: COLORS.secondary }}>

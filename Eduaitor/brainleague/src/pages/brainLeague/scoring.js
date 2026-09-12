@@ -36,7 +36,7 @@ export const badgeFor = (score) => {
 };
 
 /**
- * Pick a brain type from the per-category scores (0–20 each of the 5).
+ * Pick a brain type from the per-category scores (0–20 each).
  * Dominant category wins; ties prefer the "strategist" archetypes.
  */
 export const brainTypeFor = (catScores) => {
@@ -46,18 +46,18 @@ export const brainTypeFor = (catScores) => {
 
   const pick = (list) => {
     const key = list[0];
-    if (key === "observation") return BRAIN_TYPES.eagle;
+    if (key === "observation" || key === "oddone") return BRAIN_TYPES.eagle;
     if (key === "pattern") return BRAIN_TYPES.eagle;
-    if (key === "memory") return BRAIN_TYPES.owl;
+    if (key === "memory" || key === "pairs") return BRAIN_TYPES.owl;
     if (key === "speed") return BRAIN_TYPES.fox;
-    if (key === "logic") return BRAIN_TYPES.wolf;
+    if (key === "logic" || key === "quickmath") return BRAIN_TYPES.wolf;
     return BRAIN_TYPES.wolf;
   };
 
   // Balanced brain → strategist.
   if (leaders.length >= 3) return BRAIN_TYPES.wolf;
   // Tie between logic and another powerhouse → wolf.
-  if (leaders.includes("logic") && leaders.length >= 2) return BRAIN_TYPES.wolf;
+  if (leaders.some((k) => k === "logic" || k === "quickmath") && leaders.length >= 2) return BRAIN_TYPES.wolf;
   // Dominant speed wins outright.
   if (leaders.includes("speed") && max >= 10) return BRAIN_TYPES.fox;
   // Otherwise go with the leader(s).

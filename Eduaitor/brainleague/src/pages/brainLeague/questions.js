@@ -142,6 +142,53 @@ const SPEED_BANK = [
   { target: 6, size: 5 }, { target: 0, size: 5 },
 ].map((q) => ({ kind: "speed", ...q }));
 
+// ── QUICK MATH ───────────────────────────────────────────────────────────────
+const OPS = ["+", "−", "×"];
+
+function quickMathQuestion(level = 0) {
+  const op = pick(OPS);
+  let a, b, answer;
+  if (op === "×") {
+    a = 2 + Math.floor(Math.random() * (level ? 12 : 8));
+    b = 2 + Math.floor(Math.random() * (level ? 9 : 6));
+    answer = a * b;
+  } else {
+    a = 1 + Math.floor(Math.random() * (level ? 40 : 20));
+    b = 1 + Math.floor(Math.random() * (level ? a : 12));
+    answer = op === "+" ? a + b : a - b;
+  }
+  return { kind: "quickmath", expr: `${a} ${op} ${b}`, answer, options: mathOptions(answer) };
+}
+
+function mathOptions(answer) {
+  const cand = [answer, answer + 1, answer - 1, answer + 5, answer - 5, answer + 2];
+  const uniq = [...new Set(cand)].filter((x) => x >= 0);
+  while (uniq.length < 4) uniq.push(answer + uniq.length);
+  return shuffle(uniq).slice(0, 4);
+}
+
+// ── ODD ONE OUT ──────────────────────────────────────────────────────────────
+const ODD_POOL = ["🍕", "🌈", "🚀", "🦋", "⚽", "🎈", "🍓", "🐢", "🎲", "🌻",
+  "🍩", "🦊", "🎸", "⭐", "🍎", "🐧", "⛵", "🧸", "🍉", "🐱",
+  "🚲", "📚", "🌙", "🎧", "🐳", "🍦", "🦄", "🌵", "🎁", "🍒"];
+
+function oddOneQuestion(level = 0) {
+  const X = pick(ODD_POOL);
+  const Y = pick(ODD_POOL.filter((e) => e !== X));
+  const size = level ? 12 : 9;
+  const grid = Array(size).fill(X);
+  grid[Math.floor(Math.random() * size)] = Y;
+  return { kind: "oddone", grid, target: Y, answer: grid.indexOf(Y) };
+}
+
+// ── SPOT THE PAIR ────────────────────────────────────────────────────────────
+function pairQuestion() {
+  const dup = pick(ODD_POOL);
+  const others = shuffle(ODD_POOL.filter((e) => e !== dup)).slice(0, 6);
+  const cards = shuffle([dup, dup, ...others]); // 8 cards, exactly one identical pair
+  return { kind: "pairs", cards, pairValue: dup, answer: dup };
+}
+
 /** Bundled default bank (same 100 questions, keyed by category). */
 export const STATIC_BANK = {
   observation: [...OBSERVATION_TRIANGLES, ...OBSERVATION_COUNTS],
@@ -149,6 +196,9 @@ export const STATIC_BANK = {
   logic: LOGIC_BANK,
   pattern: PATTERN_BANK,
   speed: SPEED_BANK,
+  quickmath: [null], // generated on the fly
+  oddone: [null],
+  pairs: [null],
 };
 
 /** Admin-managed bank installed at runtime (setRemoteBank). */
@@ -170,26 +220,33 @@ const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 /**
  * Builds one fully-resolved random question for a category from the active
  * bank (remote or bundled). The result is stable per play (memoized) so
- * options never reshuffle.
+ * options never reshuffle. `level` 1 = adaptive harder variant for hot runs.
  */
-export function buildQuestion(key) {
+export function buildQuestion(key, level = 0) {
+  // Fully generated games (no static bank needed).
+  if (key === "quickmath") return { key, ...quickMathQuestion(level) };
+  if (key === "oddone") return { key, ...oddOneQuestion(level) };
+  if (key === "pairs") return { key, ...pairQuestion() };
+
   const item = pick(bankFor(key));
   if (!item) return null;
 
   switch (item.kind) {
     case "triangles": {
-      const answer = countTriangles(item.n);
-      return { key, kind: "triangles", n: item.n, answer, options: numOptions(answer) };
+      const n = level ? item.n + 1 : item.n;
+      const answer = countTriangles(n);
+      return { key, kind: "triangles", n, answer, options: numOptions(answer) };
     }
 
     case "count": {
+      const size = level ? 7 : item.size;
       return {
         key,
         kind: "count",
         target: item.target,
         count: item.count,
         decoys: item.decoys,
-        size: item.size,
+        size,
         answer: item.count,
         options: numOptions(item.count),
       };
@@ -206,16 +263,21 @@ export function buildQuestion(key) {
 
     case "logic":
     case "pattern": {
+      const source = bankFor(key);
+      const hardPool = level ? source.filter((q) => q.seq && q.seq.length >= 5) : source;
+      const chosen = level && hardPool.length ? pick(hardPool) : item;
       return {
         key,
-        seq: item.seq,
-        answer: item.answer,
-        options: shuffle([item.answer, ...item.traps]),
+        seq: chosen.seq,
+        answer: chosen.answer,
+        options: shuffle([chosen.answer, ...chosen.traps]),
       };
     }
 
     case "speed": {
-      return { key, target: item.target, size: item.size };
+      const target = level ? 1 + Math.floor(Math.random() * 9) : item.target;
+      const size = Math.max(4, item.size - (level ? 1 : 0));
+      return { key, target, size };
     }
 
     default:
