@@ -300,10 +300,12 @@ export const getLandingStats = async (_req, res) => {
 
 export const submitAttempt = async (req, res) => {
   try {
-    const { name, email, phone, verification, score, badgeName, topType, durationMs, results, channel } =
-      req.body || {};
+    const {
+      name, email, phone, verification, score, baseScore, bonusPoints, livesLeft,
+      perfect, maxCombo, bossHits, badgeName, topType, durationMs, results, channel,
+    } = req.body || {};
     if (!name) return res.status(400).json({ message: "Name is required" });
-    if (typeof score !== "number" || score < 0 || score > 100) {
+    if (typeof score !== "number" || score < 0 || score > 200) {
       return res.status(400).json({ message: "Invalid score" });
     }
     const safeName = cleanStr(String(name), 30);
@@ -346,7 +348,13 @@ export const submitAttempt = async (req, res) => {
         $set: {
           name: safeName,
           email: safeEmail,
-          score,
+          score: Math.min(200, score),
+          baseScore: typeof baseScore === "number" ? baseScore : score,
+          bonusPoints: typeof bonusPoints === "number" ? bonusPoints : 0,
+          livesLeft: typeof livesLeft === "number" ? livesLeft : 0,
+          perfect: Boolean(perfect),
+          maxCombo: typeof maxCombo === "number" ? maxCombo : 0,
+          bossHits: typeof bossHits === "number" ? bossHits : 0,
           badgeName: badgeName != null ? String(badgeName) : "",
           topType: topType != null ? String(topType) : "",
           durationMs: typeof durationMs === "number" ? durationMs : 0,
@@ -826,7 +834,7 @@ export const getStatsTrend = async (req, res) => {
         bestScore: p.bestScore,
       })),
       scoreBands: scoreBands.map((b) => ({
-        label: b._id === "other" ? "other" : `${b._id}-${(b._id || 0) + 19}`,
+        label: b._id === "other" ? "100+" : `${b._id}-${(b._id || 0) + 19}`,
         count: b.count,
       })),
     });

@@ -25,7 +25,31 @@ const brainAttemptSchema = new mongoose.Schema(
       type: Number,
       required: true,
       min: 0,
-      max: 100,
+      max: 200, // base 100 + bonus (combos, doubles, boss, perfect, lives)
+    },
+    baseScore: {
+      type: Number,
+      default: 0,
+    },
+    bonusPoints: {
+      type: Number,
+      default: 0,
+    },
+    livesLeft: {
+      type: Number,
+      default: 0,
+    },
+    perfect: {
+      type: Boolean,
+      default: false,
+    },
+    maxCombo: {
+      type: Number,
+      default: 0,
+    },
+    bossHits: {
+      type: Number,
+      default: 0,
     },
     badgeName: {
       type: String,
