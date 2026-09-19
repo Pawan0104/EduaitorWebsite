@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import "./Navbar.css";
 import { NavLink, Link } from "react-router-dom";
 import { useContactPopup } from "./ContactPopup";
+import { useAuthPopup } from "./AuthPopup";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { openContactPopup } = useContactPopup();
+  const { openAuthPopup } = useAuthPopup();
 
   const closeMenu = () => setIsMenuOpen(false);
 
@@ -49,15 +51,6 @@ const Navbar = () => {
           <li onClick={closeMenu}>
             <NavLink to="/plans">Pricing</NavLink>
           </li>
-          <li className="nb-brain-mobile" onClick={closeMenu}>
-            <Link to="/brain-league" className="nb-brain-mobile__link">
-              <span aria-hidden="true">🧠</span>
-              <span>
-                <strong>Brain League</strong>
-                <small>100-question brain quiz</small>
-              </span>
-            </Link>
-          </li>
           <li>
             <button
               type="button"
@@ -68,6 +61,15 @@ const Navbar = () => {
               }}
             >
               Contact
+            </button>
+          </li>
+          <li className="nb-mlogin-item" onClick={closeMenu}>
+            <button
+              type="button"
+              className="nb-mlogin-link"
+              onClick={() => openAuthPopup("login")}
+            >
+              Login
             </button>
           </li>
           <li className="nb-ignitex-item" onClick={closeMenu}>
@@ -89,21 +91,16 @@ const Navbar = () => {
         </ul>
 
         <div className="nav-btn">
-          <Link to="/brain-league" onClick={closeMenu} className="nb-brain" aria-label="Brain League quiz">
-            <span className="nb-brain__cord" aria-hidden="true" />
-            <span className="nb-brain__board">
-              <span className="nb-brain__icon" aria-hidden="true">🧠</span>
-              <span className="nb-brain__text">
-                <strong>Brain League</strong>
-                <small>100-Q Brain Quiz</small>
-              </span>
-            </span>
-          </Link>
-          <NavLink to="/login" onClick={closeMenu}>
-            <button type="button" className="login-btn">
-              Login
-            </button>
-          </NavLink>
+          <button
+            type="button"
+            className="login-btn"
+            onClick={() => {
+              closeMenu();
+              openAuthPopup("login");
+            }}
+          >
+            Login
+          </button>
           <button
             type="button"
             className="demo-btn"

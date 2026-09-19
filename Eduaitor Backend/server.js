@@ -14,8 +14,6 @@ import contactLeadRoute from "./routes/contactLeadRoute.js";
 import homeFrequentIconsRoute from "./routes/homeFrequentIconsRoute.js";
 import blogPostRoute from "./routes/blogPostRoute.js";
 import blogCommentRoute from "./routes/blogCommentRoute.js";
-import brainLeagueRoute from "./routes/brainLeagueRoute.js";
-import whatsappRoute from "./routes/whatsappRoute.js";
 
 const app = express();
 app.set("trust proxy", 1);
@@ -74,12 +72,7 @@ app.use(
 );
 
 app.use(
-    express.json({
-        verify: (req, res, buf) => {
-            // Keep the raw buffer only for the WhatsApp webhook (signature checks).
-            if (req.url.startsWith("/api/whatsapp/webhook")) req.rawBody = buf;
-        },
-    })
+    express.json()
 );
 app.use(express.urlencoded({ extended: true }));
 
@@ -106,8 +99,6 @@ app.use("/api/awards", awardRoute);
 app.use("/api/home-frequent-icons", homeFrequentIconsRoute);
 app.use("/api/blog-posts", blogPostRoute);
 app.use("/api/blog-comments", blogCommentRoute);
-app.use("/api/brain-league", brainLeagueRoute);
-app.use("/api/whatsapp", whatsappRoute);
 
 /* ─── 404 ─── */
 app.use((req, res) => {
