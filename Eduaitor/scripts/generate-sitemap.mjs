@@ -1,11 +1,11 @@
-import { writeFile, mkdir } from "node:fs/promises";
+import { writeFile, mkdir, readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.join(__dirname, "..", "public");
 const SITE_ROOT = "https://eduaitor.com";
-const BLOG_API = "https://eduaitorwebsite.onrender.com/api/blog-posts";
+const BLOG_API = process.env.BLOG_API || "https://eduaitorwebsite.onrender.com/api/blog-posts";
 
 const STATIC_ROUTES = [
   { path: "/", priority: "1.0", changefreq: "daily" },
@@ -49,25 +49,45 @@ const STATIC_ROUTES = [
 ];
 
 async function fetchBlogSlugs() {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
   try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 15000);
     const res = await fetch(BLOG_API, {
       headers: { Accept: "application/json" },
       signal: controller.signal,
     });
-    clearTimeout(timer);
-    if (!res.ok) return [];
+    if (!res.ok) {
+      console.warn(`[sitemap] Blog API returned HTTP ${res.status}`);
+      return { ok: false, posts: [] };
+    }
     const data = await res.json();
     const posts = Array.isArray(data.data) ? data.data : [];
-    return posts
-      .filter((p) => p && /^[a-z0-9-]+$/i.test(String(p.slug || "")))
-      .map((p) => ({
-        path: `/blog/${p.slug}`,
-        lastmod: p.updatedAt || p.publishedAt || "",
-      }));
+    return {
+      ok: true,
+      posts: posts
+        .filter((p) => p && /^[a-z0-9-]+$/i.test(String(p.slug || "")))
+        .map((p) => ({
+          path: `/blog/${p.slug}`,
+          lastmod: p.updatedAt || p.publishedAt || "",
+        })),
+    };
   } catch (err) {
     console.warn("[sitemap] Could not fetch blog posts:", err.message);
+    return { ok: false, posts: [] };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function readExistingBlogSlugs() {
+  try {
+    const xml = await readFile(path.join(PUBLIC_DIR, "sitemap.xml"), "utf8");
+    const locs = xml.match(/<loc>[^<]*<\/loc>/g) || [];
+    return locs
+      .map((l) => l.replace(/<\/?loc>/g, ""))
+      .filter((l) => l.startsWith(`${SITE_ROOT}/blog/`))
+      .map((l) => ({ path: l.slice(SITE_ROOT.length), lastmod: "" }));
+  } catch {
     return [];
   }
 }
@@ -81,7 +101,13 @@ function escapeXml(str) {
 }
 
 async function main() {
-  const blog = await fetchBlogSlugs();
+  const { ok, posts } = await fetchBlogSlugs();
+  const blog = ok ? posts : await readExistingBlogSlugs();
+  if (!ok) {
+    console.warn(
+      `[sitemap] Blog API unavailable; reused ${blog.length} blog URLs from existing sitemap.xml`,
+    );
+  }
   const lastmod = new Date().toISOString();
 
   const urls = [
