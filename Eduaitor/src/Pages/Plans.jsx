@@ -5,6 +5,8 @@ import { useContactPopup } from "../Components/ContactPopup";
 import { getSettingsCached } from "../lib/settingsCache";
 import {
   DEFAULT_RATES,
+  PRE_LAUNCH,
+  applyPreLaunch,
   formatRate,
   ratesFromSettings,
   savingsPercent,
@@ -270,9 +272,11 @@ export default function Plans() {
       .catch(() => {});
   }, []);
 
+  const active = useMemo(() => applyPreLaunch(rates), [rates]);
+
   const savePct = savingsPercent(
-    rates.monthlyRatePerDay,
-    rates.yearlyRatePerDay
+    active.monthlyRatePerDay,
+    active.yearlyRatePerDay
   );
 
   const students = useMemo(() => {
@@ -287,8 +291,8 @@ export default function Plans() {
       return { monthlyCost: null, annualCost: null, savings: null };
     }
     const days = 30;
-    const monthlyBase = students * days * rates.monthlyRatePerDay;
-    const yearlyBase = students * days * rates.yearlyRatePerDay;
+    const monthlyBase = students * days * active.monthlyRatePerDay;
+    const yearlyBase = students * days * active.yearlyRatePerDay;
     const annualFull = monthlyBase * 12;
     const annualDiscounted = yearlyBase * 12;
 
@@ -305,7 +309,7 @@ export default function Plans() {
       annualCost: Math.round(annualFull),
       savings: 0,
     };
-  }, [students, billing, rates]);
+  }, [students, billing, active]);
 
   const pickPreset = (n) => {
     setCustom(false);
@@ -479,6 +483,12 @@ export default function Plans() {
             <article className="pp-one">
               <div className="pp-one__ribbon">MOST POPULAR</div>
               <div className="pp-one__top">
+                {active.preLaunch ? (
+                  <span className="pp-one__prelaunch">
+                    {PRE_LAUNCH.label} · ₹
+                    {formatRate(PRE_LAUNCH.ratePerDay)} per student per day
+                  </span>
+                ) : null}
                 <h3>
                   <span className="pp-one__star" aria-hidden="true">
                     {ic(Icons.star)}
@@ -495,8 +505,13 @@ export default function Plans() {
               <div className="pp-one__rates">
                 <div className="pp-one__rate">
                   <span className="pp-one__tag">BILLED MONTHLY</span>
+                  {active.preLaunch ? (
+                    <s className="pp-one__was">
+                      ₹{formatRate(rates.monthlyRatePerDay)}
+                    </s>
+                  ) : null}
                   <strong>
-                    ₹{formatRate(rates.monthlyRatePerDay)}{" "}
+                    ₹{formatRate(active.monthlyRatePerDay)}{" "}
                     <small>per day per student</small>
                   </strong>
                   <p>Billed Monthly</p>
@@ -506,8 +521,13 @@ export default function Plans() {
                     <span className="pp-one__save">{savePct}% SAVINGS</span>
                   ) : null}
                   <span className="pp-one__tag pp-one__tag--green">BILLED ANNUALLY</span>
+                  {active.preLaunch ? (
+                    <s className="pp-one__was">
+                      ₹{formatRate(rates.yearlyRatePerDay)}
+                    </s>
+                  ) : null}
                   <strong>
-                    ₹{formatRate(rates.yearlyRatePerDay)}{" "}
+                    ₹{formatRate(active.yearlyRatePerDay)}{" "}
                     <small>per day per student</small>
                   </strong>
                   <p>Billed Annually</p>
@@ -612,9 +632,9 @@ export default function Plans() {
               <div>
                 <strong>Transparent Pricing</strong>
                 <span>
-                  ₹{formatRate(rates.monthlyRatePerDay)} monthly or ₹
-                  {formatRate(rates.yearlyRatePerDay)} annually per student per
-                  day.
+                  {active.preLaunch
+                    ? `${PRE_LAUNCH.label}: ₹${formatRate(active.monthlyRatePerDay)} per student per day, for every school.`
+                    : `₹${formatRate(active.monthlyRatePerDay)} monthly or ₹${formatRate(active.yearlyRatePerDay)} annually per student per day.`}
                 </span>
               </div>
             </div>
@@ -625,9 +645,11 @@ export default function Plans() {
               <div>
                 <strong>Maximum Savings</strong>
                 <span>
-                  {savePct > 0
-                    ? `Save ${savePct}% with Annual Billing.`
-                    : "Choose Annual Billing for the best yearly rate."}
+                  {active.preLaunch
+                    ? "Same Pre-Launch Price Every Way"
+                    : savePct > 0
+                      ? `Save ${savePct}% with Annual Billing.`
+                      : "Choose Annual Billing for the best yearly rate."}
                 </span>
               </div>
             </div>
@@ -732,11 +754,13 @@ export default function Plans() {
               </div>
 
               <div className={`pp-calc__save${billing === "annual" && savings ? " is-on" : ""}`}>
-                {billing === "annual" && savings
-                  ? `You Save ${formatINR(savings)} with Annual Billing!`
-                  : savePct > 0
-                    ? `You Save ${savePct}% with Annual Billing!`
-                    : "Choose Annual Billing for the best yearly rate."}
+                {active.preLaunch
+                  ? `${PRE_LAUNCH.label} pricing applies to every school — no annual commitment needed.`
+                  : billing === "annual" && savings
+                    ? `You Save ${formatINR(savings)} with Annual Billing!`
+                    : savePct > 0
+                      ? `You Save ${savePct}% with Annual Billing!`
+                      : "Choose Annual Billing for the best yearly rate."}
               </div>
             </div>
 
@@ -756,9 +780,9 @@ export default function Plans() {
                 ))}
               </ul>
               <div className="pp-love__promise">
-                ₹{formatRate(rates.monthlyRatePerDay)} per day monthly, ₹
-                {formatRate(rates.yearlyRatePerDay)} yearly. Maximum Value.
-                That's the EduAitor Promise!
+                {active.preLaunch
+                  ? `${PRE_LAUNCH.label} — ₹${formatRate(active.monthlyRatePerDay)} per student per day for every school. That's the EduAitor Promise!`
+                  : `₹${formatRate(active.monthlyRatePerDay)} per day monthly, ₹${formatRate(active.yearlyRatePerDay)} yearly. Maximum Value. That's the EduAitor Promise!`}
               </div>
             </aside>
           </div>

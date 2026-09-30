@@ -3,6 +3,21 @@ export const DEFAULT_RATES = {
   yearlyRatePerDay: 0.75,
 };
 
+export const PRE_LAUNCH = {
+  active: true,
+  ratePerDay: 0.5,
+  label: "PRE-LAUNCH OFFER",
+};
+
+export function applyPreLaunch(rates) {
+  if (!PRE_LAUNCH.active) return { ...rates, preLaunch: false };
+  return {
+    monthlyRatePerDay: PRE_LAUNCH.ratePerDay,
+    yearlyRatePerDay: PRE_LAUNCH.ratePerDay,
+    preLaunch: true,
+  };
+}
+
 export function ratesFromSettings(settings) {
   const general = settings?.general || {};
   const monthly = Number(general.monthlyRatePerDay);
