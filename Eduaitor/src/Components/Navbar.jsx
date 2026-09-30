@@ -93,16 +93,6 @@ const Navbar = () => {
         <div className="nav-btn">
           <button
             type="button"
-            className="login-btn"
-            onClick={() => {
-              closeMenu();
-              openAuthPopup("login");
-            }}
-          >
-            Login
-          </button>
-          <button
-            type="button"
             className="demo-btn"
             onClick={() => {
               closeMenu();
