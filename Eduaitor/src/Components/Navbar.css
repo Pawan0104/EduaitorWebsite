@@ -327,25 +327,30 @@
     height: 44px;
     max-width: min(220px, 70vw);
   }
-
-  .login-btn {
-    display: none;
-  }
 }
 
 @media (max-width: 480px) {
   .navbar nav {
     padding: 0 16px;
+    gap: 10px;
+  }
+  .nb-brand {
+    flex-shrink: 1;
+    min-width: 0;
   }
   .nb-logo-img {
-    height: 44px;
-    max-width: 170px;
+    height: 42px;
+    max-width: 120px;
   }
   .nb-tagline {
-    font-size: 9px;
+    display: none;
   }
+  .nav-btn {
+    gap: 8px;
+  }
+  .login-btn,
   .demo-btn {
-    padding: 8px 12px;
+    padding: 8px 11px;
     font-size: 12px;
   }
 }
