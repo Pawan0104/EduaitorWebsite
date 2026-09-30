@@ -2,12 +2,15 @@ import React, { useState } from "react";
 import "./Navbar.css";
 import { NavLink, Link } from "react-router-dom";
 import { useContactPopup } from "./ContactPopup";
-import { useAuthPopup } from "./AuthPopup";
+
+const ERP_ADMIN_URL = (
+  import.meta.env.VITE_ADMIN_URL || "https://eduaitor.com/admin"
+).replace(/\/+$/, "");
+const ERP_LOGIN_URL = `${ERP_ADMIN_URL}/login`;
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { openContactPopup } = useContactPopup();
-  const { openAuthPopup } = useAuthPopup();
 
   const closeMenu = () => setIsMenuOpen(false);
 
@@ -63,15 +66,6 @@ const Navbar = () => {
               Contact
             </button>
           </li>
-          <li className="nb-mlogin-item" onClick={closeMenu}>
-            <button
-              type="button"
-              className="nb-mlogin-link"
-              onClick={() => openAuthPopup("login")}
-            >
-              Login
-            </button>
-          </li>
           <li className="nb-ignitex-item" onClick={closeMenu}>
             <NavLink
               to="/ignitex"
@@ -91,6 +85,9 @@ const Navbar = () => {
         </ul>
 
         <div className="nav-btn">
+          <a className="login-btn" href={ERP_LOGIN_URL}>
+            Login
+          </a>
           <button
             type="button"
             className="demo-btn"

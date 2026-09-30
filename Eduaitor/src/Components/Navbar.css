@@ -212,6 +212,12 @@
 }
 
 .login-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  white-space: nowrap;
+  line-height: 1;
   background: #fff;
   border: 1.5px solid var(--primary);
   color: var(--primary);
