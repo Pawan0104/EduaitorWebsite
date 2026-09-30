@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import "./ContactPopup.css";
 import { API_URL } from "../lib/api";
 
@@ -71,11 +71,14 @@ export function ContactPopupProvider({ children }) {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState("");
+  const [done, setDone] = useState(false);
+  const panelRef = useRef(null);
 
   const openContactPopup = useCallback((next = "contact-popup") => {
     setCopy(resolveCopy(next));
     setOpen(true);
     setStatus("");
+    setDone(false);
     setErrors({});
   }, []);
 
@@ -87,14 +90,40 @@ export function ContactPopupProvider({ children }) {
   useEffect(() => {
     if (!open) return undefined;
     const onKeyDown = (event) => {
-      if (event.key === "Escape") closeContactPopup();
+      if (event.key === "Escape") {
+        closeContactPopup();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const panel = panelRef.current;
+      if (!panel) return;
+      const focusables = panel.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusables.length) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener("keydown", onKeyDown);
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    const restoreTo = document.activeElement;
+    const focusTimer = window.setTimeout(() => {
+      const field = panelRef.current?.querySelector("input:not([disabled])");
+      if (field) field.focus();
+    }, 60);
     return () => {
       document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = previous;
+      window.clearTimeout(focusTimer);
+      if (restoreTo && typeof restoreTo.focus === "function") restoreTo.focus();
     };
   }, [open, closeContactPopup]);
 
@@ -145,6 +174,7 @@ export function ContactPopupProvider({ children }) {
       }
 
       setStatus(data.message || "Thanks! Our team will contact you shortly.");
+      setDone(true);
       setName("");
       setPhone("");
       setEmail("");
@@ -152,7 +182,8 @@ export function ContactPopupProvider({ children }) {
       window.setTimeout(() => {
         setOpen(false);
         setStatus("");
-      }, 1800);
+        setDone(false);
+      }, 2600);
     } catch (err) {
       const msg = String(err?.message || "");
       if (err?.name === "AbortError") {
@@ -181,7 +212,8 @@ export function ContactPopupProvider({ children }) {
             aria-label="Close contact form"
             onClick={closeContactPopup}
           />
-          <div className="cu-popup__panel">
+          <div className="cu-popup__panel" ref={panelRef}>
+            <span className="cu-popup__glow" aria-hidden="true" />
             <button
               type="button"
               className="cu-popup__close"
@@ -190,11 +222,39 @@ export function ContactPopupProvider({ children }) {
             >
               ×
             </button>
-            <p className="cu-popup__eyebrow">{copy.eyebrow}</p>
-            <h2 id="cu-popup-title">{copy.title}</h2>
-            <p className="cu-popup__sub">{copy.sub}</p>
 
-            <form className="cu-popup__form" onSubmit={onSubmit} noValidate>
+            {done ? (
+              <div className="cu-popup__done">
+                <span className="cu-popup__check" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" focusable="false">
+                    <path d="M4.5 12.5l5 5 10-11" />
+                  </svg>
+                </span>
+                <h2 id="cu-popup-title">Request received</h2>
+                <p className="cu-popup__doneMsg">{status}</p>
+                <p className="cu-popup__doneSub">
+                  Our team typically replies within one business day.
+                </p>
+              </div>
+            ) : (
+              <>
+                <p className="cu-popup__eyebrow">{copy.eyebrow}</p>
+                <h2 id="cu-popup-title">{copy.title}</h2>
+                <p className="cu-popup__sub">{copy.sub}</p>
+
+                <ul className="cu-popup__assure">
+                  <li>
+                    <span aria-hidden="true">✓</span> No spam, ever
+                  </li>
+                  <li>
+                    <span aria-hidden="true">✓</span> Free guidance
+                  </li>
+                  <li>
+                    <span aria-hidden="true">✓</span> Reply in 24h
+                  </li>
+                </ul>
+
+                <form className="cu-popup__form" onSubmit={onSubmit} noValidate>
               <label>
                 <span>Name *</span>
                 <input
@@ -239,20 +299,34 @@ export function ContactPopupProvider({ children }) {
                 {errors.phone && <em className="cu-popup__error">{errors.phone}</em>}
               </label>
 
-              {status && (
-                <p
-                  className={`cu-popup__status${
-                    /thanks|shortly|success/i.test(status) ? " is-ok" : " is-error"
-                  }`}
-                >
-                  {status}
-                </p>
-              )}
+                  {status && (
+                    <p
+                      className={`cu-popup__status${
+                        /thanks|shortly|success/i.test(status) ? " is-ok" : " is-error"
+                      }`}
+                    >
+                      {status}
+                    </p>
+                  )}
 
-              <button type="submit" className="cu-popup__submit" disabled={submitting}>
-                {submitting ? "Submitting…" : copy.submit}
-              </button>
-            </form>
+                  <button type="submit" className="cu-popup__submit" disabled={submitting}>
+                    {submitting ? (
+                      <>
+                        <span className="cu-popup__spin" aria-hidden="true" />
+                        Submitting…
+                      </>
+                    ) : (
+                      <>
+                        {copy.submit}
+                        <span className="cu-popup__arrow" aria-hidden="true">
+                          →
+                        </span>
+                      </>
+                    )}
+                  </button>
+                </form>
+              </>
+            )}
           </div>
         </div>
       )}
