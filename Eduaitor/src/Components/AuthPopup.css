@@ -1,0 +1,30 @@
+.au-popup__tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  background: #eef2ff;
+  border-radius: 12px;
+  padding: 5px;
+  margin: 0 0 18px;
+}
+.au-popup__tab {
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 0;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #64748b;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.au-popup__tab.is-active {
+  background: #fff;
+  color: #2563eb;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.12);
+}
+.au-popup__forgot {
+  font-size: 0.82rem;
+  color: #2563eb;
+  font-weight: 600;
+  cursor: pointer;
+}
