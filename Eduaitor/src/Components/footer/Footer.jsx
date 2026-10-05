@@ -4,7 +4,6 @@ import {
   FaStar,
   FaGraduationCap,
   FaBrain,
-  FaUsers,
   FaSchool,
   FaMobileAlt,
   FaUserGraduate,
@@ -12,10 +11,7 @@ import {
   FaFileAlt,
   FaChartBar,
   FaMagic,
-  FaInfoCircle,
-  FaFlag,
   FaBriefcase,
-  FaHandshake,
   FaCalendarAlt,
   FaHeadset,
   FaRupeeSign,
@@ -27,6 +23,8 @@ import {
   FaLinkedinIn,
   FaYoutube,
   FaInstagram,
+  FaTwitter,
+  FaClock,
   FaHeart,
   FaArrowRight,
 } from "react-icons/fa";
@@ -36,7 +34,6 @@ import { API_URL } from "../../lib/api";
 
 const productItems = [
   { label: "Features", to: "/ecosystem", icon: FaStar },
-  { label: "Mobile Apps", to: "/#ecosystem", icon: FaMobileAlt },
   {
     label: "AI Academic Assistant",
     to: "/ai-academic-assistant",
@@ -83,13 +80,11 @@ const solutionItems = [
   { label: "School LMS", to: "/school-lms", icon: FaBookOpen },
 ];
 
+// About Us / Our Mission / Our Team / Partners were removed from the column
+// and are replaced by a single "Latest Update" tile that links to /about-us.
 const companyItems = [
-  { label: "About Us", to: "/about-us", icon: FaInfoCircle },
   { label: "IgniteX", to: "/ignitex", icon: FaMagic },
-  { label: "Our Mission", to: "/our-mission", icon: FaFlag },
-  { label: "Our Team", to: "/our-team", icon: FaUsers },
   { label: "Careers", to: "/careers", icon: FaBriefcase },
-  { label: "Partners", to: "/partners", icon: FaHandshake },
 ];
 
 const legalItems = [
@@ -111,14 +106,29 @@ const defaultSettings = {
   copyright: "© 2026 EduAitor Technologies Pvt. Ltd. All rights reserved.",
 };
 
-function FooterCol({ title, items, colClass }) {
+function FooterCol({ title, items, colClass, children }) {
   return (
     <div className={colClass ? `ft-col ${colClass}` : "ft-col"}>
       <h3 className="ft-col-title">{title}</h3>
       <ul className="ft-links">
-        {items.map(({ label, to, icon: Icon }) => (
+        {items.map(({ label, to, icon: Icon, external }) => (
           <li key={label}>
-            {to.startsWith("/") && !to.includes("#") ? (
+            {external ? (
+              <a
+                href={to}
+                className="ft-link"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className="ft-link-left">
+                  <Icon className="ft-link-icon" aria-hidden />
+                  <span>{label}</span>
+                </span>
+                <span className="ft-chevron" aria-hidden>
+                  ›
+                </span>
+              </a>
+            ) : to.startsWith("/") && !to.includes("#") ? (
               <NavLink to={to} className="ft-link">
                 <span className="ft-link-left">
                   <Icon className="ft-link-icon" aria-hidden />
@@ -142,6 +152,7 @@ function FooterCol({ title, items, colClass }) {
           </li>
         ))}
       </ul>
+      {children}
     </div>
   );
 }
@@ -173,6 +184,29 @@ const Footer = () => {
   const emails = settings.emails?.filter(Boolean) || [];
   const phones = settings.phones?.filter(Boolean) || [];
 
+  // "Mobile Apps" opens the Google Play listing. Falls back to the ecosystem
+  // section when no Play URL has been configured in admin settings.
+  const playUrl = (settings.googlePlayUrl || "").trim();
+  const productLinks = [
+    {
+      label: "Mobile Apps",
+      to: playUrl || "/#ecosystem",
+      icon: FaMobileAlt,
+      external: Boolean(playUrl),
+    },
+    ...productItems,
+  ];
+
+  // Only render icons that actually have a URL, so the footer never shows a
+  // dead "#" link. YouTube was previously hardcoded to "#".
+  const socialLinks = [
+    { key: "facebook", href: settings.facebook, Icon: FaFacebookF, label: "Facebook" },
+    { key: "instagram", href: settings.instagram, Icon: FaInstagram, label: "Instagram" },
+    { key: "linkedin", href: settings.linkedin, Icon: FaLinkedinIn, label: "LinkedIn" },
+    { key: "youtube", href: settings.youtube, Icon: FaYoutube, label: "YouTube" },
+    { key: "twitter", href: settings.twitter, Icon: FaTwitter, label: "X (Twitter)" },
+  ].filter((s) => (s.href || "").trim());
+
   return (
     <footer className="footer">
       <div className="ft-top">
@@ -200,9 +234,22 @@ const Footer = () => {
             </div>
           </div>
 
-          <FooterCol title="PRODUCT" items={productItems} colClass="ft-col--product" />
+          <FooterCol title="PRODUCT" items={productLinks} colClass="ft-col--product" />
           <FooterCol title="SOLUTIONS" items={solutionItems} colClass="ft-col--solutions" />
-          <FooterCol title="COMPANY" items={companyItems} />
+          <FooterCol title="COMPANY" items={companyItems}>
+            <NavLink to="/about-us" className="ft-update-tile">
+              <span className="ft-update-tile-icon" aria-hidden>
+                <FaClock />
+              </span>
+              <span className="ft-update-tile-body">
+                <strong>Latest Update</strong>
+                <span>See what's new at EduAitor</span>
+              </span>
+              <span className="ft-chevron" aria-hidden>
+                ›
+              </span>
+            </NavLink>
+          </FooterCol>
 
           <div className="ft-cta">
             <h3 className="ft-cta-title">
@@ -229,26 +276,14 @@ const Footer = () => {
               <FaHeadset className="ft-btn-icon" aria-hidden />
               <span>Talk to Our Experts</span>
             </button>
-            {settings.showAppDownload !== false && (
+            {settings.showAppDownload !== false && playUrl && (
               <>
                 <p className="ft-app-label">Download the EduAitor App</p>
                 <div className="ft-badges">
-                  <a
-                    href={settings.googlePlayUrl || "#"}
-                    aria-label="Google Play"
-                  >
+                  <a href={playUrl} target="_blank" rel="noreferrer" aria-label="Google Play">
                     <img
                       src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
                       alt="Get it on Google Play"
-                    />
-                  </a>
-                  <a
-                    href={settings.appStoreUrl || "#"}
-                    aria-label="App Store"
-                  >
-                    <img
-                      src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg"
-                      alt="Download on the App Store"
                     />
                   </a>
                 </div>
@@ -307,18 +342,17 @@ const Footer = () => {
 
             <div className="ft-social">
               <span className="ft-social-label">Follow Us</span>
-              <a href={settings.facebook || "#"} aria-label="Facebook">
-                <FaFacebookF />
-              </a>
-              <a href={settings.linkedin || "#"} aria-label="LinkedIn">
-                <FaLinkedinIn />
-              </a>
-              <a href="#" aria-label="YouTube">
-                <FaYoutube />
-              </a>
-              <a href={settings.instagram || "#"} aria-label="Instagram">
-                <FaInstagram />
-              </a>
+              {socialLinks.map(({ key, href, Icon, label }) => (
+                <a
+                  key={key}
+                  href={href}
+                  aria-label={label}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <Icon />
+                </a>
+              ))}
             </div>
           </div>
 

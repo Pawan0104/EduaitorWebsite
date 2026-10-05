@@ -63,6 +63,7 @@ const settingSchema = new mongoose.Schema(
             linkedin: String,
             facebook: String,
             twitter: String,
+            youtube: String,
 
             showAppDownload: { type: Boolean, default: true },
             googlePlayUrl: String,

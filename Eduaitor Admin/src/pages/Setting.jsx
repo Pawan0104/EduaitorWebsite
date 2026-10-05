@@ -471,6 +471,12 @@ function GeneralPanel({ data, setData, onFile, previews }) {
             onChange={(e) => set("twitter", e.target.value)}
             placeholder="https://x.com/..."
           />
+          <Input
+            label="YouTube"
+            value={data.youtube || ""}
+            onChange={(e) => set("youtube", e.target.value)}
+            placeholder="https://youtube.com/@..."
+          />
         </div>
       </SectionCard>
 
