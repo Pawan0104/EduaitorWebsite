@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "./home-v2.css";
 import { getSettingsCached } from "../../lib/settingsCache";
 import {
   DEFAULT_RATES,
+  PRE_LAUNCH,
+  applyPreLaunch,
   formatRate,
   ratesFromSettings,
   savingsPercent,
@@ -144,14 +146,22 @@ export default function PricingOneSection() {
       .catch(() => {});
   }, []);
 
+  // Applies the same pre-launch override as the /plans page so both pages
+  // advertise one price. Previously this page read the raw settings rates and
+  // showed a different figure to /plans while PRE_LAUNCH was active.
+  const active = useMemo(() => applyPreLaunch(rates), [rates]);
+
   const savePct = savingsPercent(
-    rates.monthlyRatePerDay,
-    rates.yearlyRatePerDay
+    active.monthlyRatePerDay,
+    active.yearlyRatePerDay
   );
 
   const yearlyChecks = [
     "All features included",
     ...(savePct > 0 ? [`${savePct}% discount vs. monthly plan`] : []),
+    ...(active.preLaunch
+      ? [`${PRE_LAUNCH.label} - no annual commitment needed`]
+      : []),
     "Best value for your school",
   ];
 
@@ -210,9 +220,20 @@ export default function PricingOneSection() {
             <div className="hv-pricing__plans">
               <div className="hv-pricing__plan hv-pricing__plan--monthly">
                 <div className="hv-pricing__plan-label">MONTHLY PLAN</div>
+                {active.preLaunch ? (
+                  <span className="hv-pricing__prelaunch">
+                    {PRE_LAUNCH.label} · ₹
+                    {formatRate(PRE_LAUNCH.ratePerDay)} per student per day
+                  </span>
+                ) : null}
                 <div className="hv-pricing__plan-price">
+                  {active.preLaunch ? (
+                    <s className="hv-pricing__was">
+                      ₹{formatRate(rates.monthlyRatePerDay)}
+                    </s>
+                  ) : null}
                   <span className="hv-pricing__rupee">₹</span>{" "}
-                  {formatRate(rates.monthlyRatePerDay)}
+                  {formatRate(active.monthlyRatePerDay)}
                 </div>
                 <div className="hv-pricing__plan-unit">PER STUDENT PER DAY</div>
                 <span className="hv-pricing__plan-badge hv-pricing__plan-badge--blue">
@@ -240,14 +261,21 @@ export default function PricingOneSection() {
               <div className="hv-pricing__save-badge">
                 {savePct > 0
                   ? `SAVE ${savePct}% WITH YEARLY PLAN`
-                  : "YEARLY PLAN"}
+                  : active.preLaunch
+                    ? PRE_LAUNCH.label
+                    : "YEARLY PLAN"}
               </div>
 
               <div className="hv-pricing__plan hv-pricing__plan--yearly">
                 <div className="hv-pricing__plan-label">YEARLY PLAN</div>
                 <div className="hv-pricing__plan-price hv-pricing__plan-price--green">
+                  {active.preLaunch ? (
+                    <s className="hv-pricing__was">
+                      ₹{formatRate(rates.yearlyRatePerDay)}
+                    </s>
+                  ) : null}
                   <span className="hv-pricing__rupee">₹</span>{" "}
-                  {formatRate(rates.yearlyRatePerDay)}
+                  {formatRate(active.yearlyRatePerDay)}
                 </div>
                 <div className="hv-pricing__plan-unit">PER STUDENT PER DAY</div>
                 <span className="hv-pricing__plan-badge hv-pricing__plan-badge--green">
@@ -312,7 +340,7 @@ export default function PricingOneSection() {
           <div className="hv-pricing__impact-promise">
             One Plan. Every Feature.{" "}
             <strong>
-              ₹{formatRate(rates.monthlyRatePerDay)} Per Student Per Day.
+              ₹{formatRate(active.monthlyRatePerDay)} Per Student Per Day.
             </strong>{" "}
             That's the EduAitor Promise.
           </div>

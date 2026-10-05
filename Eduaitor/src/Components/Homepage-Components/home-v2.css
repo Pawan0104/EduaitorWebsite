@@ -848,6 +848,27 @@
   color: #16a34a;
 }
 
+/* Pre-launch offer: mirrors pp-one__prelaunch on the /plans page so the two
+   pages present the same offer. */
+.hv-pricing__prelaunch {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--primary, #2563eb);
+}
+
+/* Struck-through pre-pre-launch rate. */
+.hv-pricing__was {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+
 .hv-pricing__plan-checks {
   list-style: none;
   text-align: left;
