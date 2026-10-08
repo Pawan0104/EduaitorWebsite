@@ -32,6 +32,9 @@ import "./Footer.css";
 import { useContactPopup } from "../ContactPopup";
 import { API_URL } from "../../lib/api";
 
+const DEFAULT_PLAY_URL =
+  "https://play.google.com/store/apps/details?id=eduaitor.app";
+
 const productItems = [
   { label: "Features", to: "/ecosystem", icon: FaStar },
   {
@@ -103,6 +106,7 @@ const defaultSettings = {
   phones: ["+91 72300 60069"],
   address:
     "EduAitor Technologies Pvt. Ltd. B-28, Sector-63, Noida, Uttar Pradesh - 201301, India",
+  googlePlayUrl: DEFAULT_PLAY_URL,
   copyright: "© 2026 EduAitor Technologies Pvt. Ltd. All rights reserved.",
 };
 
@@ -186,7 +190,7 @@ const Footer = () => {
 
   // "Mobile Apps" opens the Google Play listing. Falls back to the ecosystem
   // section when no Play URL has been configured in admin settings.
-  const playUrl = (settings.googlePlayUrl || "").trim();
+  const playUrl = (settings.googlePlayUrl || DEFAULT_PLAY_URL).trim();
   const productLinks = [
     {
       label: "Mobile Apps",
