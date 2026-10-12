@@ -5,7 +5,8 @@ export const DEFAULT_RATES = {
 
 export const PRE_LAUNCH = {
   active: true,
-  ratePerDay: 0.5,
+  ratePerDay: 0.5, // monthly billing, per student per day
+  yearlyRatePerDay: 0.4, // annual billing, per student per day
   label: "PRE-LAUNCH OFFER",
 };
 
@@ -13,7 +14,8 @@ export function applyPreLaunch(rates) {
   if (!PRE_LAUNCH.active) return { ...rates, preLaunch: false };
   return {
     monthlyRatePerDay: PRE_LAUNCH.ratePerDay,
-    yearlyRatePerDay: PRE_LAUNCH.ratePerDay,
+    yearlyRatePerDay:
+      PRE_LAUNCH.yearlyRatePerDay ?? PRE_LAUNCH.ratePerDay,
     preLaunch: true,
   };
 }
