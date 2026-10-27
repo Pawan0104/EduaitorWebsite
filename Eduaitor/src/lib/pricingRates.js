@@ -3,8 +3,11 @@ export const DEFAULT_RATES = {
   yearlyRatePerDay: 0.75,
 };
 
+// Kept for reference: the pricing shown on the website must come from the
+// admin (Settings rates + Plans CMS), so this hardcoded override is disabled.
+// Flip `active` back to true only if a manual pre-launch campaign is needed.
 export const PRE_LAUNCH = {
-  active: true,
+  active: false,
   ratePerDay: 0.5, // monthly billing, per student per day
   yearlyRatePerDay: 0.4, // annual billing, per student per day
   label: "PRE-LAUNCH OFFER",

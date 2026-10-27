@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import { Icons } from "../Components/icons";
 import { useContactPopup } from "../Components/ContactPopup";
 import { getSettingsCached } from "../lib/settingsCache";
+import { API_URL } from "../lib/api";
 import {
   DEFAULT_RATES,
   PRE_LAUNCH,
@@ -26,6 +28,98 @@ const formatINR = (n) =>
       }).format(n);
 
 const PRESETS = [250, 500, 750, 1000];
+
+/* ── Plan card rendered from the admin Plans CMS (`GET /api/plans`) ── */
+const numberOrNull = (value) => {
+  const n = Number(value);
+  return Number.isFinite(n) && n >= 0 ? n : null;
+};
+
+function PlanPrice({ value }) {
+  if (value == null) return <small>Contact us</small>;
+  return (
+    <>
+      ₹{formatRate(value)} <small>per student / month</small>
+    </>
+  );
+}
+
+function DbPlanCard({ plan, onContact }) {
+  const monthly = numberOrNull(plan?.price?.monthly);
+  const yearly = numberOrNull(plan?.price?.yearly);
+  const savePct =
+    monthly != null && yearly != null ? savingsPercent(monthly, yearly) : 0;
+  const features = (plan?.features || [])
+    .map((f) => String(f || "").trim())
+    .filter(Boolean);
+
+  return (
+    <article className="pp-one">
+      {plan?.highlight ? (
+        <div className="pp-one__ribbon">MOST POPULAR</div>
+      ) : null}
+
+      <div className="pp-one__top">
+        <h3>
+          <span className="pp-one__star" aria-hidden="true">
+            {ic(Icons.star)}
+          </span>
+          {plan?.name || "Plan"}
+          <span className="pp-one__star" aria-hidden="true">
+            {ic(Icons.star)}
+          </span>
+        </h3>
+        {plan?.short ? <span>{plan.short}</span> : null}
+      </div>
+
+      <div className="pp-one__rates">
+        <div className="pp-one__rate">
+          <span className="pp-one__tag">BILLED MONTHLY</span>
+          <strong>
+            <PlanPrice value={monthly} />
+          </strong>
+          <p>Billed Monthly</p>
+        </div>
+        <div className="pp-one__rate pp-one__rate--annual">
+          {savePct > 0 ? (
+            <span className="pp-one__save">{savePct}% SAVINGS</span>
+          ) : null}
+          <span className="pp-one__tag pp-one__tag--green">
+            BILLED ANNUALLY
+          </span>
+          <strong>
+            <PlanPrice value={yearly} />
+          </strong>
+          <p>Billed Annually</p>
+        </div>
+      </div>
+
+      {features.length > 0 ? (
+        <div className="pp-one__included">
+          <strong className="pp-one__included-title">
+            Everything Included in {plan?.name || "this plan"}
+          </strong>
+          <div className="pp-one__included-grid">
+            {features.map((feature, i) => (
+              <div key={`${feature}-${i}`} className="pp-one__included-item">
+                <span aria-hidden="true">{ic(Icons.check)}</span>
+                <strong>{feature}</strong>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      <div className="pp-one__foot">
+        {plan?.short || "Everything you need to run your school."}
+      </div>
+
+      <button type="button" className="pp-one__cta" onClick={onContact}>
+        {plan?.CTA || "Request Demo"}
+      </button>
+    </article>
+  );
+}
 
 const included = [
   {
@@ -264,12 +358,37 @@ export default function Plans() {
   const [studentsInput, setStudentsInput] = useState("");
   const [billing, setBilling] = useState("monthly");
   const [rates, setRates] = useState(DEFAULT_RATES);
+  const [plans, setPlans] = useState([]);
+  const [plansLoading, setPlansLoading] = useState(true);
   const { openContactPopup } = useContactPopup();
 
   useEffect(() => {
     getSettingsCached()
       .then((data) => setRates(ratesFromSettings(data)))
       .catch(() => {});
+  }, []);
+
+  // Plans are managed in the admin (Plans CMS). The website must render those
+  // plans, not a hardcoded list, so always read them from the public API.
+  useEffect(() => {
+    let cancelled = false;
+
+    axios
+      .get(`${API_URL}/plans?active=true`)
+      .then((res) => {
+        if (cancelled) return;
+        setPlans(Array.isArray(res.data) ? res.data : []);
+      })
+      .catch(() => {
+        if (!cancelled) setPlans([]);
+      })
+      .finally(() => {
+        if (!cancelled) setPlansLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const active = useMemo(() => applyPreLaunch(rates), [rates]);
@@ -480,75 +599,112 @@ export default function Plans() {
           </div>
 
           <div className="pp-path__grid">
-            <article className="pp-one">
-              <div className="pp-one__ribbon">MOST POPULAR</div>
-              <div className="pp-one__top">
-                {active.preLaunch ? (
-                  <span className="pp-one__prelaunch">
-                    {PRE_LAUNCH.label} · ₹
-                    {formatRate(PRE_LAUNCH.ratePerDay)} per student per day
-                  </span>
-                ) : null}
-                <h3>
-                  <span className="pp-one__star" aria-hidden="true">
-                    {ic(Icons.star)}
-                  </span>
-                  EDUAITOR ONE
-                  <span className="pp-one__star" aria-hidden="true">
-                    {ic(Icons.star)}
-                  </span>
-                </h3>
-                <span>For Individual Schools</span>
-                <p>One Simple Plan. Everything Included.</p>
-                <em>One Platform. One Price. Total Peace of Mind.</em>
-              </div>
-              <div className="pp-one__rates">
-                <div className="pp-one__rate">
-                  <span className="pp-one__tag">BILLED MONTHLY</span>
+            {plansLoading ? (
+              <article className="pp-one pp-one--loading">
+                <div className="pp-one__top">
+                  <h3>
+                    <span className="pp-one__star" aria-hidden="true">
+                      {ic(Icons.star)}
+                    </span>
+                    Loading plans…
+                    <span className="pp-one__star" aria-hidden="true">
+                      {ic(Icons.star)}
+                    </span>
+                  </h3>
+                  <span>Fetching the latest plans from the admin.</span>
+                </div>
+                <div className="pp-one__included">
+                  <div className="pp-one__included-grid">
+                    {[0, 1, 2, 3].map((i) => (
+                      <div
+                        key={i}
+                        className="pp-one__included-item pp-one__skeleton"
+                      />
+                    ))}
+                  </div>
+                </div>
+              </article>
+            ) : plans.length > 0 ? (
+              plans.map((plan) => (
+                <DbPlanCard
+                  key={plan._id || plan.id || plan.name}
+                  plan={plan}
+                  onContact={() => openContactPopup("plans-request-demo")}
+                />
+              ))
+            ) : (
+              /* Fallback: keep the page usable if the API is unreachable or the
+                 admin has no active plans yet. */
+              <article className="pp-one">
+                <div className="pp-one__ribbon">MOST POPULAR</div>
+                <div className="pp-one__top">
                   {active.preLaunch ? (
-                    <s className="pp-one__was">
-                      ₹{formatRate(rates.monthlyRatePerDay)}
-                    </s>
+                    <span className="pp-one__prelaunch">
+                      {PRE_LAUNCH.label} · ₹
+                      {formatRate(PRE_LAUNCH.ratePerDay)} per student per day
+                    </span>
                   ) : null}
-                  <strong>
-                    ₹{formatRate(active.monthlyRatePerDay)}{" "}
-                    <small>per day per student</small>
-                  </strong>
-                  <p>Billed Monthly</p>
+                  <h3>
+                    <span className="pp-one__star" aria-hidden="true">
+                      {ic(Icons.star)}
+                    </span>
+                    EDUAITOR ONE
+                    <span className="pp-one__star" aria-hidden="true">
+                      {ic(Icons.star)}
+                    </span>
+                  </h3>
+                  <span>For Individual Schools</span>
+                  <p>One Simple Plan. Everything Included.</p>
+                  <em>One Platform. One Price. Total Peace of Mind.</em>
                 </div>
-                <div className="pp-one__rate pp-one__rate--annual">
-                  {savePct > 0 ? (
-                    <span className="pp-one__save">{savePct}% SAVINGS</span>
-                  ) : null}
-                  <span className="pp-one__tag pp-one__tag--green">BILLED ANNUALLY</span>
-                  {active.preLaunch ? (
-                    <s className="pp-one__was">
-                      ₹{formatRate(rates.yearlyRatePerDay)}
-                    </s>
-                  ) : null}
-                  <strong>
-                    ₹{formatRate(active.yearlyRatePerDay)}{" "}
-                    <small>per day per student</small>
-                  </strong>
-                  <p>Billed Annually</p>
+                <div className="pp-one__rates">
+                  <div className="pp-one__rate">
+                    <span className="pp-one__tag">BILLED MONTHLY</span>
+                    {active.preLaunch ? (
+                      <s className="pp-one__was">
+                        ₹{formatRate(rates.monthlyRatePerDay)}
+                      </s>
+                    ) : null}
+                    <strong>
+                      ₹{formatRate(active.monthlyRatePerDay)}{" "}
+                      <small>per day per student</small>
+                    </strong>
+                    <p>Billed Monthly</p>
+                  </div>
+                  <div className="pp-one__rate pp-one__rate--annual">
+                    {savePct > 0 ? (
+                      <span className="pp-one__save">{savePct}% SAVINGS</span>
+                    ) : null}
+                    <span className="pp-one__tag pp-one__tag--green">BILLED ANNUALLY</span>
+                    {active.preLaunch ? (
+                      <s className="pp-one__was">
+                        ₹{formatRate(rates.yearlyRatePerDay)}
+                      </s>
+                    ) : null}
+                    <strong>
+                      ₹{formatRate(active.yearlyRatePerDay)}{" "}
+                      <small>per day per student</small>
+                    </strong>
+                    <p>Billed Annually</p>
+                  </div>
                 </div>
-              </div>
-              <div className="pp-one__included">
-                <strong className="pp-one__included-title">Everything Included in One Plan</strong>
-                <div className="pp-one__included-grid">
-                  {onePlanFeatures.map((feature) => (
-                    <div key={feature.label} className="pp-one__included-item">
-                      <span aria-hidden="true">{ic(feature.icon)}</span>
-                      <strong>{feature.label}</strong>
-                    </div>
-                  ))}
+                <div className="pp-one__included">
+                  <strong className="pp-one__included-title">Everything Included in One Plan</strong>
+                  <div className="pp-one__included-grid">
+                    {onePlanFeatures.map((feature) => (
+                      <div key={feature.label} className="pp-one__included-item">
+                        <span aria-hidden="true">{ic(feature.icon)}</span>
+                        <strong>{feature.label}</strong>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-              <div className="pp-one__foot">
-                Every Feature. Every Update. Every School. No hidden costs. No feature
-                restrictions. No complicated plans.
-              </div>
-            </article>
+                <div className="pp-one__foot">
+                  Every Feature. Every Update. Every School. No hidden costs. No feature
+                  restrictions. No complicated plans.
+                </div>
+              </article>
+            )}
 
             <article className="pp-ent">
               <div className="pp-ent__head">
